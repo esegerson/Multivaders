@@ -1,0 +1,192 @@
+html, body { height: 100vh; margin: 0; padding: 0; }
+
+body {
+    background-color: black;
+    background: linear-gradient(to bottom, #000, #459);
+    background-attachment: fixed;
+    color: white;
+    font-family: sans-serif;
+}
+
+body.noscroll { overflow: hidden; }
+
+#gameTitle { margin: 20px;}
+
+#gameContainer {
+    overflow: hidden;
+    position: relative;
+    height: 100vh;
+    padding-left: 1em;
+    pointer-events: none;
+}
+
+button {
+    background-color: #333;
+    color: rgba(255, 255, 255, 0.8);
+    border-width: 3px;
+    border-radius: 11px;
+    padding: 10px;
+    font-size: 14px;
+}
+button:hover {
+    background-color: #444;
+    color: rgba(255, 255, 255, 1);
+}
+.grid {
+    display: grid;
+    grid-template-columns: repeat(13, 1fr);
+    gap: 5px;
+}
+.grid button.selected {
+    background-color: #162;
+    border-color: #040;            
+}
+
+#setName, .score, #statsContainer { 
+    color: rgba(255, 255, 255, 0.5);
+    margin: 1em;
+}
+
+#statsContainer {
+    position: absolute;
+    bottom: 0;
+    opacity: 0.3;
+    pointer-events: auto;
+}
+
+#statsContainer:hover {
+    opacity: 0.7;
+}
+
+#gameContainer.paused {
+    filter: blur(0.7em);
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+#gameContainer .background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 80vh;
+    opacity: 0.1;
+    color: black;
+    pointer-events: none;
+    z-index: -1;
+    filter: blur(6px);
+    animation: wiggle 30s infinite ease-in-out;
+}
+
+@keyframes wiggle {
+    0%   { transform: rotate(5deg); }
+    50%  { transform: rotate(-5deg); }
+    100% { transform: rotate(5deg); }
+}
+
+.vader {
+    position: absolute;
+    top: -200px; /* Start just off-screen */
+    color: rgba(255, 255, 255, 0.5);
+    font-family: monospace;
+    font-size: 5em;
+    text-align: right;
+    width: min-content;
+    line-height: 0.9em;
+    opacity: 1;
+    transition: filter 2s ease-out, opacity 8s ease-out;
+    animation: dance 2s infinite ease-in-out;
+}
+
+.vader .result {
+    border-top: 0.08em solid rgba(255, 255, 255, 0.5);
+}
+
+.vader.active {
+    color: white;
+    text-shadow: 0 0 0.3em rgba(255,255,255,1);
+}
+
+.vader.active .result {
+    border-color: white;
+}
+
+.vader.active .operator {
+    animation: wiggle 1s infinite ease-in-out;
+}
+
+.vader.correct {
+    color: #0f0;
+    opacity: 0;
+    filter: blur(2em);
+}
+
+.vader.incorrect {
+    color: #f00;
+}
+
+.vader.correct .result {
+    border-color: #0f0;
+}
+
+.vader.incorrect .result {
+    border-color: #f00;
+}
+
+.vader.dead {
+    color: black;
+    text-shadow: 0 0 0.3em purple;
+    animation: jiggle 0.1s infinite;
+}
+
+.vader.dead .result {
+    border-color: black;
+}
+
+@keyframes jiggle {
+    0%   { transform: rotate(10deg) translate(0, 0); }
+    25%  { transform: rotate(10deg) translate(-1px, 1px); }
+    50%  { transform: rotate(10deg) translate(1px, -1px); }
+    75%  { transform: rotate(10deg) translate(-1px, -1px); }
+    100% { transform: rotate(10deg) translate(1px, 1px); }
+}
+
+@keyframes dance {
+    0%   { transform: translate(0, 0);}
+    50%  { transform: translate(0, -10px); }
+    100% { transform: translate(0, 0); }
+}
+
+#paused {
+    width: 100vw;
+    height: 100vh;
+    text-align: center;
+    color: white;
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 3vw;
+    margin: 30vh 0;
+    pointer-events: none;;
+}
+
+#gameOver {
+    margin: 1em;
+}
+
+#startGame {
+    font-size: 200%;
+}
+
+ul.tips > li { line-height: 1.8em; }
+
+ul.tips > li > span { 
+    font-family: monospace; 
+    font-size: 1.3em; 
+    background-color: rgba(0,0,0,0.3);
+    border-radius: 3px;
+    padding: 0.2em;
+}

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multivaders</title>
+    <script src="game.js"></script>
+    <link rel="stylesheet" href="game.css" />
+</head>
+<body>
+    <div id="gameTitle">
+        <h1>Multivaders!</h1>
+        <p>Multivaders is a thrilling space shooter game where you defend your planet from waves of alien invaders. Solve multiplication problems to defeat the enemies!</p>
+        <p>Select what multiplication facts you'd like to work with:</p>
+        <p>Presets: 
+            <button onclick="preset(1);">Set A</button> 
+            <button onclick="preset(2)">Set B</button>
+            <button onclick="preset(3)">Set C</button>
+            <button onclick="preset(4)">Set D</button>
+            <button onclick="preset(5)">Set E</button>
+        </p>
+        <div class="grid">
+            <!-- Generate 12x12 buttons -->
+            <!-- Each button can have unique IDs or classes if needed -->
+            <script>
+                const maxFactor = 12;
+                const gridContainer = document.querySelector('.grid');
+                for (let i = 0; i <= maxFactor; i++)
+                    for (let j = 0; j <= maxFactor; j++) {
+                        const button = document.createElement('button');
+                        button.textContent = i + " \u00d7 " + j; // Display the product of i and j
+                        button.setAttribute("data-fact-a", i);
+                        button.setAttribute("data-fact-b", j);
+                        button.addEventListener("click",() => {
+                            button.classList.toggle("selected");
+                            //Select the commutative one (if not a square)
+                            const commutativeButton = document.querySelector(`button[data-fact-a="${j}"][data-fact-b="${i}"]`);
+                            if (commutativeButton && i !== j) commutativeButton.classList.toggle("selected");
+                        });
+                        gridContainer.appendChild(button);
+                    }
+            </script>
+        </div>
+        <p><button id="startGame" onclick="start();">Start Game</button></p>
+        <p>Tips:</p>
+        <ul class="tips">
+            <li>Type <span>numbers</span> to complete the problems</li>
+            <li>Press <span>Enter</span> to submit your answer</li>
+            <li>Press <span>Backspace</span> to erase</li>
+            <li>Press <span>Spacebar</span> to pause</li>
+            <li>Press <span>Escape</span> to quit</li>
+            <li>Answering incorrectly will make the problem speed up!</li>
+            <li>Game over when the problem touches the bottom of the</li>
+        </ul>
+    </div>
+    
+    <div id="gameContainer" style="display: none;">
+        <div id="setName"></div>
+        <div class="score">Score: <span id="score">0</span></div>
+        <div class="background">&#215;</div>
+        <div id="statsContainer">
+            <p id="numVaders"></p>
+            <p id="delay"></p>
+            <p id="difficulty"></p>
+            <p id="speed"></p>
+            <p id="chord"></p>
+        </div>
+    </div>
+
+    <div id="gameOver" style="display: none;">
+        <h1>Game Over</h1>
+        <p>Your score: <span id="score2"></span></p>
+        <button id="playAgain" onclick="location.reload();">Play Again</button>
+    </div>
+
+    <div id="paused" style="display: none;">Paused</div>
+    
+    <div id="templates" style="display: none;">
+        <div id="vaderTemplate" class="vader">
+            <table>
+                <tr><td class="factA" colspan="2"></td></tr>
+                <tr><td class="operator">&#215;</td><td class="factB"></td></tr>
+                <tr><td class="result" colspan="2">&nbsp;</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <!--<audio src="in_the_rain_at_dusk-145152.mp3" id="gameMusic" loop></audio>-->
+    <audio src="calm-soft-background-music-357212.mp3" id="gameMusic" loop></audio>
+</body>
+</html>
