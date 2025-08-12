@@ -49,7 +49,7 @@ function playKeyboardPress(harmonic = 0) {
         C:  [getNoteFreq("C", 4), getNoteFreq("E", 4), getNoteFreq("G", 4), getNoteFreq("C", 3)],
         G:  [getNoteFreq("G", 3), getNoteFreq("B", 3), getNoteFreq("D", 4), getNoteFreq("G", 2)],
         Am: [getNoteFreq("A", 3), getNoteFreq("C", 4), getNoteFreq("E", 4), getNoteFreq("A", 2)],
-        F:  [getNoteFreq("F", 4), getNoteFreq("A", 4), getNoteFreq("C", 5), getNoteFreq("F", 3)]
+        F:  [getNoteFreq("F", 4), getNoteFreq("A", 3), getNoteFreq("C", 4), getNoteFreq("F", 3)]
     }
     if (harmonic < 0) harmonic = 0;
     if (harmonic > toneHz.C.length - 1) harmonic = toneHz.C.length - 1;
