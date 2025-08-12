@@ -38,7 +38,6 @@ function preset(set) {
                 button.classList.add('selected');
             }
         }
-        document.getElementById("setName").textContent = "Set " + presetKey;
     }
 }
 
