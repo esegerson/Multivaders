@@ -18,19 +18,17 @@ let presets = {
 let selectedProblems = [];
 let lastVaderSpanwed = null;
 let lastId = 0;
-let difficulty = 0;
 let score = 0;
 let gameLoopInterval = null;
 let statLoopInterval = null;
-let startingVaders = 20;
+let startingVaders = 10;
 let autoSolve = false;
 let autoSolveInProgress = false;
-let musicStart = null;
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+let stats = [];
 
 function preset(set) {
     const buttons = document.querySelectorAll('.grid button');
-    buttons.forEach(button => button.classList.remove('selected'));
     const presetKey = String.fromCharCode(64 + set); // Convert 1 -> 'A', 2 -> 'B', etc.
     const selectedPreset = presets[presetKey];
     if (selectedPreset) {
@@ -42,6 +40,10 @@ function preset(set) {
         }
         document.getElementById("setName").textContent = "Set " + presetKey;
     }
+}
+
+function clearSelection() {
+    document.querySelectorAll(".grid button").forEach(b => b.classList.remove("selected"));
 }
 
 function start() {
@@ -82,11 +84,11 @@ function start() {
     spawnVader(lastId++); // Spawn the first vader
     gameLoopInterval = setInterval(gameLoop, 33); // Start the game loop ~30fps
     statLoopInterval = setInterval(updateStats, 10); // Update stats every 1/100 second
-
+    
     //Play music
-    document.getElementById("gameMusic").volume = 0.2;
-    document.getElementById("gameMusic").play();
-    musicStart = performance.now();
+    let music = document.getElementById("gameMusic");
+    music.volume = 0.2;
+    music.play();
 }
 
 function gameLoop() {
@@ -199,8 +201,8 @@ function getProblem() {
 }
 
 function createVader(id, factA, factB) {
-    var vaderTemplate = document.getElementById("vaderTemplate");
-    var vaderClone = vaderTemplate.cloneNode(true);
+    let vaderTemplate = document.getElementById("vaderTemplate");
+    let vaderClone = vaderTemplate.cloneNode(true);
     vaderClone.querySelector(".factA").textContent = factA;
     vaderClone.querySelector(".factB").textContent = factB;
     vaderClone.querySelector(".result").textContent = "\xa0"; // Non-breaking space
@@ -208,14 +210,23 @@ function createVader(id, factA, factB) {
     vaderClone.setAttribute("data-id", id);
     vaderClone.style.top = "-132px"; // Start above the viewport
     vaderClone.style.left = Math.random() * (window.innerWidth - 100) + "px"; // Random horizontal position
-    vaderClone.setAttribute("data-speed", getSpeed(difficulty));
+    vaderClone.setAttribute("data-speed", getSpeed());
     return vaderClone;
 }
 
-function getSpeed(difficulty) {
-    let rv = Math.round((Math.random() * difficulty / 2 + difficulty) * 10) / 200;
+function getSpeed(variance = 1) {
+    //Variance = 1 allows some randomness to the speed,
+    //but that's annoying when displaying a speed stat, so variance = 0 kills that
+    let difficulty = score / 3;
+    let rv = Math.round((Math.random() * variance * difficulty / 2 + difficulty) * 10) / 200;
     if (rv < 0.2) rv = 0.2; // Ensure a minimum speed
     return rv; // Speed in pixels per frame (33ms)
+}
+
+function getEstimatedLifespan() {
+    let v = getSpeed(0); //px / s
+    let h = window.innerHeight - 180; //px
+    return h / v; //s
 }
 
 function getDelay() {
@@ -254,7 +265,7 @@ function keyListener(e) {
         setDeadBackgroundStyle(1); // Set background to dead state
         gameOver();
     } else if (e.key === " ") {
-        var gameContainer = document.getElementById("gameContainer");
+        let gameContainer = document.getElementById("gameContainer");
         gameContainer.classList.toggle("paused");
         if (gameContainer.classList.contains("paused")) {
             clearInterval(gameLoopInterval);
@@ -329,8 +340,6 @@ function incrementScore() {
     score++;
     document.getElementById("score").textContent = score;
     document.getElementById("score2").textContent = score;
-
-    if (score % 5 === 0) difficulty += 0.5;
 }
 
 function tintBackground() {
@@ -349,12 +358,34 @@ function tintBackground() {
 
 function updateStats() {
     let container = document.getElementById("statsContainer");
-    container.querySelector("#numVaders").textContent = "# Vaders: " 
-        + document.querySelectorAll("#gameContainer .vader:not(.correct)").length;
-    container.querySelector("#delay").textContent = "Delay: " + (getDelay() / 1000).toFixed(1) + "s";
-    container.querySelector("#difficulty").textContent = "Difficulty: " + difficulty.toFixed(1);
-    container.querySelector("#speed").textContent = "Speed: " + (getSpeed(difficulty) * 33).toFixed(0) + "px/s";
-    container.querySelector("#chord").textContent = "Chord: " + getChord();
+
+    //Get some stats
+    stats.NumVaders = document.querySelectorAll("#gameContainer .vader:not(.correct)").length;
+    stats.Delay = (getDelay() / 1000).toFixed(1) + "s";
+    stats.Speed = (getSpeed(0) * 33).toFixed(0) + "px/s";
+    stats.Lifespan = (getEstimatedLifespan() / 33).toFixed(0) + "s";
+    stats.Chord = getChord();
+    
+    //Debug
+    //let oldVal = container.querySelector("#chord").textContent;
+    //container.querySelector("#chord").textContent = "Chord: " + getChord();
+    //if (container.querySelector("#chord").textContent != oldVal) playKeyboardPress(0);
+
+    //Display stats
+    let dl = document.createElement("dl");
+    dl.innerHTML = '';
+    for (const key in stats) {
+        const dt = document.createElement("dt");
+        dt.textContent = key;
+        const dd = document.createElement("dd");
+        dd.textContent = stats[key];
+        dl.appendChild(dt);
+        dl.appendChild(dd);
+    }
+    let oldDl = container.getElementsByTagName("dl")[0];
+    if (oldDl) oldDl.remove();
+    container.appendChild(dl);
+
 }
 
 function setDeadBackgroundStyle(o) {
@@ -362,68 +393,3 @@ function setDeadBackgroundStyle(o) {
         "linear-gradient(to bottom, rgba(0,0,0,0), rgba(255,0,0," + o + ")), linear-gradient(to bottom, #000, #459)";
 }
 
-function getChordLengthInMs() {
-    //Measured chord length is 4363.875 ms long (109.994 bpm), per audio file
-    const bpm = 109.9939847; //Beats per minute
-    const beatsPerMeasure = 4;
-    const measuresPerChord = 2;
-    const browserAdjustment = 1.0051; //Despite precice numbers, browser seems to switch chords faster than song
-    return 1000 * 60 / bpm * beatsPerMeasure * measuresPerChord * browserAdjustment;
-}
-
-function getChord() {
-    // Returns the current chord based on the elapsed time since music started.
-    // The song is 3:36.372 long and there is a gap in the pattern when the song loops (the song hangs a bit at the end).
-    const chords = ["C", "G", "Am", "F"];
-    const audioElement = document.getElementById("gameMusic");
-    const songDuration = audioElement.duration * 1000; //In ms
-    const timeIntoCurrentLoop = audioElement.currentTime * 1000;
-    const loopGap = songDuration - Math.floor(songDuration / getChordLengthInMs()) * getChordLengthInMs();
-    if (songDuration - timeIntoCurrentLoop < loopGap) return chords[0];
-    
-    const numLoops = Math.floor(performance.now() - musicStart) / (songDuration);
-    const loopDelay = numLoops * loopGap;
-    const offset = 323; // Offset to sync with music (323ms measured in file before song starts playing)
-    const elapsed = performance.now() - musicStart + loopDelay - offset;
-    const chordIndex = Math.floor(elapsed / getChordLengthInMs()) % 4;
-    return chords[chordIndex];
-}
-
-function playKeyboardPress(harmonic = 0) {
-    //Manages the tone played.
-    //Background music plays chords: C G Am F every 17.4 seconds
-    const toneHz = { 
-        C:  [261.63, 329.63, 392.00, 130.81],
-        G:  [392.00, 493.88, 587.33, 196.00],
-        Am: [220.00, 261.63, 329.63, 110.00],
-        F:  [174.61, 220.00, 261.63,  87.31]
-    };
-    if (harmonic < 0) harmonic = 0;
-    if (harmonic > toneHz.C.length - 1) harmonic = toneHz.C.length - 1;
-    let chordSymbol = getChord();
-    let chord = toneHz[chordSymbol];
-    let tone = chord[harmonic] || chord[0]; // Default to first tone if harmonic is out of bounds
-    playKeyboardPressSound(tone);
-}
-
-function playKeyboardPressSound(toneHz) {
-    const initVolume = 0.08;
-    const oscillator = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
-
-    // Setup oscillator
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(toneHz, audioCtx.currentTime);
-  
-    // Connect nodes
-    oscillator.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
-  
-    // Fade out after 1 second
-    gainNode.gain.setValueAtTime(initVolume, audioCtx.currentTime);
-    gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1);
-  
-    // Start and stop
-    oscillator.start();
-    oscillator.stop(audioCtx.currentTime + 1);
-}

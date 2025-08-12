@@ -58,6 +58,15 @@ button:hover {
     opacity: 0.7;
 }
 
+#statsContainer DL { 
+    display: grid; 
+    grid-template-columns: max-content 1fr;
+    column-gap: 1rem;
+    row-gap: 0.5rem;
+}
+
+#statsContainer DL > DD { margin: 0; }
+
 #gameContainer.paused {
     filter: blur(0.7em);
     pointer-events: none;
