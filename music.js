@@ -38,9 +38,6 @@ function getChord(adjustForBrowser = true) {
     // The song is 3:36.372 long and there is a gap in the pattern when the song loops (the song hangs a bit at the end).
     const songData = getSongData();
         
-    //Debug
-    stats.SongTimeLeft = ((songData.durationMs - songData.currentTimeMs) / 1000).toFixed(0);
-    
     return songData.currentChord();
 }
 
