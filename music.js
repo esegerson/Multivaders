@@ -152,7 +152,7 @@ function getLoudnessMultiplier(frequencyHz) {
 function playKeyboardPressSound(toneHz) {
     const oscillator = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
-    const initVolume = 0.008; //Quiet
+    const initVolume = 0.006; //Quiet
     let vol = initVolume * getLoudnessMultiplier(toneHz);
     
     // Setup oscillator

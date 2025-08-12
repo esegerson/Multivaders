@@ -16,7 +16,7 @@ let presets = {
 };
 
 let selectedProblems = [];
-let lastVaderSpanwed = null;
+let lastVaderSpawned = null;
 let lastId = 0;
 let score = 0;
 let gameLoopInterval = null;
@@ -68,7 +68,7 @@ function start() {
     score = -1;
     incrementScore(); // Start score at 0
 
-    //Span initial vaders
+    //Spawn initial vaders
     for (let i = 0; i < startingVaders; i++) {
         spawnVader(lastId++);
     }
@@ -97,8 +97,8 @@ function gameLoop() {
     let vaders = document.querySelectorAll("#gameContainer .vader");
     let incompleteVaders = Array.from(vaders).filter(v => !v.classList.contains("correct"));
 
-    //Span regular vader
-    if (now - lastVaderSpanwed > getDelay() || incompleteVaders.length === 0) {
+    //Spawn regular vader
+    if (now - lastVaderSpawned > getDelay() || incompleteVaders.length === 0) {
         spawnVader(lastId++);
     }
 
@@ -188,7 +188,7 @@ function spawnVader(id) {
     if (container.querySelectorAll(".active").length === 0)
         vader.classList.add("active");
     container.appendChild(vader);
-    lastVaderSpanwed = performance.now();
+    lastVaderSpawned = performance.now();
 }
 
 function getProblem() {
