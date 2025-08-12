@@ -10,6 +10,11 @@ On the title screen, players can select what individual problems they want to wo
 
 The player must solve the problems by typing in the correct answer. Solving a problem makes the problem vanish and the player is onto another problem. As the problems approach the bottom of the screen, the screen starts to turn red. If a problem hits the bottom of the screen, the game is over. If the player enters the wrong answer, the speed of the problem is doubled (cumulative), making it rush toward the bottom of the screen. Spacebar pauses the game. Escape ends the game. Backspace erases what was written.
 
+## Play it now!
+
+This is a browser-based game. You can play it here:
+https://esegerson.github.io/Multivaders/
+
 ## Technicals
 
 ### Music
