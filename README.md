@@ -41,10 +41,10 @@ The game is built entirely in HTML, JavaScript, and CSS.
 ## Known Bugs
 
 - Problems continue to wiggle when the game is paused and the music continues to play
-- Test on mobile
+- Does not work on mobile; no on-screen keyboard
 
 ## Assets
 
 One asset is used, a royalty-free MP3 file ["Calm Soft Background Music"](https://pixabay.com/music/upbeat-calm-soft-background-music-357212/) by [original_soundtrack](https://pixabay.com/users/original_soundtrack-50153119/), found on [Pixabay.com](https://pixabay.com). Direct download of file is [here](https://cdn.pixabay.com/download/audio/2025/06/09/audio_2feeb02bcd.mp3?filename=calm-soft-background-music-357212.mp3).
 
-All other files were hand-written by myself.
+All other files were authored by myself.
