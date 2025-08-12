@@ -87,22 +87,25 @@ function getNoteFreq(note, octave) {
  * Calculates a loudness compensation multiplier for a given frequency (Hz)
  * on a 12-semitone-per-octave musical scale, based on a lookup table derived from ISO 226:2003 principles.
  * The lookup table provides pre-determined SPL adjustments for specific musical note frequencies
- * to achieve a more balanced perceived loudness at a target phon level at 10 phon.
+ * to achieve a more balanced perceived loudness at a target phon level of 10 phon.
  *
  * @param {number} frequencyHz The input frequency in Hertz (Hz).
  * @returns {number} The loudness compensation multiplier.
  */
 function getLoudnessMultiplier(frequencyHz) {
     const loudnessCompensationTable = {
-        // Crude measurements from a graph in
-        // https://cdn.standards.iteh.ai/samples/34222/d93363dbdafa470aab734f04d091065b/ISO-226-2003.pdf
-        // Targeted 10 phon (quiet).
-        // Keys are Hz, values are dB
-        63: 49, // Quiet, needs boosting
-        125: 34,
-        250: 21,
-        500: 13, // Loud, doesn't need boosting
-        1000: 10 //Graph levels out here
+        //https://cdn.standards.iteh.ai/samples/34222/d93363dbdafa470aab734f04d091065b/ISO-226-2003.pdf
+        //Targeted 10 phon (quiet). Only need Hz from 63 (C2) to 1000 (C6).
+        //Keys are Hz, values are dB
+        63:   49.0, //Quiet, needs boosting
+        125:  33.5,
+        250:  21.5,
+        316:  18.0,
+        398:  15.5,
+        500:  13.0, //Loud, doesn't need boosting
+        630:  11.5,
+        794:  10.0, //Graph levels out here
+        1000: 10.0
     };
 
     // Extract frequencies and dB values from the table
@@ -170,4 +173,16 @@ function playKeyboardPressSound(toneHz) {
     // Start and stop
     oscillator.start();
     oscillator.stop(audioCtx.currentTime + 1);
+}
+
+function toneTest() {
+    //All tones should have the same loudness.  See loudnessCompensationTable above.
+    let i = 0;
+    for (let h = 60; h < 1000; h+=40) {
+        setTimeout(function() {
+            playKeyboardPressSound(h);
+            console.log(h.toFixed(0) + " : " + getLoudnessMultiplier(h).toFixed(3))
+        }, i * 500);
+        i++;
+    }
 }
