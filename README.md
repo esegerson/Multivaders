@@ -19,7 +19,7 @@ https://esegerson.github.io/Multivaders/
 
 ### Music
 
-A song is played while playing. Tones are played when the player types a number. There is some code to play a tone that harmonizes with the song, but it's a little off and needs work.
+A song is played while playing. Tones are synthesized when the player types a number. Code plays a tone that harmonizes with the song.
 
 ### Difficulty Progression
 
