@@ -12,7 +12,7 @@ function getSongData() {
         durationMs: a.duration * 1000, //216372.219; Audacity agrees; ~3:36
         startMs: 323, //Measured with Audacity
         lastChordMs: 209791, //Measured with Audacity
-        bpm: 109.992926, //(1 / chordLengthMs) * beatsPerMeasure * measuresPerChord * 1000
+        bpm: 109.992926, //beatsPerMeasure * measuresPerChord * 1000 * 60 / chordLengthMs
         beatsPerMeasure: 4, //"4/4" time
         measuresPerChord: 2,
         numChords: 48, //(lastChordMs - startMs) / chordLengthMs
@@ -21,30 +21,28 @@ function getSongData() {
         chordProgression: ["C", "G", "Am", "F"], //It's a "4 chord song"
         numChordProgressionLoops: 12, //numChords / chordProgression.length
         currentChord: function() {
-            const cur = this.audioElement.currentTime * 1000;
-            let ix = 0;
-            if (cur > this.startMs && cur < this.lastChordMs)
+            //Returns the current chord based on the elapsed time since music started.
+            let ix = 0; //Root song chord
+            if (this.currentTimeMs > this.startMs && this.currentTimeMs < this.lastChordMs)
                 //this.startMs is more accurate, but in practice, it's good to register the 
                 //next chord a hair early to allow time for tone to play after keypress,
                 //hence the multiplication by zero part.
-                ix = Math.floor((cur - this.startMs * 0) / this.chordLengthMs) % this.chordProgression.length;
+                ix = Math.floor((this.currentTimeMs - this.startMs * 0) / this.chordLengthMs) 
+                    % this.chordProgression.length;
             return this.chordProgression[ix];
         }
     };
 }
 
-function getChord(adjustForBrowser = true) {
-    // Returns the current chord based on the elapsed time since music started.
-    // The song is 3:36.372 long and there is a gap in the pattern when the song loops (the song hangs a bit at the end).
+function getChord() {
     const songData = getSongData();
-        
     return songData.currentChord();
 }
 
 function playKeyboardPress(harmonic = 0) {
     //Manages the tone played.
     //Background music plays chord progression {C G Am F} roughly every 17.5 seconds
-    //Tones below: first 3 are chord components, 4th is a low base note for Enter key
+    //Tones below: first 3 are chord triad, 4th is a low bass root for Enter key
     const toneHz = {
         C:  [getNoteFreq("C", 4), getNoteFreq("E", 4), getNoteFreq("G", 4), getNoteFreq("C", 3)],
         G:  [getNoteFreq("G", 3), getNoteFreq("B", 3), getNoteFreq("D", 4), getNoteFreq("G", 2)],
@@ -55,7 +53,7 @@ function playKeyboardPress(harmonic = 0) {
     if (harmonic > toneHz.C.length - 1) harmonic = toneHz.C.length - 1;
     let chordSymbol = getChord();
     let chord = toneHz[chordSymbol];
-    let tone = chord[harmonic] || chord[0]; // Default to first tone if harmonic is out of bounds
+    let tone = chord[harmonic] || chord[0]; //Default to first tone if harmonic is out of bounds
     playKeyboardPressSound(tone);
 }
 
