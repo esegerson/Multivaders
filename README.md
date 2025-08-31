@@ -30,8 +30,6 @@ The game is built entirely in HTML, JavaScript, and CSS.
 ## TODO / Wishlist
 
 - Maybe more presets on the title screen
-- Add a laser and turret to blast problems
-- More visual effects/decorations, such as clouds, or subtle "dancing" multiplication signs floating upward (instead of the one that's fixed in the middle)
 - Add a progressive saw-like difficulty ladder
 - Remove the stats in the bottom-left when fine-tuning is complete
 - Improve the inevitable game-over experience; the game-over screen is basic, and currently the problems on-screen turn black when I feel like they should continue to bombard the bottom of the screen for 5 seconds

@@ -16,7 +16,7 @@ body.noscroll { overflow: hidden; }
     overflow: hidden;
     position: relative;
     height: 100vh;
-    padding-left: 1em;
+    padding-left: 1rem;
     pointer-events: none;
 }
 
@@ -44,7 +44,7 @@ button:hover {
 
 #setName, .score, #statsContainer { 
     color: rgba(255, 255, 255, 0.5);
-    margin: 1em;
+    margin: 1rem;
 }
 
 #statsContainer {
@@ -68,7 +68,7 @@ button:hover {
 #statsContainer DL > DD { margin: 0; }
 
 #gameContainer.paused {
-    filter: blur(0.7em);
+    filter: blur(0.7rem);
     pointer-events: none;
     opacity: 0.6;
 }
@@ -90,7 +90,7 @@ button:hover {
     animation: wiggle 30s infinite ease-in-out;
 }
 
-@keyframes wiggle {
+@keyframes wiggle { /*rotate slightly left & right (for the multis)*/
     0%   { transform: rotate(5deg); }
     50%  { transform: rotate(-5deg); }
     100% { transform: rotate(5deg); }
@@ -130,7 +130,7 @@ button:hover {
 .vader.correct {
     color: #0f0;
     opacity: 0;
-    filter: blur(2em);
+    filter: blur(2rem);
 }
 
 .vader.incorrect {
@@ -147,7 +147,7 @@ button:hover {
 
 .vader.dead {
     color: black;
-    text-shadow: 0 0 0.3em purple;
+    text-shadow: 0 0 0.3rem purple;
     animation: jiggle 0.1s infinite;
 }
 
@@ -155,7 +155,7 @@ button:hover {
     border-color: black;
 }
 
-@keyframes jiggle {
+@keyframes jiggle { /*death rattle*/
     0%   { transform: rotate(10deg) translate(0, 0); }
     25%  { transform: rotate(10deg) translate(-1px, 1px); }
     50%  { transform: rotate(10deg) translate(1px, -1px); }
@@ -163,7 +163,7 @@ button:hover {
     100% { transform: rotate(10deg) translate(1px, 1px); }
 }
 
-@keyframes dance {
+@keyframes dance { /*bob up & down*/
     0%   { transform: translate(0, 0);}
     50%  { transform: translate(0, -10px); }
     100% { transform: translate(0, 0); }
@@ -183,19 +183,77 @@ button:hover {
 }
 
 #gameOver {
-    margin: 1em;
+    margin: 1rem;
 }
 
 #startGame {
     font-size: 200%;
 }
 
-ul.tips > li { line-height: 1.8em; }
+ul.tips > li { line-height: 1.8rem; }
 
 ul.tips > li > span { 
     font-family: monospace; 
-    font-size: 1.3em; 
+    font-size: 1.3rem; 
     background-color: rgba(0,0,0,0.3);
     border-radius: 3px;
-    padding: 0.2em;
+    padding: 0.2rem;
 }
+
+#gameContainer > .background2 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 15rem;
+    font-weight: bold;
+    color: black;
+    pointer-events: none;
+    z-index: -1;
+    filter: blur(6px);
+}
+
+#gameContainer > .background2 > .multi {
+    position: absolute;
+    animation: wiggle 10s infinite ease-in-out;
+}
+
+#gameContainer > .background2 > .multi:after {
+    content: "\00D7"; /*multiplication sign*/
+}
+
+#gameContainer .turret {
+    /*Visual style of turret is in SVG*/
+    position: absolute; 
+    top: calc(100vh - 50px); /*Bottom of screen*/ 
+    left: calc(50vw - 50px); /*Center of screen*/
+}
+
+#laserContainer, #laserContainer #svgLaser {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+}
+
+#laserContainer svg g line {
+    stroke:rgb(255,0,0);
+    stroke-width:4px;
+}
+
+#laserContainer svg g circle {
+    stroke-opacity: 0;
+    fill: url(#laserGrad);
+    r: 5px;
+    opacity: 1;
+    animation: fadeOut 10s forwards;
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }

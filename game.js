@@ -83,6 +83,12 @@ function start() {
     spawnVader(lastId++); // Spawn the first vader
     gameLoopInterval = setInterval(gameLoop, 33); // Start the game loop ~30fps
     statLoopInterval = setInterval(updateStats, 10); // Update stats every 1/100 second
+
+    //Pre-populate multis (decorative background elements)
+    const multiContainer = document.querySelector("#gameContainer .background2");
+    for (let i = 0; i < 20; i++) {
+        multiContainer.appendChild(createMulti(true));
+    } 
     
     //Play music
     let music = document.getElementById("gameMusic");
@@ -105,7 +111,7 @@ function gameLoop() {
     for (const vader of vaders) {
         let speed = parseFloat(vader.getAttribute("data-speed") || 1);
         let top = parseFloat(vader.style.top || "-150");
-        if (top < 50) {
+        if (top < 50 && score < 100) { //Do a fast slide-in so user doesn't have to wait
             speed = (50 - top) / 5 * speed; //Hustle to get onto the screen
             if (speed < 0.2) speed = 0.2; // Ensure a minimum speed
         }
@@ -142,7 +148,13 @@ function gameLoop() {
         let lastSolve = Math.max(
             ... Array.from(solvedVaders).map(v => parseInt(v.getAttribute("data-solved") || 0))
         );
-        if (now - lastSolve > 700 && !autoSolveInProgress) {
+        
+        //Auto-solver kicks into 2nd gear after 100 points
+        let readDelay = score < 100 ? 700 : 600;
+        let digitDelay = score < 100 ? 200 : 130;
+        let submitDelay = score < 100 ? 300 : 170;
+            
+        if (now - lastSolve > readDelay && !autoSolveInProgress) {
             autoSolveInProgress = true;
             let activeVader = document.querySelector("#gameContainer .vader.active");
             let factA = parseInt(activeVader.querySelector(".factA").textContent);
@@ -151,11 +163,17 @@ function gameLoop() {
             let delay = 0;
             for (let c of result.toString()) {
                 setTimeout(() => { sendKeyPress(c); }, delay);
-                delay += 200;
+                delay += digitDelay;
             }
-            setTimeout(() => { sendKeyPress("Enter"); autoSolveInProgress = false; }, delay += 300);
+            setTimeout(() => { sendKeyPress("Enter"); autoSolveInProgress = false; }, delay += submitDelay);
         }
     }
+
+    //Animate background
+    manageBackgroundMultis();
+
+    //Animate laser particles
+    moveLaserParticles();
 }
 
 function sendKeyPress(key) {
@@ -307,6 +325,7 @@ function keyListener(e) {
             activeVader.classList.add("correct");
             activeVader.classList.remove("active");
             activeVader.setAttribute("data-solved", performance.now());
+            zapLaser(activeVader);
             incrementScore();
             getNextActiveVader(activeVader.getAttribute("data-id"));
             playKeyboardPress(3); //3 = the bass harmonic
@@ -314,7 +333,7 @@ function keyListener(e) {
             activeVader.setAttribute("data-last-val", result.textContent);
             activeVader.classList.add("incorrect");
             let speed = parseFloat(activeVader.getAttribute("data-speed"));
-            activeVader.setAttribute("data-speed", speed * 2); // Increase speed on incorrect answer
+            activeVader.setAttribute("data-speed", speed * 3); // Increase speed on incorrect answer
         }
     }
 }
@@ -365,11 +384,6 @@ function updateStats() {
     stats.Lifespan = (getEstimatedLifespan() / 33).toFixed(0) + "s";
     stats.Chord = getChord();
     
-    //Debug
-    //let oldVal = container.querySelector("#chord").textContent;
-    //container.querySelector("#chord").textContent = "Chord: " + getChord();
-    //if (container.querySelector("#chord").textContent != oldVal) playKeyboardPress(0);
-
     //Display stats
     let dl = document.createElement("dl");
     dl.innerHTML = '';
@@ -384,7 +398,6 @@ function updateStats() {
     let oldDl = container.getElementsByTagName("dl")[0];
     if (oldDl) oldDl.remove();
     container.appendChild(dl);
-
 }
 
 function setDeadBackgroundStyle(o) {
@@ -392,3 +405,97 @@ function setDeadBackgroundStyle(o) {
         "linear-gradient(to bottom, rgba(0,0,0,0), rgba(255,0,0," + o + ")), linear-gradient(to bottom, #000, #459)";
 }
 
+function manageBackgroundMultis() {
+    //A multi is just a visual decoration, a large "×" character that floats up the screen
+    const maxNumMultis = 20 + score / 5; //When score = 100, maxNumMultis = 40
+    const multiWidth = 100;
+    const bgContainer = document.querySelector("#gameContainer .background2");
+        
+    //Spawn
+    let numMultis = bgContainer.querySelectorAll(".multi").length;
+    if (numMultis < maxNumMultis) bgContainer.appendChild(createMulti(false));
+
+    //Move up and cull
+    for (const multi of bgContainer.querySelectorAll(".multi")) {
+        let top = parseFloat(multi.style.top || "0");
+        let speed = multi.getAttribute("data-speed") || 1;
+        top -= speed;
+        multi.style.top = top + "px";
+        if (top < multiWidth * -1) multi.remove();
+    }
+}
+
+function createMulti(init) {
+    const multiWidth = 20;
+    const left = Math.round(Math.random() * (window.innerWidth - multiWidth));
+    const top = init ? Math.round(Math.random() * window.innerHeight) : window.innerHeight;
+    let multi = document.createElement("div");
+    multi.classList.add("multi");
+    multi.style.left = left + "px";
+    multi.style.top = top + "px";
+    multi.style.fontSize = (Math.random() * 5 + 10) + "rem";
+    multi.style.animationDelay = (Math.random() * -10) + "s"; //Negative delay so there's no "jump"
+    multi.style.opacity = (Math.random() * 0.2).toString();
+    multi.setAttribute("data-speed", getSpeed() * 2);
+    return multi;
+}
+
+function zapLaser(targetVader) {
+    let resultElement = targetVader.querySelector(".result");
+    let targetX = parseInt(targetVader.style.left) + targetVader.offsetWidth / 2 + 20;
+    let targetY = parseInt(targetVader.style.top) + targetVader.offsetHeight - 20;
+    let turretX = window.innerWidth / 2;
+    let turretY = window.innerHeight - 10;
+
+    //Draw
+    let g = document.getElementById("g");
+    let svgl = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    svgl.setAttribute('x1', turretX);
+    svgl.setAttribute('y1', turretY);
+    svgl.setAttribute('x2', targetX);
+    svgl.setAttribute('y2', targetY);
+    createLaserParticles(g, turretX, turretY, targetX, targetY);
+    g.append(svgl);
+
+    //Schedule line removal
+    setTimeout(() => { svgl.remove(); }, 100);
+}
+
+function createLaserParticles(g, x1, y1, x2, y2) {
+    //Create small particles along the laser path for a more dramatic effect
+    //Randomly place a particle somewhere along the line from (x1, y1) to (x2, y2)
+    let numParticles = 100;
+    for (let i = 0; i < numParticles; i++) {
+        let t = Math.random();
+        let px = x1 + t * (x2 - x1);
+        let py = y1 + t * (y2 - y1);
+        let vx = (Math.random() * 2 - 1) * 0.5;
+        let vy = (Math.random() * 2 - 1) * 0.5;
+        let particle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        particle.setAttribute("cx", px);
+        particle.setAttribute("cy", py);
+        particle.setAttribute("vx", vx);
+        particle.setAttribute("vy", vy);
+        particle.style.animationDelay = (Math.random() * -10) + "s"; //Negative delay so there's no "jump"
+
+        //Add particle
+        g.append(particle);
+
+        //Schedule particle removal
+        setTimeout(() => { particle.remove(); }, 10000);
+    }
+}
+
+function moveLaserParticles() {
+    let g = document.getElementById("g");
+    for (const particle of g.querySelectorAll("circle")) {
+        let cx = parseFloat(particle.getAttribute("cx"));
+        let cy = parseFloat(particle.getAttribute("cy"));
+        let vx = parseFloat(particle.getAttribute("vx"));
+        let vy = parseFloat(particle.getAttribute("vy"));
+        cx += vx;
+        cy += vy;
+        particle.setAttribute("cx", cx);
+        particle.setAttribute("cy", cy);
+    }
+}
