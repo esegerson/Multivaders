@@ -108,7 +108,9 @@ function gameLoop() {
     if (now - lastVaderSpawned > getDelay() || incompleteVaders.length === 0) {
         if (incompleteVaders.length === 0) {
             hitCeiling += 4;
-            score += 4;
+            //Award 4 extra points (in additon to the 1 point for solving each vader)
+            score += 3; //4th extra point awarded in incrementScore()
+            incrementScore(); 
         }
         else
             hitCeiling -= 1;
