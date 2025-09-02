@@ -26,6 +26,7 @@ let autoSolve = false;
 let autoSolveInProgress = false;
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 let stats = [];
+let showStats = false;
 
 function preset(set) {
     const buttons = document.querySelectorAll('.grid button');
@@ -335,6 +336,15 @@ function keyListener(e) {
             let speed = parseFloat(activeVader.getAttribute("data-speed"));
             activeVader.setAttribute("data-speed", speed * 3); // Increase speed on incorrect answer
         }
+    } else if (e.key === "`") {
+        //Toggle stats display
+        showStats = !showStats;
+    } else if (e.key === "ArrowLeft" || e.key === "a") {
+        //Left
+        selectDifferentVader(-1);
+    } else if (e.key === "ArrowRight" || e.key === "d") {
+        //Right
+        selectDifferentVader(1);
     }
 }
 
@@ -352,6 +362,31 @@ function getNextActiveVader() {
     }
     if (id != null) 
         vaders.filter(v => v.getAttribute("data-id") === id)[0].classList.add("active");
+}
+
+function selectDifferentVader(direction) {
+    //Direction: -1 = left of current active vader, 1 = right
+    const vaders = Array.from(document.querySelectorAll("#gameContainer .vader:not(.correct)"));
+    if (vaders.length === 0) return;
+    const activeVader = document.querySelector("#gameContainer .vader.active");
+    const vaderPos = parseInt(activeVader.style.left);
+    const eligibleVaders = vaders.filter(v => {
+        const pos = parseInt(v.style.left);
+        return direction === -1 ? pos < vaderPos : pos > vaderPos;
+    });
+    if (eligibleVaders.length === 0) return; //No eligible vaders in that direction
+    const nearestVader = eligibleVaders.reduce((prev, curr) => {
+        const prevLeft = parseInt(prev.style.left);
+        const currLeft = parseInt(curr.style.left);
+        if (direction === -1)
+            return currLeft > prevLeft ? curr : prev;
+        else
+            return currLeft < prevLeft ? curr : prev;
+    });
+    if (nearestVader) {
+        activeVader.classList.remove("active");
+        nearestVader.classList.add("active");
+    }
 }
 
 function incrementScore() {
@@ -376,6 +411,11 @@ function tintBackground() {
 
 function updateStats() {
     let container = document.getElementById("statsContainer");
+    if (!showStats) {
+        container.style.display = "none";
+        return;
+    }
+    container.style.display = "block";
 
     //Get some stats
     stats.NumVaders = document.querySelectorAll("#gameContainer .vader:not(.correct)").length;
