@@ -29,9 +29,9 @@ The game is built entirely in HTML, JavaScript, and CSS.
 
 ## TODO / Wishlist
 
+- Clearing the screen awards extra points but it needs a visual/audio indicator
 - Maybe more presets on the title screen
 - Add a progressive saw-like difficulty ladder
-- Remove the stats in the bottom-left when fine-tuning is complete
 - Improve the inevitable game-over experience; the game-over screen is basic, and currently the problems on-screen turn black when I feel like they should continue to bombard the bottom of the screen for 5 seconds
 - Use local storage so players can make their own presets
 - Use local storage to save high scores (with old-school initials?)
