@@ -19,6 +19,7 @@ let selectedProblems = [];
 let lastVaderSpawned = null;
 let lastId = 0;
 let score = 0;
+let hitCeiling = 0;
 let gameLoopInterval = null;
 let statLoopInterval = null;
 let startingVaders = 10;
@@ -105,6 +106,14 @@ function gameLoop() {
 
     //Spawn regular vader
     if (now - lastVaderSpawned > getDelay() || incompleteVaders.length === 0) {
+        if (incompleteVaders.length === 0) {
+            hitCeiling += 4;
+            score += 4;
+        }
+        else
+            hitCeiling -= 1;
+        if (hitCeiling < 0) hitCeiling = 0;
+
         spawnVader(lastId++);
     }
 
@@ -153,7 +162,7 @@ function gameLoop() {
         //Auto-solver kicks into 2nd gear after 100 points
         let readDelay = score < 100 ? 700 : 600;
         let digitDelay = score < 100 ? 200 : 130;
-        let submitDelay = score < 100 ? 300 : 170;
+        let submitDelay = score < 100 ? 300 : 130;
             
         if (now - lastSolve > readDelay && !autoSolveInProgress) {
             autoSolveInProgress = true;
@@ -263,8 +272,9 @@ function getDelay() {
         but by the time the initial screen is cleared, the delay is down to 10 seconds or less,
         and by 100 points, the delay is down to 1 second, which is insanely difficult.
     */
-    let seconds = 460 / (score + 20) - 2.87;
-    if (seconds < 1) seconds = 1; // Ensure a minimum delay of 1 second
+    let seconds = 460 / (score + 20) - 2.87 - hitCeiling;
+    if (seconds < 0.9 && hitCeiling == 0) seconds = 0.9; // Ensure a minimum delay of 1 second
+    if (seconds < 0.7 && hitCeiling > 0) seconds = 0.7; // If the user is hitting the ceiling, allow a faster rate
     return seconds * 1000;
 }
 
@@ -420,6 +430,7 @@ function updateStats() {
     //Get some stats
     stats.NumVaders = document.querySelectorAll("#gameContainer .vader:not(.correct)").length;
     stats.Delay = (getDelay() / 1000).toFixed(1) + "s";
+    stats.HitCeiling = hitCeiling;
     stats.Speed = (getSpeed(0) * 33).toFixed(0) + "px/s";
     stats.Lifespan = (getEstimatedLifespan() / 33).toFixed(0) + "s";
     stats.Chord = getChord();
