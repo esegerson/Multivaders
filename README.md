@@ -31,7 +31,6 @@ The game is built entirely in HTML, JavaScript, and CSS.
 
 ## TODO / Wishlist
 
-- Clearing the screen awards extra points but it needs a visual/audio indicator
 - Maybe more presets on the title screen
 - Add a progressive saw-like difficulty ladder
     - Perhaps exploding problems that take out neighbors, providing a reprieve
@@ -40,6 +39,11 @@ The game is built entirely in HTML, JavaScript, and CSS.
 - Use local storage so players can make their own presets
 - Use local storage to save high scores (with old-school initials?)
 - Improve how left and right arrows choose different problems.  Currently it just looks at horizontal position, but I'd like to take into account the vertical position, too.  If there's a problem near the bottom of the screen to the right, I'd like the right-arrow to select that one over the one right next to the active problem that's at the top of the screen.
+- More sound effects:
+    - Wrong answer "buzz"
+    - Correct answer "zap"
+    - Backspace "click"
+    - Game over "groan"
 
 ## Known Bugs
 
