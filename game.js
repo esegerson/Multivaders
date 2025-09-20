@@ -110,7 +110,9 @@ function gameLoop() {
             hitCeiling += 4;
             //Award 4 extra points (in additon to the 1 point for solving each vader)
             score += 3; //4th extra point awarded in incrementScore()
-            incrementScore(); 
+            playChimeSound();
+            showScreenTip({ type: "clear", classname: "tipclear", text: "Clear! +4" });
+            incrementScore();
         }
         else
             hitCeiling -= 1;
@@ -340,6 +342,10 @@ function keyListener(e) {
             activeVader.setAttribute("data-solved", performance.now());
             zapLaser(activeVader);
             incrementScore();
+            showScreenTip({ type: "point", classname: "tippoint", text: "+1",
+                x: parseInt(activeVader.style.left) + activeVader.offsetWidth / 2 + 30,
+                y: parseInt(activeVader.style.top) + activeVader.offsetHeight - 60
+             });
             getNextActiveVader(activeVader.getAttribute("data-id"));
             playKeyboardPress(3); //3 = the bass harmonic
         } else {
@@ -551,4 +557,24 @@ function moveLaserParticles() {
         particle.setAttribute("cx", cx);
         particle.setAttribute("cy", cy);
     }
+}
+
+function showScreenTip(tipDetails) {
+    let tc = document.getElementById("tipContainer");
+    let e = document.createElement("div");
+    switch (tipDetails.type) {
+        case "clear":
+            
+            e.className = tipDetails.classname;
+            e.textContent = tipDetails.text;
+            break;
+        case "point":
+            e.className = tipDetails.classname;
+            e.textContent = tipDetails.text;
+            e.style.left = tipDetails.x + "px";
+            e.style.top = tipDetails.y + "px";
+            break;
+    }
+    tc.appendChild(e);
+    e.addEventListener("animationend", () => { e.remove(); });
 }

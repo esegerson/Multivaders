@@ -184,3 +184,48 @@ function toneTest() {
         i++;
     }
 }
+
+function playChimeSound() {
+    var chord = getChord();
+    playChimeSoundHelper(chord);
+}
+
+function playChimeSoundHelper(chord) {
+    const toneHz = { //Inverted triads with root on top
+        C:  [getNoteFreq("E", 4), getNoteFreq("G", 4), getNoteFreq("C", 5)],
+        G:  [getNoteFreq("B", 3), getNoteFreq("D", 4), getNoteFreq("G", 4)],
+        Am: [getNoteFreq("C", 4), getNoteFreq("E", 4), getNoteFreq("A", 4)],
+        F:  [getNoteFreq("A", 3), getNoteFreq("C", 4), getNoteFreq("F", 4)]
+    };
+
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const gainNode = audioCtx.createGain();
+    const initVolume = 0.006;
+    const chimeDuration = 2; // Chime fades out over 2 seconds
+    const strumDelayMs = 80; // Delay between notes for strum effect
+
+    const chordNotes = toneHz[chord];
+
+    chordNotes.forEach((freq, index) => {
+        setTimeout(() => {
+        const vol = initVolume * getLoudnessMultiplier(freq);
+    
+        const oscillator = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        // Set oscillator properties
+        oscillator.type = 'sawtooth';
+        oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+        // Set gain properties
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime); // Slightly quieter for lower notes
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + chimeDuration);
+
+        // Connect and play
+        oscillator.connect(gain);
+        gain.connect(audioCtx.destination);
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + chimeDuration);
+        }, index * strumDelayMs);
+    });
+}

@@ -47,6 +47,8 @@ button:hover {
     margin: 1rem;
 }
 
+.score, #score2 { color: yellow; font-size: 1.5rem; }
+
 #statsContainer {
     position: absolute;
     bottom: 0;
@@ -200,7 +202,7 @@ ul.tips > li > span {
     padding: 0.2rem;
 }
 
-#gameContainer > .background2 {
+#gameContainer > .background2, #gameContainer > #tipContainer {
     position: absolute;
     top: 0;
     left: 0;
@@ -213,8 +215,9 @@ ul.tips > li > span {
     color: black;
     pointer-events: none;
     z-index: -1;
-    filter: blur(6px);
 }
+
+#gameContainer > .background2 { filter: blur(6px); }
 
 #gameContainer > .background2 > .multi {
     position: absolute;
@@ -256,4 +259,24 @@ ul.tips > li > span {
 @keyframes fadeOut {
     from { opacity: 1; }
     to { opacity: 0; }
-  }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(0) rotate(-10deg); filter: blur(0); }
+    to { transform: translateY(-1em) rotate(-5deg); filter: blur(6px); }
+}
+
+#gameContainer > #tipContainer { color: yellow; }
+#tipContainer > * { position: absolute; }
+
+#tipContainer .tipclear {
+    top: 40vh;
+    width: 100%;
+    font-size: 4rem;
+    animation: fadeOut 5s forwards, slideUp 5s forwards;
+}
+
+#tipContainer .tippoint {
+    font-size: 2rem;
+    animation: fadeOut 2s forwards, slideUp 2s forwards;
+}
