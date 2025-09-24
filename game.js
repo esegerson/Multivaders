@@ -89,12 +89,14 @@ function gameLoop() {
     //Spawn regular vader
     if (now - lastVaderSpawned > getDelay() || incompleteVaders.length === 0) {
         if (incompleteVaders.length === 0) {
+            let extraPoints = 4;
+            if (hitCeiling > 0) extraPoints += 4; //Score MORE if you just cleared the screen (very hard!)
             hitCeiling += 4;
             //Award 4 extra points (in additon to the 1 point for solving each vader)
-            score += 3; //4th extra point awarded in incrementScore()
+            score += extraPoints - 1; //Last extra point awarded in incrementScore()
             playChimeSound();
-            showScreenTip({ type: "clear", classname: "tipclear", text: "Clear! +4" });
-            incrementScore();
+            showScreenTip({ type: "clear", classname: "tipclear", text: "Clear! +" + extraPoints });
+            incrementScore(); //Called here to refresh the score display
         }
         else
             hitCeiling -= 1;
