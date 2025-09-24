@@ -29,24 +29,6 @@ const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 let stats = [];
 let showStats = false;
 
-function preset(set) {
-    const buttons = document.querySelectorAll('.grid button');
-    const presetKey = String.fromCharCode(64 + set); // Convert 1 -> 'A', 2 -> 'B', etc.
-    const selectedPreset = presets[presetKey];
-    if (selectedPreset) {
-        for (const f of selectedPreset) {
-            const button = document.querySelector(`button[data-fact-a="${f[0]}"][data-fact-b="${f[1]}"]`);
-            if (button) {
-                button.classList.add('selected');
-            }
-        }
-    }
-}
-
-function clearSelection() {
-    document.querySelectorAll(".grid button").forEach(b => b.classList.remove("selected"));
-}
-
 function start() {
     const selectedButtons = document.querySelectorAll('.grid button.selected');
     if (selectedButtons.length === 0) {
@@ -577,4 +559,42 @@ function showScreenTip(tipDetails) {
     }
     tc.appendChild(e);
     e.addEventListener("animationend", () => { e.remove(); });
+}
+
+function preset(set) {
+    //For loading hardcoded presets ("Set A")
+    const buttons = document.querySelectorAll('.grid button');
+    const presetKey = String.fromCharCode(64 + set); // Convert 1 -> 'A', 2 -> 'B', etc.
+    const selectedPreset = presets[presetKey];
+    if (selectedPreset) {
+        for (const f of selectedPreset) {
+            const button = document.querySelector(`button[data-fact-a="${f[0]}"][data-fact-b="${f[1]}"]`);
+            if (button) button.classList.add('selected');
+        }
+    }
+}
+
+function clearSelection() {
+    document.querySelectorAll(".grid button").forEach(b => b.classList.remove("selected"));
+}
+
+
+function hoverPreset(el) {
+    if (el.classList.contains("hardcoded")) {
+        const buttons = document.querySelectorAll('.grid button');
+        const presetKey = el.innerText.replace("Set ", "").trim(); // Extract 'A', 'B', etc.
+        const selectedPreset = presets[presetKey];
+        for (const f of selectedPreset) {
+            const button = document.querySelector(`button[data-fact-a="${f[0]}"][data-fact-b="${f[1]}"]`);
+            if (button) button.classList.add('hover');
+        }
+    } else {
+
+    }
+}
+
+function clearHoverPreset() {
+    for (const b of document.querySelectorAll('.grid button.hover')) {
+        b.classList.remove('hover');
+    }
 }

@@ -37,6 +37,10 @@ button:hover {
     grid-template-columns: repeat(13, 1fr);
     gap: 5px;
 }
+.grid button.hover {
+    /*This is a preview hover from hovering over the set buttons*/
+    background-color: #454;
+}
 .grid button.selected {
     background-color: #162;
     border-color: #040;            
