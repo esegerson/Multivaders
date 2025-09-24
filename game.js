@@ -572,12 +572,126 @@ function preset(set) {
             if (button) button.classList.add('selected');
         }
     }
+    updateClearButton();
+}
+
+function presetCustom(btn) {
+    if (btn.classList.contains("delete")) {
+        //Delete this preset
+        let presetName = btn.innerText;
+        let presetList = JSON.parse(localStorage.getItem("presets"));
+        presetList = presetList.filter(p => p.name !== presetName);
+        localStorage.setItem("presets", JSON.stringify(presetList));
+        deletePreset(document.getElementById("btnDeletePreset"));
+        refreshCustomPresetButtons();
+        return;
+    } else {
+        //Load this preset
+        let preset = JSON.parse(localStorage.getItem("presets")).filter(p => p.name === btn.innerText)[0];
+        for (const f of preset.facts) {
+            const button = document.querySelector(`button[data-fact-a="${f[0]}"][data-fact-b="${f[1]}"]`);
+            if (button) button.classList.add('selected');
+        }
+        updateClearButton();
+    }
 }
 
 function clearSelection() {
     document.querySelectorAll(".grid button").forEach(b => b.classList.remove("selected"));
+    updateClearButton();
 }
 
+function updateClearButton() {
+    let noFactsSeleted = document.querySelectorAll('.grid button.selected').length === 0;
+    document.getElementById("btnClear").disabled = noFactsSeleted;
+    document.getElementById("btnClear").title = noFactsSeleted 
+        ? "No  facts to clear." 
+        : "Clear all selected multiplication facts.";
+    document.getElementById("btnMakePreset").disabled = noFactsSeleted;
+    document.getElementById("btnMakePreset").title = noFactsSeleted 
+        ? "Select at least one multiplication fact to create a preset." 
+        : "Create a custom preset from the selected multiplication facts.";
+}
+
+function openPresetModal() {
+    document.getElementById("btnMakePreset").style.display = "none";
+    document.getElementById("presetSave").style.display = "inline";
+    document.getElementById("setname").select();
+    document.getElementById("setname").focus();
+}
+
+function closeNewPresetUi() {
+    document.getElementById("btnMakePreset").style.display = "inline";
+    document.getElementById("presetSave").style.display = "none";
+}
+
+function savePreset() {
+    let presetName = document.getElementById("setname").value.trim();
+    if (presetName.length === 0) {
+        let n = document.getElementById("presetList").children.length + 1;
+        presetName = "Custom " + n;
+    }
+    let newPreset = {
+        name: presetName,
+        facts: Array.from(document.querySelectorAll(".grid button.selected")).map(b => [
+            parseInt(b.getAttribute("data-fact-a")),
+            parseInt(b.getAttribute("data-fact-b"))
+        ])
+    };
+    if (newPreset.facts.length === 0) {
+        alert("Please select at least one multiplication fact before saving a preset.");
+        return;
+    }
+    let presetList = JSON.parse(localStorage.getItem("presets"));
+    if (presetList == null) 
+        presetList = [];
+    else if (presetList.some(x => x.name === newPreset.name)) {
+        alert("A preset with that name already exists. Please choose a different name.");
+        return;
+    }
+    presetList.push(newPreset);
+    localStorage.setItem("presets", JSON.stringify(presetList));
+    refreshCustomPresetButtons();
+    closeNewPresetUi();
+}
+
+function deletePreset(deleteButton) {
+    const buttons = document.querySelectorAll("#presetList > BUTTON");
+    for (const b of buttons)
+        if (b.classList.contains("delete")) 
+            b.classList.remove("delete"); 
+        else {
+            b.classList.add("delete");
+            b.style.animationDelay = (Math.random() * -1) + "s"; //Negative delay so there's no "jump"
+        }
+    if (deleteButton.classList.contains("deleteMode")) {
+        deleteButton.classList.remove("deleteMode");
+        deleteButton.innerText = deleteButton.innerText.replace("Done Deleting", "Delete Preset");
+    } else {
+        deleteButton.classList.add("deleteMode");
+        deleteButton.innerText = deleteButton.innerText.replace("Delete Preset", "Done Deleting");
+    }
+}
+
+function refreshCustomPresetButtons() {
+    let presetList = JSON.parse(localStorage.getItem("presets"));
+    if (presetList == null) presetList = [];
+    let container = document.getElementById("presetList");
+    container.innerHTML = '';
+    for (const p of presetList) {
+        let el = document.createElement("button");
+        el.innerText = p.name;
+        el.setAttribute("onclick", "presetCustom(this)");
+        el.setAttribute("onmouseover", "hoverPreset(this)");
+        el.setAttribute("onmouseout", "clearHoverPreset()");
+        container.appendChild(el);
+    }
+    const hasCustomPresets = container.childNodes.length > 0;
+    document.getElementById("btnDeletePreset").disabled = !hasCustomPresets;
+    document.getElementById("btnDeletePreset").title = hasCustomPresets
+        ? "Delete a custom preset"
+        : "No custom presets to delete";
+}
 
 function hoverPreset(el) {
     if (el.classList.contains("hardcoded")) {
@@ -589,7 +703,11 @@ function hoverPreset(el) {
             if (button) button.classList.add('hover');
         }
     } else {
-
+        let preset = JSON.parse(localStorage.getItem("presets")).filter(p => p.name === el.innerText)[0];
+        for (const f of preset.facts) {
+            const button = document.querySelector(`button[data-fact-a="${f[0]}"][data-fact-b="${f[1]}"]`);
+            if (button) button.classList.add('hover');
+        }
     }
 }
 

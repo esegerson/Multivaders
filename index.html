@@ -13,17 +13,26 @@
         <h1>Multivaders!</h1>
         <p>Multivaders is a thrilling space shooter game where you defend your planet from waves of alien invaders. Solve multiplication problems to defeat the enemies!</p>
         <p>Select what multiplication facts you'd like to work with:</p>
-        <p>Presets: 
+        <p id="presetButtons">Presets: 
             <button class="hardcoded" onclick="preset(1)" onmouseover="hoverPreset(this)" onmouseout="clearHoverPreset()">Set A</button> 
             <button class="hardcoded" onclick="preset(2)" onmouseover="hoverPreset(this)" onmouseout="clearHoverPreset()">Set B</button>
             <button class="hardcoded" onclick="preset(3)" onmouseover="hoverPreset(this)" onmouseout="clearHoverPreset()">Set C</button>
             <button class="hardcoded" onclick="preset(4)" onmouseover="hoverPreset(this)" onmouseout="clearHoverPreset()">Set D</button>
             <button class="hardcoded" onclick="preset(5)" onmouseover="hoverPreset(this)" onmouseout="clearHoverPreset()">Set E</button>
-            <button onclick="clearSelection()">Clear</button>
+            <span id="presetList"></span>
+            <span class="savePresetContainer">
+                <button id="btnMakePreset" disabled onclick="openPresetModal()" title="Select a fact to create a preset">&plus; Make Preset</button>
+                <span id="presetSave" style="display: none;">
+                    <input type="text" id="setname" placeholder="Preset Name" maxlength="20"/>
+                    <button onclick="savePreset()" title="Save Preset">&#x2714;</button>
+                    <button onclick="closeNewPresetUi()" title="Cancel">&#x2716;</button>
+                </span>
+            </span>
+            <button id="btnDeletePreset" disabled onclick="deletePreset(this)" title="No custom presets to delete">&minus; Delete Preset</button>
+            <button id="btnClear" disabled onclick="clearSelection()" title="No facts to clear">Clear</button>
         </p>
         <div class="grid">
             <!-- Generate 12x12 buttons -->
-            <!-- Each button can have unique IDs or classes if needed -->
             <script>
                 const maxFactor = 12;
                 const gridContainer = document.querySelector('.grid');
@@ -35,12 +44,15 @@
                         button.setAttribute("data-fact-b", j);
                         button.addEventListener("click",() => {
                             button.classList.toggle("selected");
+                            updateClearButton();
                             //Select the commutative one (if not a square)
                             const commutativeButton = document.querySelector(`button[data-fact-a="${j}"][data-fact-b="${i}"]`);
                             if (commutativeButton && i !== j) commutativeButton.classList.toggle("selected");
                         });
                         gridContainer.appendChild(button);
                     }
+                updateClearButton();
+                refreshCustomPresetButtons();
             </script>
         </div>
         <p><button id="startGame" onclick="start();">Start Game</button></p>
