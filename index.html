@@ -6,6 +6,7 @@
     <title>Multivaders</title>
     <script src="game.js"></script>
     <script src="music.js"></script>
+    <script src="ui.js"></script>
     <link rel="stylesheet" href="game.css" />
 </head>
 <body>
@@ -31,30 +32,7 @@
             <button id="btnDeletePreset" disabled onclick="deletePreset(this)" title="No custom presets to delete">&minus; Delete Preset</button>
             <button id="btnClear" disabled onclick="clearSelection()" title="No facts to clear">Clear</button>
         </p>
-        <div class="grid">
-            <!-- Generate 12x12 buttons -->
-            <script>
-                const maxFactor = 12;
-                const gridContainer = document.querySelector('.grid');
-                for (let i = 0; i <= maxFactor; i++)
-                    for (let j = 0; j <= maxFactor; j++) {
-                        const button = document.createElement('button');
-                        button.textContent = i + " \u00d7 " + j; // Display the product of i and j
-                        button.setAttribute("data-fact-a", i);
-                        button.setAttribute("data-fact-b", j);
-                        button.addEventListener("click",() => {
-                            button.classList.toggle("selected");
-                            updateClearButton();
-                            //Select the commutative one (if not a square)
-                            const commutativeButton = document.querySelector(`button[data-fact-a="${j}"][data-fact-b="${i}"]`);
-                            if (commutativeButton && i !== j) commutativeButton.classList.toggle("selected");
-                        });
-                        gridContainer.appendChild(button);
-                    }
-                updateClearButton();
-                refreshCustomPresetButtons();
-            </script>
-        </div>
+        <div class="grid"></div>
         <p><button id="startGame" onclick="start();">Start Game</button></p>
         <p>Tips:</p>
         <ul class="tips">
@@ -79,6 +57,16 @@
             <li>More visual splash</li>
             <li>More creative gameplay</li>
         </ul>
+
+        <div style="display: none;">
+            <h2>High Scores!</h2>
+            <ol id="highScoresList">
+                <li><dl><dt>EAS</dt><dd>115</dd><dd>Set C</dd><dd>9/1/2025</dd></dl></li>
+                <li><dl><dt>EAS</dt><dd>35</dd><dd>Set A</dd></dl><dd>9/1/2025</dd></li>
+                <li><dl><dt>EAS</dt><dd>17</dd><dd>Set B</dd></dl><dd>9/1/2025</dd></li>
+                
+            </ol>
+        </div>
     </div>
 
     <div id="gameContainer" style="display: none;">
