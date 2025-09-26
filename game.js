@@ -276,13 +276,13 @@ function isPaused() {
 }
 
 function keyListener(e) {
-    let isPaused = isPaused();
+    let paused = isPaused();
     const activeVader = document.querySelector(".active");
     const result = activeVader.querySelector(".result");
     if (document.querySelector(".vader.dead")) {
         return; // If a vader is dead, ignore all key presses
     } else if (e.key === "Escape") {
-        if (isPaused) return; // Cannot quit while paused
+        if (paused) return; // Cannot quit while paused
         for (const vader of document.querySelectorAll("#gameContainer .vader:not(.correct)")) {
             vader.classList.remove("active");
             vader.classList.remove("correct");
@@ -294,8 +294,8 @@ function keyListener(e) {
     } else if (e.key === " ") {
         let gameContainer = document.getElementById("gameContainer");
         gameContainer.classList.toggle("paused");
-        isPaused = !isPaused;
-        if (isPaused) {
+        paused = !paused;
+        if (paused) {
             clearInterval(gameLoopInterval);
             document.getElementById("paused").style.display = "block";
             let music = document.getElementById("gameMusic");
@@ -309,18 +309,18 @@ function keyListener(e) {
             elapsedPaused += (performance.now() - pausedStart);
         }
     } else if (e.key === "Pause") {
-        if (isPaused) return; // Cannot autosolve while paused
+        if (paused) return; // Cannot autosolve while paused
         e.preventDefault();
         autoSolve = !autoSolve; // Toggle auto-solve mode
     } else if (e.key === "Backspace") {
-        if (isPaused) return; // Cannot type while paused
+        if (paused) return; // Cannot type while paused
         e.preventDefault();
         result.textContent = result.textContent.slice(0, -1);
         if (result.textContent.length === 0) result.textContent = "\xa0";
         activeVader.classList.remove("correct");
         activeVader.classList.remove("incorrect");
     } else if (e.key.length === 1 && e.key >= '0' && e.key <= '9') {
-        if (isPaused) return; // Cannot type while paused
+        if (paused) return; // Cannot type while paused
 
         e.preventDefault();
 
@@ -336,7 +336,7 @@ function keyListener(e) {
             playKeyboardPress(Math.floor(Math.random() * 3));
         }
     } else if (e.key === "Enter") {
-        if (isPaused) return; // Cannot type while paused
+        if (paused) return; // Cannot type while paused
         if (result.textContent === (activeVader.getAttribute("data-last-val") || "~")) 
             return; //Prevent accidental double-enters on wrong answers which can quickly end the game
         const factA = parseInt(activeVader.querySelector(".factA").textContent);
@@ -366,11 +366,11 @@ function keyListener(e) {
         showStats = !showStats;
     } else if (e.key === "ArrowLeft" || e.key === "a") {
         //Left
-        if (isPaused) return; // Cannot play while paused
+        if (paused) return; // Cannot play while paused
         selectDifferentVader(-1);
     } else if (e.key === "ArrowRight" || e.key === "d") {
         //Right
-        if (isPaused) return; // Cannot play while paused
+        if (paused) return; // Cannot play while paused
         selectDifferentVader(1);
     }
 }
