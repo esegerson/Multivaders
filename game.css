@@ -64,14 +64,13 @@ button.delete:hover {
     border-color: #040;            
 }
 .savePresetContainer {
-    display: inline-flex;
     align-items: center;
 }
 #btnMakePreset, #presetSave { display: inline-block; width: 10em; }
 #presetSave { display: inline-flex; align-items: center; }
 #setname { 
     flex: 1; 
-    width: 106px; 
+    width: 89px; 
     min-width: 0; 
     box-sizing: border-box; 
     height: 2.7em; 

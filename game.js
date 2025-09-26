@@ -643,6 +643,7 @@ function updateClearButton() {
     document.getElementById("btnMakePreset").title = noFactsSeleted 
         ? "Select at least one multiplication fact to create a preset." 
         : "Create a custom preset from the selected multiplication facts.";
+    closeNewPresetUi();
 }
 
 function openPresetModal() {
