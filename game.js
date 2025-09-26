@@ -13,6 +13,7 @@ let showStats = false;
 let timer = 0;
 let elapsedPaused = 0;
 let pausedStart = 0;
+let overrideSpeed = false;
 
 function start() {
     const selectedButtons = document.querySelectorAll('.grid button.selected');
@@ -87,12 +88,13 @@ function gameLoop() {
             hitCeiling -= 1;
         if (hitCeiling < 0) hitCeiling = 0;
 
-        spawnVader(lastId++);
+        if (!overrideSpeed) spawnVader(lastId++);
     }
 
     //Move all vaders down
     for (const vader of vaders) {
         let speed = parseFloat(vader.getAttribute("data-speed") || 1);
+        if (overrideSpeed) speed = 0;
         let top = parseFloat(vader.style.top || "-150");
         if (top < 50 && score < 100) { //Do a fast slide-in so user doesn't have to wait
             speed = (50 - top) / 5 * speed; //Hustle to get onto the screen
@@ -198,6 +200,10 @@ function getProblem() {
         alert("No multiplication facts selected.");
         return null;
     }
+    
+    //Currently get completely random problems from selected set.
+    //In the future I may want to temporarilly bias some problems
+    //to emphasize a multi-shot upgrade.
     const randomIndex = Math.floor(Math.random() * selectedProblems.length);
     return selectedProblems[randomIndex];
 }
@@ -303,16 +309,12 @@ function keyListener(e) {
         activeVader.classList.remove("incorrect");
     } else if (e.key.length === 1 && e.key >= '0' && e.key <= '9') {
         if (paused) return; // Cannot type while paused
-
         e.preventDefault();
-
         if (activeVader.classList.contains("incorrect")) {
             result.textContent = ""; // Reset if previously incorrect
             activeVader.classList.remove("incorrect");
         }
-
         if (result.textContent.length === 1 && result.textContent === "\xa0") result.textContent = "";
-
         if (result.textContent.length < 3) {
             result.textContent += e.key;
             playKeyboardPress(Math.floor(Math.random() * 3));
@@ -354,6 +356,13 @@ function keyListener(e) {
         //Right
         if (paused) return; // Cannot play while paused
         selectDifferentVader(1);
+    } else if (e.key === "PageUp" && showStats) {
+        //Stop vaders only when stats are shown (debugging)
+        overrideSpeed = !overrideSpeed;
+        let vaders = document.querySelectorAll("#gameContainer .vader");
+        for (const vader of vaders)
+            if (overrideSpeed) vader.classList.add("paused");
+            else vader.classList.remove("paused");
     }
 }
 
@@ -475,6 +484,7 @@ function manageBackgroundMultis() {
     for (const multi of bgContainer.querySelectorAll(".multi")) {
         let top = parseFloat(multi.style.top || "0");
         let speed = multi.getAttribute("data-speed") || 1;
+        if (overrideSpeed) speed = 0;
         top -= speed;
         multi.style.top = top + "px";
         if (top < multiWidth * -1) multi.remove();

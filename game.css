@@ -181,7 +181,7 @@ button.delete:hover {
     animation: jiggle 0.1s infinite;
 }
 .vader.dead .result { border-color: black; }
-#gameContainer.paused .vader { animation-play-state: paused; }
+#gameContainer.paused .vader, .vader.paused { animation-play-state: paused; }
 
 @keyframes jiggle { /*death rattle*/
     0%   { transform: rotate(10deg) translate(0, 0); }
