@@ -28,6 +28,9 @@ let autoSolveInProgress = false;
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 let stats = [];
 let showStats = false;
+let timer = 0;
+let elapsedPaused = 0;
+let pausedStart = 0;
 
 function start() {
     const selectedButtons = document.querySelectorAll('.grid button.selected');
@@ -286,9 +289,11 @@ function keyListener(e) {
         if (gameContainer.classList.contains("paused")) {
             clearInterval(gameLoopInterval);
             document.getElementById("paused").style.display = "block";
+            pausedStart = performance.now();
         } else {
             gameLoopInterval = setInterval(gameLoop, 33); // Resume the game loop
             document.getElementById("paused").style.display = "none";
+            elapsedPaused += (performance.now() - pausedStart);
         }
     } else if (e.key === "Pause") {
         e.preventDefault();
@@ -418,6 +423,9 @@ function updateStats() {
         return;
     }
     container.style.display = "block";
+    let secs = ((performance.now() - timer - elapsedPaused) / 1000).toFixed(0);
+    let min = Math.floor(secs / 60);
+    let sec = secs % 60;
 
     //Get some stats
     stats.NumVaders = document.querySelectorAll("#gameContainer .vader:not(.correct)").length;
@@ -425,6 +433,7 @@ function updateStats() {
     stats.HitCeiling = hitCeiling;
     stats.Speed = (getSpeed(0) * 33).toFixed(0) + "px/s";
     stats.Lifespan = (getEstimatedLifespan() / 33).toFixed(0) + "s";
+    stats.Time = min + ":" + (sec < 10 ? "0" : "") + sec;
     stats.Chord = getChord();
     
     //Display stats
