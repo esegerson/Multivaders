@@ -61,6 +61,7 @@ The game is built entirely in HTML, JavaScript, and CSS.
     - Menu enhancements:
         - Hovering over presets now previews what the set is
         - Can now create your own custom sets
+            - Suggestions: perfect squares, 1-digit answers, 3-digit answers, all 7s, draw a picture
     - Game enhancements:
         - Score elements are now yellow
         - Zapped problems display "+1"

@@ -717,6 +717,7 @@ function refreshCustomPresetButtons() {
         el.setAttribute("onmouseover", "hoverPreset(this)");
         el.setAttribute("onmouseout", "clearHoverPreset()");
         container.appendChild(el);
+        container.appendChild(document.createTextNode(" ")); //Add a space between buttons
     }
     const hasCustomPresets = container.childNodes.length > 0;
     document.getElementById("btnDeletePreset").disabled = !hasCustomPresets;
