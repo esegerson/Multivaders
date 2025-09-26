@@ -68,15 +68,16 @@
             <li>Press <span>Left</span> or <span>Right</span> to target a different problem</li>
             <li>Press <span>`</span> or <span>~</span> under the Escape key to toggle stats display</li>
             <li><span>1</span> point for every problem solved.</li>
-            <li><span>4</span> extra points every time you clear the screen.</li>
+            <li><span>4</span> extra points if you clear the screen.</li>
+            <li><span>8</span> extra points if you clear the screen soon after the last clear.</li>
             <li>The game gets harder the more points you score!  Can you beat <span>100</span>?</span>></li>
         </ul>
 
         <p>Coming Soon:</p>
         <ul class="tips">
             <li>Remember high scores</li>
-            <li>Create your own sets</li>
             <li>More visual splash</li>
+            <li>More creative gameplay</li>
         </ul>
     </div>
 
@@ -132,7 +133,11 @@
         <button id="playAgain" onclick="location.reload();">Play Again</button>
     </div>
 
-    <div id="paused" style="display: none;">Paused</div>
+    <div id="paused" style="display: none;">
+        <p>Paused</p>
+        <p>Press spacebar to continue</p>
+        <p>Score: <span id="pauseScore"></span></p>
+    </div>
     
     <div id="templates" style="display: none;">
         <div id="vaderTemplate" class="vader">

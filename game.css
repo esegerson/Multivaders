@@ -107,7 +107,7 @@ button.delete:hover {
 }
 
 #statsContainer:hover {
-    opacity: 0.7;
+    opacity: 1;
 }
 
 #statsContainer DL { 
@@ -161,51 +161,28 @@ button.delete:hover {
     transition: filter 2s ease-out, opacity 8s ease-out;
     animation: dance 2s infinite ease-in-out;
 }
-
-.vader .result {
-    border-top: 0.08em solid rgba(255, 255, 255, 0.5);
-}
-
+.vader .result { border-top: 0.08em solid rgba(255, 255, 255, 0.5); }
 .vader.active {
     color: white;
     text-shadow: 0 0 0.3em rgba(255,255,255,1);
 }
-
-.vader.active .result {
-    border-color: white;
-}
-
-.vader.active .operator {
-    animation: wiggle 1s infinite ease-in-out;
-}
-
+.vader.active .result { border-color: white; }
+.vader.active .operator { animation: wiggle 1s infinite ease-in-out; }
 .vader.correct {
     color: #0f0;
     opacity: 0;
     filter: blur(2rem);
 }
-
-.vader.incorrect {
-    color: #f00;
-}
-
-.vader.correct .result {
-    border-color: #0f0;
-}
-
-.vader.incorrect .result {
-    border-color: #f00;
-}
-
+.vader.incorrect { color: #f00; }
+.vader.correct .result { border-color: #0f0; }
+.vader.incorrect .result { border-color: #f00;}
 .vader.dead {
     color: black;
     text-shadow: 0 0 0.3rem purple;
     animation: jiggle 0.1s infinite;
 }
-
-.vader.dead .result {
-    border-color: black;
-}
+.vader.dead .result { border-color: black; }
+#gameContainer.paused .vader { animation-play-state: paused; }
 
 @keyframes jiggle { /*death rattle*/
     0%   { transform: rotate(10deg) translate(0, 0); }
@@ -233,6 +210,9 @@ button.delete:hover {
     margin: 30vh 0;
     pointer-events: none;;
 }
+
+#paused p + p { font-size: 60%; opacity: 0.6; }
+#paused p:last-child { color: yellow; }
 
 #gameOver {
     margin: 1rem;

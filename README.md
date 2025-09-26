@@ -52,7 +52,6 @@ The game is built entirely in HTML, JavaScript, and CSS.
 
 ## Known Bugs
 
-- Problems continue to wiggle when the game is paused and the music continues to play
 - Does not work on mobile: no on-screen keyboard; cannot hover over presets
 - Does not scale to different resolutions well - larger resolutions are easier because the problems take longer to fall
 
