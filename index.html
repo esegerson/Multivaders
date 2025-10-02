@@ -69,19 +69,23 @@
         </div>
     </div>
 
-    <div id="gameContainer" style="display: none;">
+    <div id="gameContainer" class="max" style="display: none;">
         <div class="score">Score: <span id="score">0</span></div>
         <div id="tipContainer"></div>
         <div class="decoration">
-            <div class="laserContainer" id="laserContainer">
-                <svg id="svgLaser">
+            <div id="svgContainer">
+                <svg id="svgLaser" class="max">
                     <defs>
                         <radialGradient id="laserGrad" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
                             <stop offset="0%" style="stop-color:yellow;stop-opacity:1" />
                             <stop offset="100%" style="stop-color:yellow;stop-opacity:0" />
                         </radialGradient>
                     </defs>
-                    <g id="g" />
+                    <g id="sparks" />
+                </svg>
+                <svg id="svgFX" class="max">
+                    <g id="orbitersFront" />
+                    <g id="networkLines" />
                 </svg>
             </div>
             <div class="turret" id="turret">
@@ -111,7 +115,12 @@
         </div>
         <div class="background">&#215;</div>
         <div class="background2"></div>
-        <div id="statsContainer">
+        <div id="statsContainer"></div>
+        <div id="vaderContainer"></div>
+        <div id="svgContainerBehind">
+            <svg id="svgBehind" class="max">
+                <g id="orbitersBehind" />
+            </svg>
         </div>
     </div>
 

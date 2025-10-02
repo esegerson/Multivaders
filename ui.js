@@ -119,7 +119,8 @@ function savePreset() {
         facts: Array.from(document.querySelectorAll(".grid button.selected")).map(b => [
             parseInt(b.getAttribute("data-fact-a")),
             parseInt(b.getAttribute("data-fact-b"))
-        ])
+        ]),
+        highScores: []
     };
     if (newPreset.facts.length === 0) {
         alert("Please select at least one multiplication fact before saving a preset.");

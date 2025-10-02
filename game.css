@@ -12,12 +12,25 @@ body.noscroll { overflow: hidden; }
 
 #gameTitle { margin: 20px;}
 
+.max {
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+}
+
 #gameContainer {
     overflow: hidden;
     position: relative;
-    height: 100vh;
     padding-left: 1rem;
     pointer-events: none;
+}
+
+#vaderContainer {
+    overflow: hidden;
+
 }
 
 button {
@@ -161,12 +174,12 @@ button.delete:hover {
     animation: dance 2s infinite ease-in-out;
 }
 .vader .result { border-top: 0.08em solid rgba(255, 255, 255, 0.5); }
-.vader.active {
+.vader.active, .vader.related {
     color: white;
     text-shadow: 0 0 0.3em rgba(255,255,255,1);
 }
-.vader.active .result { border-color: white; }
-.vader.active .operator { animation: wiggle 1s infinite ease-in-out; }
+.vader.active .result, .vader.related .result { border-color: white; }
+.vader.active .operator, .vader.related .operator { animation: wiggle 1s infinite ease-in-out; }
 .vader.correct {
     color: #0f0;
     opacity: 0;
@@ -264,7 +277,7 @@ ul.tips > li > span {
     left: calc(50vw - 50px); /*Center of screen*/
 }
 
-#laserContainer, #laserContainer #svgLaser {
+#svgContainer, #svgContainer #svgLaser {
     position: absolute;
     top: 0;
     left: 0;
@@ -272,17 +285,30 @@ ul.tips > li > span {
     height: 100vh;
 }
 
-#laserContainer svg g line {
+#svgContainer svg g#sparks line {
     stroke:rgb(255,0,0);
     stroke-width:4px;
 }
 
-#laserContainer svg g circle {
+#svgContainer svg g#sparks circle {
     stroke-opacity: 0;
     fill: url(#laserGrad);
     r: 5px;
     opacity: 1;
     animation: fadeOut 10s forwards;
+}
+
+#svgFX { z-index: 99; }
+#svgBehind { z-index: -99; }
+
+#orbitersFront circle, #orbitersBehind circle {
+    fill: chartreuse;
+}
+
+g#networkLines line {
+    stroke: white;
+    stroke-width: 2px;
+    opacity: 0.1;
 }
 
 @keyframes fadeOut {
