@@ -57,6 +57,10 @@ The game is built entirely in HTML, JavaScript, and CSS.
 
 ## Recent Updates
 
+- *October 2025:*
+    - Menu enhancements:
+        - Presets are now automatically selected if you choose the corresponding facts
+        - Multiple presets are now indicated with a highlight color
 - *September 2025:*
     - Menu enhancements:
         - Hovering over presets now previews what the set is
@@ -74,6 +78,8 @@ The game is built entirely in HTML, JavaScript, and CSS.
         - Wrong answers triple in speed instead of double
     - Graphical enhancements:
         - Added a turret that zaps problems
+- *July 2025:*
+    - Initial release, core gameplay complete
 
 ## Assets
 

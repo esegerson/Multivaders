@@ -19,6 +19,7 @@ let presets = {
 };
 
 let selectedProblems = [];
+let selectedSetName = "";
 
 document.addEventListener("DOMContentLoaded", function() {
     //Generate 12x12 buttons
@@ -32,29 +33,40 @@ document.addEventListener("DOMContentLoaded", function() {
             button.setAttribute("data-fact-b", j);
             button.addEventListener("click",() => {
                 button.classList.toggle("selected");
+                updatePresetButtons();
                 updateClearButton();
                 //Select the commutative one (if not a square)
                 const commutativeButton = document.querySelector(`button[data-fact-a="${j}"][data-fact-b="${i}"]`);
                 if (commutativeButton && i !== j) commutativeButton.classList.toggle("selected");
+                updatePresetButtons();
             });
             gridContainer.appendChild(button);
         }
     updateClearButton();
     refreshCustomPresetButtons();
+    gameDomLoaded();
+});
+
+window.addEventListener("load", function() {
+    if (window.location.protocol === "file:")
+        console.clear(); //Helps with debugging; don't care about all the GET 200s
 });
 
 function preset(set) {
     //For loading hardcoded presets ("Set A")
-    const buttons = document.querySelectorAll('.grid button');
     const presetKey = String.fromCharCode(64 + set); // Convert 1 -> 'A', 2 -> 'B', etc.
     const selectedPreset = presets[presetKey];
     if (selectedPreset) {
+        const setButton = document.querySelectorAll("#presetButtons > button.hardcoded")[set - 1];
+        setButton.classList.add("hover");
+        if (noSelectedFacts()) setButton.classList.add("selected");
         for (const f of selectedPreset) {
             const button = document.querySelector(`button[data-fact-a="${f[0]}"][data-fact-b="${f[1]}"]`);
             if (button) button.classList.add('selected');
         }
     }
     updateClearButton();
+    selectedSetName = "Set " + presetKey;
 }
 
 function presetCustom(btn) {
@@ -75,24 +87,37 @@ function presetCustom(btn) {
             if (button) button.classList.add('selected');
         }
         updateClearButton();
+        //TODO: maintain a pure selected set for high scores
+        //if (selectedSetName === "" && document.querySelectorAll(".grid button.selected").length === 0) {
+            btn.classList.add("selected");
+            selectedSetName = btn.textContent;
+        //} else {
+            
+        //}
     }
 }
 
 function clearSelection() {
     document.querySelectorAll(".grid button").forEach(b => b.classList.remove("selected"));
+    for (const b of document.querySelectorAll("#presetButtons button")) 
+        b.classList.remove("selected");
+    selectedSetName = "";
     updateClearButton();
+    updatePresetButtons();
 }
 
 function updateClearButton() {
-    let noFactsSeleted = document.querySelectorAll('.grid button.selected').length === 0;
-    document.getElementById("btnClear").disabled = noFactsSeleted;
-    document.getElementById("btnClear").title = noFactsSeleted 
+    let noFactsSelected = noSelectedFacts();
+    let presetSelected = noSelectedPreset();
+    document.getElementById("btnClear").disabled = noFactsSelected;
+    document.getElementById("btnClear").title = noFactsSelected 
         ? "No  facts to clear." 
         : "Clear all selected multiplication facts.";
-    document.getElementById("btnMakePreset").disabled = noFactsSeleted;
-    document.getElementById("btnMakePreset").title = noFactsSeleted 
+    document.getElementById("btnMakePreset").disabled = noFactsSelected || !presetSelected;
+    document.getElementById("btnMakePreset").title = noFactsSelected 
         ? "Select at least one multiplication fact to create a preset." 
         : "Create a custom preset from the selected multiplication facts.";
+    if (noFactsSelected) document.querySelectorAll("#presetButtons button.hover").forEach(b => b.classList.remove("hover"));
     closeNewPresetUi();
 }
 
@@ -130,6 +155,9 @@ function savePreset() {
     if (presetList == null) 
         presetList = [];
     else if (presetList.some(x => x.name === newPreset.name)) {
+        alert("A preset with that name already exists. Please choose a different name.");
+        return;
+    } else if (presetName.length === 5 && /\bSet [A-E]\b/.test(presetName)) {
         alert("A preset with that name already exists. Please choose a different name.");
         return;
     }
@@ -200,4 +228,88 @@ function clearHoverPreset() {
     for (const b of document.querySelectorAll('.grid button.hover')) {
         b.classList.remove('hover');
     }
+}
+
+function noSelectedFacts() {
+    return document.querySelectorAll(".grid button.selected").length === 0;
+}
+
+function noSelectedPreset() {
+    return document.querySelectorAll("#presetButtons button.selected").length === 0;
+}
+
+function combinePresets() {
+    //Put all hardcoded and custom presets into one object
+    //Also, grab a reference to the corresponding button
+    let combinedPresets = JSON.parse(localStorage.getItem("presets"));
+    for (const p of combinedPresets) 
+        p.element = Array.from(document.querySelectorAll("#presetList > button"))
+            .find(x => x.textContent === p.name);
+    for (let key in presets) {
+        const setName = "Set " + key;
+        combinedPresets.push({
+            name: setName,
+            facts: presets[key],
+            element: Array.from(document.querySelectorAll("#presetButtons > button.hardcoded"))
+                .find(x => x.textContent === setName)
+        });
+    }
+    return combinedPresets;
+}
+
+function selectedFactsToArray() {
+    //Convert list of buttons to facts
+    const selectedButtons = document.querySelectorAll(".grid button.selected");
+    let selectedFacts = [];
+    for (const b of selectedButtons)
+        selectedFacts.push([parseInt(b.getAttribute("data-fact-a")), parseInt(b.getAttribute("data-fact-b"))]);
+    return selectedFacts;
+}
+
+function arraysMatch(a, b) {
+    if (a.length !== b.length) return false;
+    const bCopy = [...b];
+    for (let itemA of a) {
+        const matchIx = bCopy.findIndex(itemB => itemA.length === itemB.length && itemA.every((v, i) => v === itemB[i]));
+        if (matchIx === -1) return false;
+        bCopy.splice(matchIx, 1); //Remove matched item to prevent dups
+    }
+    return true;
+}
+
+function isArraySetSubset(a, b) {
+    //If a is fully represented in b, return true
+    return a.every(subA =>
+        b.some(subB => 
+          Array.isArray(subB) &&
+          subA.length === subB.length &&
+          subA.every((val, i) => val === subB[i])
+        )
+      );
+}
+
+function updatePresetButtons() {
+    const selectedFacts = selectedFactsToArray();
+    const presets = combinePresets();
+    const exactMatches = presets.filter(p => arraysMatch(p.facts, selectedFacts));
+    for (const p of presets) {
+        p.element.classList.remove("selected");
+        p.element.classList.remove("hover");
+        const isExactMatch = arraysMatch(p.facts, selectedFacts);
+        const isSubset = isArraySetSubset(p.facts, selectedFacts);
+        if (isExactMatch && exactMatches.length === 1)
+            p.element.classList.add("selected");
+        else if (isExactMatch || isSubset)
+            p.element.classList.add("hover");
+    }
+
+    const numPresetSelected = presets.filter(p => p.element.classList.contains("selected")).length;
+
+    selectedPresetName = numPresetSelected === 1 ? exactMatches[0].name : "";
+
+    document.getElementById("setNote").style.display 
+        = numPresetSelected === 1 || selectedFacts.length == 0 ? "none" : "inline";
+    document.getElementById("startGame").disabled = selectedFacts.length === 0;
+    document.getElementById("startGame").setAttribute("title", 
+        selectedFacts.length === 0 ? "Select at least one fact to play" : "Play!");
 }

@@ -1,3 +1,10 @@
+:root {
+    --vaderColor: rgba(255, 255, 255, 0.5);
+    --vaderActiveColor: white;
+    --vaderRunnerColor: rgba(64, 192, 64, 0.5);
+    --vaderActiveRunnerColor: #0f0;
+}
+
 html, body { height: 100vh; margin: 0; padding: 0; }
 
 body {
@@ -53,7 +60,7 @@ button.delete {
 button.delete:hover {
     background-color: #a00;
 }
-#presetButtons BUTTON:disabled {
+#presetButtons BUTTON:disabled, #startGame:disabled {
     background-color: #222;
     color: rgba(255, 255, 255, 0.3);
     border-color: #444;
@@ -68,11 +75,11 @@ button.delete:hover {
     grid-template-columns: repeat(13, 1fr);
     gap: 5px;
 }
-.grid button.hover {
+.grid button.hover, #presetButtons button.hover {
     /*This is a preview hover from hovering over the set buttons*/
     background-color: #454;
 }
-.grid button.selected {
+.grid button.selected, #presetButtons button.selected {
     background-color: #162;
     border-color: #040;            
 }
@@ -163,7 +170,7 @@ button.delete:hover {
 .vader {
     position: absolute;
     top: -200px; /* Start just off-screen */
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--vaderColor);
     font-family: monospace;
     font-size: 5em;
     text-align: right;
@@ -173,15 +180,15 @@ button.delete:hover {
     transition: filter 2s ease-out, opacity 8s ease-out;
     animation: dance 2s infinite ease-in-out;
 }
-.vader .result { border-top: 0.08em solid rgba(255, 255, 255, 0.5); }
+.vader .result { border-top: 0.08em solid var(--vaderColor); }
 .vader.active, .vader.related {
-    color: white;
+    color: var(--vaderActiveColor);
     text-shadow: 0 0 0.3em rgba(255,255,255,1);
 }
-.vader.active .result, .vader.related .result { border-color: white; }
+.vader.active .result, .vader.related .result { border-color: var(--vaderActiveColor); }
 .vader.active .operator, .vader.related .operator { animation: wiggle 1s infinite ease-in-out; }
 .vader.correct {
-    color: #0f0;
+    color: var(--vaderRunnerColor);
     opacity: 0;
     filter: blur(2rem);
 }
@@ -205,7 +212,7 @@ button.delete:hover {
 }
 
 @keyframes dance { /*bob up & down*/
-    0%   { transform: translate(0, 0);}
+    0%   { transform: translate(0, 0); }
     50%  { transform: translate(0, -10px); }
     100% { transform: translate(0, 0); }
 }
@@ -230,15 +237,15 @@ button.delete:hover {
     margin: 1rem;
 }
 
-#startGame {
-    font-size: 200%;
-}
+#startGame { font-size: 200%; }
+
+#setNote { color: white; margin-left: 1rem; opacity: 0.7; }
 
 ul.tips > li { line-height: 1.8rem; }
 
 ul.tips > li > span { 
     font-family: monospace; 
-    font-size: 1.3rem; 
+    font-size: 1.1rem; 
     background-color: rgba(0,0,0,0.3);
     border-radius: 3px;
     padding: 0.2rem;

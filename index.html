@@ -33,7 +33,10 @@
             <button id="btnClear" disabled onclick="clearSelection()" title="No facts to clear">Clear</button>
         </p>
         <div class="grid"></div>
-        <p><button id="startGame" onclick="start();">Start Game</button></p>
+        <p>
+            <button id="startGame" onclick="start();" disabled title="Select at least one fact to play">Start Game</button> 
+            <span id="setNote" style="display: none;">High scores are saved only with a preset; select or make a preset for high scores.</span>
+        </p>
         <p>Tips:</p>
         <ul class="tips">
             <li>Type <span>numbers</span> to complete the problems</li>
@@ -53,9 +56,7 @@
 
         <p>Coming Soon:</p>
         <ul class="tips">
-            <li>Remember high scores</li>
-            <li>More visual splash</li>
-            <li>More creative gameplay</li>
+            <li>High scores</li>
         </ul>
 
         <div style="display: none;">
