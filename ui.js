@@ -66,6 +66,7 @@ function preset(set) {
         }
     }
     updateClearButton();
+    updateStartButton();
     selectedSetName = "Set " + presetKey;
 }
 
@@ -87,13 +88,9 @@ function presetCustom(btn) {
             if (button) button.classList.add('selected');
         }
         updateClearButton();
-        //TODO: maintain a pure selected set for high scores
-        //if (selectedSetName === "" && document.querySelectorAll(".grid button.selected").length === 0) {
-            btn.classList.add("selected");
-            selectedSetName = btn.textContent;
-        //} else {
-            
-        //}
+        updateStartButton();
+        btn.classList.add("selected");
+        selectedSetName = btn.textContent;
     }
 }
 
@@ -288,6 +285,13 @@ function isArraySetSubset(a, b) {
       );
 }
 
+function updateStartButton() {
+    const selectedFacts = selectedFactsToArray();
+    document.getElementById("startGame").disabled = selectedFacts.length === 0;
+    document.getElementById("startGame").setAttribute("title", 
+        selectedFacts.length === 0 ? "Select at least one fact to play" : "Play!");
+}
+
 function updatePresetButtons() {
     const selectedFacts = selectedFactsToArray();
     const presets = combinePresets();
@@ -305,11 +309,9 @@ function updatePresetButtons() {
 
     const numPresetSelected = presets.filter(p => p.element.classList.contains("selected")).length;
 
-    selectedPresetName = numPresetSelected === 1 ? exactMatches[0].name : "";
+    selectedSetName = numPresetSelected === 1 ? exactMatches[0].name : "";
 
-    document.getElementById("setNote").style.display 
-        = numPresetSelected === 1 || selectedFacts.length == 0 ? "none" : "inline";
-    document.getElementById("startGame").disabled = selectedFacts.length === 0;
-    document.getElementById("startGame").setAttribute("title", 
-        selectedFacts.length === 0 ? "Select at least one fact to play" : "Play!");
+    //document.getElementById("setNote").style.display 
+    //    = numPresetSelected === 1 || selectedFacts.length == 0 ? "none" : "inline";
+    updateStartButton();
 }
