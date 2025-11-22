@@ -35,7 +35,6 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
 
 - BUG: Select preset, click Delete Preset, preset is green not red.
 - BUG: make preset, new preset is not auto-selected green
-- BUG: When playing a custom game (no preset), game over screen shows fake high score list instead of saying "make a preset to save your high score"
 - Display the high score in the top-left corner during gameplay (or what your current rank is)
 - Improve the inevitable game-over experience; the game-over screen is basic, and currently the problems on-screen turn black when I feel like they should continue to bombard the bottom of the screen for 5 seconds
 - Improve how left and right arrows choose different problems.  Currently it just looks at horizontal position, but I'd like to take into account the vertical position, too.  If there's a problem near the bottom of the screen to the right, I'd like the right-arrow to select that one over the one right next to the active problem that's at the top of the screen.

@@ -229,8 +229,19 @@ function gameOver(vader) {
         document.body.classList.toggle("noscroll");
 
         //Show high scores
-        document.getElementById("highScoresGameOver").style.display = "block";
-        populateHighScoresUI();
+        const gameOverScreen = document.getElementById("highScoresGameOver");
+        gameOverScreen.style.display = "block";
+        if (selectedSetName !== "") {
+            populateHighScoresUI();
+            document.getElementById("noset").style.display = "none";
+            //gameOverScreen.querySelector("ol.highscorelist").style.display = "block";
+        } else {
+            gameOverScreen.querySelector("h2").style.display = "none";
+            gameOverScreen.querySelector("h3").style.display = "none";
+            document.getElementById("noset").style.display = "block";
+            gameOverScreen.querySelector("ol.highscorelist").style.display = "none";
+            document.getElementById("gameOverButtons").style.display = "block";
+        }
     }, 5000);
 }
 
