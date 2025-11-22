@@ -20,6 +20,7 @@ let presets = {
 
 let selectedProblems = [];
 let selectedSetName = "";
+const defaultInitials = "\u2013\u2013\u2013"; //EN DASH x3
 
 document.addEventListener("DOMContentLoaded", function() {
     //Generate 12x12 buttons
@@ -59,24 +60,40 @@ function preset(set) {
     if (selectedPreset) {
         const setButton = document.querySelectorAll("#presetButtons > button.hardcoded")[set - 1];
         setButton.classList.add("hover");
-        if (noSelectedFacts()) setButton.classList.add("selected");
+        const numSelectedSets = document.querySelectorAll("#presetButtons .selected, #presetButtons .hover").length;
+        if (noSelectedFacts() && numSelectedSets === 1) setButton.classList.add("selected");
+        if (numSelectedSets > 1) {
+            document.querySelectorAll("#presetButtons .selected, #presetButtons .hover").forEach(b => {
+                //If more than one set selected, turn all selected sets into hover
+                b.classList.remove("selected");
+                b.classList.add("hover");
+            });
+        }        
         for (const f of selectedPreset) {
             const button = document.querySelector(`button[data-fact-a="${f[0]}"][data-fact-b="${f[1]}"]`);
             if (button) button.classList.add('selected');
         }
     }
+    let numSelectedSets = document.querySelectorAll("#presetButtons .selected, #presetButtons .hover").length;
+    selectedSetName = numSelectedSets === 1 ? "Set " + presetKey : "";
     updateClearButton();
     updateStartButton();
-    selectedSetName = "Set " + presetKey;
 }
 
 function presetCustom(btn) {
+    let presetName = btn.innerText;
     if (btn.classList.contains("delete")) {
         //Delete this preset
-        let presetName = btn.innerText;
         let presetList = JSON.parse(localStorage.getItem("presets"));
         presetList = presetList.filter(p => p.name !== presetName);
         localStorage.setItem("presets", JSON.stringify(presetList));
+
+        //Delete high scores for this preset
+        let highscoreList = JSON.parse(localStorage.getItem("highscores"));
+        highscoreList = highscoreList.filter(s => s.name !== presetName);
+        localStorage.setItem("highscores", JSON.stringify(highscoreList));
+        
+        //Update UI
         deletePreset(document.getElementById("btnDeletePreset"));
         refreshCustomPresetButtons();
         return;
@@ -87,10 +104,25 @@ function presetCustom(btn) {
             const button = document.querySelector(`button[data-fact-a="${f[0]}"][data-fact-b="${f[1]}"]`);
             if (button) button.classList.add('selected');
         }
+        
+        let numSelectedSets = document.querySelectorAll("#presetButtons .selected, #presetButtons .hover").length;
+        if (numSelectedSets === 0) {
+            btn.classList.add("selected");
+            numSelectedSets++;
+        } else {
+            document.querySelectorAll("#presetButtons .selected, #presetButtons .hover").forEach(b => {
+                //If more than one set selected, turn all selected sets into hover
+                b.classList.remove("selected");
+                b.classList.add("hover");
+            });
+            btn.classList.add("hover");
+            numSelectedSets++;
+        }
+        selectedSetName = numSelectedSets === 1 ? presetName : "";
         updateClearButton();
         updateStartButton();
-        btn.classList.add("selected");
-        selectedSetName = btn.textContent;
+        document.getElementById("setNote").style.display 
+            = numSelectedSets === 1 ? "none" : "inline";
     }
 }
 
@@ -290,6 +322,8 @@ function updateStartButton() {
     document.getElementById("startGame").disabled = selectedFacts.length === 0;
     document.getElementById("startGame").setAttribute("title", 
         selectedFacts.length === 0 ? "Select at least one fact to play" : "Play!");
+
+    document.getElementById("btnViewHighScores").style.display = selectedSetName !== "" ? "inline" : "none";
 }
 
 function updatePresetButtons() {
@@ -311,7 +345,281 @@ function updatePresetButtons() {
 
     selectedSetName = numPresetSelected === 1 ? exactMatches[0].name : "";
 
-    //document.getElementById("setNote").style.display 
-    //    = numPresetSelected === 1 || selectedFacts.length == 0 ? "none" : "inline";
+    document.getElementById("setNote").style.display 
+        = numPresetSelected === 1 || selectedFacts.length == 0 ? "none" : "inline";
     updateStartButton();
+}
+
+function submitHighScore() {
+    saveHighScore();
+    document.getElementById("gameOverButtons").style.display = "inline-block";
+}
+
+function defaultHighScores() {
+    return [
+        {rank: 1, initials: defaultInitials, score: 90, date: "", time: ""},
+        {rank: 2, initials: defaultInitials, score: 60, date: "", time: ""},
+        {rank: 3, initials: defaultInitials, score: 30, date: "", time: ""}
+    ];
+}
+
+function saveHighScore() {
+    const maxEntriesPerSet = 10;
+    const minScoreToQualify = 2;
+    const defaultScores = defaultHighScores();
+
+    //Get initials
+    let initials = document.getElementById("initialsInput").value.trim().toUpperCase();
+    if (initials.length === 0) initials = defaultInitials;
+    //else if (initials.length < 3) initials = initials.padEnd(3, " ");
+    else if (initials.length > 3) initials = initials.substring(0, 3);
+
+    //Get set name
+    let setName = selectedSetName;
+    if (setName === "") {
+        alert("Unable to save high score: No preset selected.");
+        return;
+    }
+
+    //Get score
+    let score = parseInt(document.getElementById("score2").innerText);
+    if (isNaN(score)) score = 0;
+    if (score < minScoreToQualify) {
+        alert("Score too low to qualify for high scores.");
+        return;
+    }
+
+    //Construct entry
+    const entry = {
+        rank:       0, //To be set later
+        initials:   initials,
+        score:      score,
+        date:       new Date().toLocaleDateString(), //MM/DD/YYYY
+        time:       totalSeconds //Future use, not displaying currently
+    };
+
+    //Load existing highscores
+    let highscoreList = JSON.parse(localStorage.getItem("highscores"));
+    if (highscoreList == null) highscoreList = [];
+    
+    //Find or create set entry
+    let setEntry = highscoreList.find(s => s.name === setName);
+    if (setEntry == null) {
+        setEntry = {
+            name: setName,
+            scores: defaultScores.slice()
+        };
+        highscoreList.push(setEntry);
+    }
+
+    //Add new score    
+    setEntry.scores.push(entry);
+
+    //Sort and trim
+    setEntry.scores.sort((a, b) => b.score - a.score);
+    if (setEntry.scores.length > maxEntriesPerSet)
+        setEntry.scores = setEntry.scores.slice(0, maxEntriesPerSet);
+    
+    //Update ranks
+    for (let i = 0; i < setEntry.scores.length; i++)
+        setEntry.scores[i].rank = i + 1;
+
+    //Save back to localStorage
+    localStorage.setItem("highscores", JSON.stringify(highscoreList));
+}
+
+function getHighScoresForSet(setName) {
+    let highscoreList = JSON.parse(localStorage.getItem("highscores"));
+    if (highscoreList == null) return [];
+    let setEntry = highscoreList.find(s => s.name === setName);
+    if (setEntry == null) return defaultHighScores();
+    return setEntry.scores;
+}
+
+function isHighScore(setName, score) {
+    if (setName === "") return false;
+    if (score < 2) return false;
+    let highscoreList = getHighScoresForSet(setName);
+    if (highscoreList.length < 10) return true;
+    return score > highscoreList[highscoreList.length - 1].score;
+}
+
+function populateHighScoresUI() {
+    //Grab DOM elements
+    const divHsMainMenu = document.getElementById("highScoresMainMenu");
+    const divHsGameOver = document.getElementById("highScoresGameOver");
+    const h2MainMenu = divHsMainMenu.querySelector("h2");
+    const h2GameOver = divHsGameOver.querySelector("h2");
+    const h3MainMenu = divHsMainMenu.querySelector("h3");
+    const h3GameOver = divHsGameOver.querySelector("h3");
+    const olMainMenu = divHsMainMenu.querySelector("ol");
+    const olGameOver = divHsGameOver.querySelector("ol");
+    const pNewHighScore = divHsGameOver.querySelector("p");
+    const btns = document.getElementById("gameOverButtons");
+    
+    //Load existing highscores
+    let highscoreList = getHighScoresForSet(selectedSetName);
+
+    //Get score, determine if it's a high score, and if so, what rank
+    const score = document.getElementById("score2").textContent;
+    const isHS = isHighScore(selectedSetName, score);
+    const newRank = isHS ? highscoreList.filter(entry => score < entry.score).length + 1 : 99;
+    if (newRank <= 10) {
+        //Insert new score into list for display purposes
+        highscoreList.splice(newRank - 1, 0, {
+            rank: newRank,
+            initials: "",
+            score: score,
+            date: new Date().toLocaleDateString()
+        });
+        for (let i = newRank; i < highscoreList.length; i++)
+            highscoreList[i].rank += 1;
+        document.getElementById("initialsInput").value = ""; //Clear initials input
+    }
+
+    //Clear existing entries
+    olMainMenu.replaceChildren(); 
+    olGameOver.replaceChildren();
+
+    //Set titles
+    h3MainMenu.textContent = selectedSetName;
+    h3GameOver.textContent = selectedSetName;
+
+    //Populate both lists
+    let newMarked = false;
+    for (const entry of highscoreList) {
+        const li = document.createElement("li");
+        const dl = document.createElement("dl");
+        const dt = document.createElement("dt");
+        if (isHS && entry.rank === newRank) {
+            li.classList.add("new");
+            newMarked = true;
+        }
+        if (isHS && entry.rank > 10) li.classList.add("kicked"); //Show the last one getting kicked off the list
+        dt.textContent = ordinal(entry.rank) + ":";
+        const ddInitials = document.createElement("dd");
+        ddInitials.textContent = entry.initials;
+        const ddScore = document.createElement("dd");
+        ddScore.textContent = entry.score;
+        const ddDate = document.createElement("dd");
+        ddDate.textContent = entry.date;
+        dl.appendChild(dt);
+        dl.appendChild(ddInitials);
+        dl.appendChild(ddScore);
+        dl.appendChild(ddDate);
+        li.appendChild(dl);
+        olMainMenu.appendChild(li);
+        olGameOver.appendChild(li.cloneNode(true));
+    }
+
+    //Show instructions
+    h2GameOver.style.display = selectedSetName === "" ? "none" : "block";
+    pNewHighScore.style.display = isHS ? "block" : "none";
+    btns.style.display = isHS ? "none" : "inline-block";
+
+    //Add listeners for initials input if needed
+    if (isHS && newMarked) document.addEventListener("keydown", initialsInputKeyDown);
+}
+
+function ordinal(n) {
+    return n + (n % 10 === 1 && n % 100 !== 11 ? "st" :
+                n % 10 === 2 && n % 100 !== 12 ? "nd" :
+                n % 10 === 3 && n % 100 !== 13 ? "rd" : "th");
+}
+
+function initialsInputKeyDown(e) {
+    //Keys allowed: A-Z, Backspace, Delete
+
+    const inputEl = document.getElementById("initialsInput");
+    const entry = document.querySelector("#highScoresGameOver ol.highscorelist li.new");
+    let val = inputEl.value;
+    
+    if (e.key === "Enter") {
+        submitHighScore();
+        document.removeEventListener("keydown", initialsInputKeyDown);
+        newNameSparks();
+        document.querySelector(".highscorelist li.new").classList.add("emphasize");
+        document.querySelector(".highscorelist li.new").classList.add("full"); //For short names
+        document.querySelector(".highscorelist li.kicked")?.classList.add("hidden");
+        document.querySelector("#highScoresGameOver p").style.opacity = "0";
+        e.preventDefault();
+    } else if (e.key === "Backspace") {
+        val = val.slice(0, -1);
+        entry.classList.remove("full");
+        e.preventDefault();
+    } else if (e.key.length === 1 && ((e.key >= 'A' && e.key <= 'Z') || (e.key >= 'a' && e.key <= 'z'))  && val.length < 3) {
+        val += e.key;
+        if (val.length >= 3) entry.classList.add("full"); else entry.classList.remove("full");
+        e.preventDefault();
+    }
+    inputEl.value = val;
+    document.querySelector("#highScoresGameOver ol.highscorelist li.new dd:nth-child(2)").textContent = val;
+}
+
+function newNameSparks() {
+    //Find the bounding box of the new entry, generate 100 sparks, and animate them drifting away
+    const entry = document.querySelector("#highScoresGameOver ol.highscorelist li.new");
+    const rect = entry.getBoundingClientRect();
+    const g = document.getElementById("nameSparksGroup");
+    createNewNameSparks(g, rect.left, rect.top, rect.right, rect.bottom);
+    const nameSparkAnimationInterval = setInterval(() => {
+        moveNameParticles();
+    }, 1000 / 30);
+    setTimeout(() => {
+        clearInterval(nameSparkAnimationInterval);
+    }, 10 * 1000);
+}
+
+function createNewNameSparks(g, x1, y1, x2, y2) {
+    let numParticles = 300;
+    for (let i = 0; i < numParticles; i++) {
+        let px = Math.random() * (x2 - x1) + x1;
+        let py = Math.random() * (y2 - y1) + y1;
+        let vx = (Math.random() * 2 - 1) * 2.0;
+        let vy = (Math.random() * 2 - 1) * 1.5;
+        let particle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        particle.setAttribute("cx", px);
+        particle.setAttribute("cy", py);
+        particle.setAttribute("vx", vx);
+        particle.setAttribute("vy", vy);
+        particle.style.animationDelay = (Math.random() * -10) + "s"; //Negative delay so there's no "jump"
+
+        //Add particle
+        g.append(particle);
+
+        //Schedule particle removal
+        setTimeout(() => { particle.remove(); }, 10000);
+    }
+}
+
+function moveNameParticles() {
+    let g = document.getElementById("nameSparksGroup");
+    for (const particle of g.querySelectorAll("circle")) {
+        let cx = parseFloat(particle.getAttribute("cx"));
+        let cy = parseFloat(particle.getAttribute("cy"));
+        let vx = parseFloat(particle.getAttribute("vx"));
+        let vy = parseFloat(particle.getAttribute("vy"));
+        cx += vx;
+        cy += vy;
+        particle.setAttribute("cx", cx);
+        particle.setAttribute("cy", cy);
+    }
+}
+
+function playAgain() {
+    document.getElementById("gameContainer").style.display = "block";
+    document.getElementById("gameOver").style.display = "none";
+    start();
+}
+
+function viewHighScoresMainMenu() {
+    if (selectedSetName === "") return; //Should not be possible; populate() requires this
+    document.getElementById("highScoresMainMenu").style.display = "block";
+    document.getElementById("gameTitle").style.display = "none";
+    populateHighScoresUI();
+}
+
+function returnToMainMenuFromHighScores() {
+    document.getElementById("gameTitle").style.display = "block";
+    document.getElementById("highScoresMainMenu").style.display = "none";
 }

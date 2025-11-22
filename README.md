@@ -23,20 +23,21 @@ A song is played while playing. Tones are synthesized when the player types a nu
 
 ### Difficulty Progression
 
-I want the game to get harder as the player progresses, to keep it "fun" and to try to achieve a higher score.  There are two ways to make the game harder over time:  how often a new problem appears (delay) and how fast the problem drops down the screen (speed). My goal is to make a score of 100 fairly difficult with a game-over soon after that. In the future, I'd like to build in a mechanism that will grant the player occasional reprieves ([see Jesse Schell's "Art of Game Design"](https://gamedev.stackexchange.com/a/110869)). Maybe a periodic explosive problem that destroys all the problems around it or a temporary way to multi-shot.
+I want the game to get harder as the player progresses, to keep it "fun" and to try to achieve a higher score.  There are two ways to make the game harder over time:  how often a new problem appears (delay) and how fast the problem drops down the screen (speed). My goal is to make a score of 100 fairly difficult with a game-over soon after that. The multishot feature is a powerful mechanism that can quickly clear a crowded screen, providing some temporary relief ([see Jesse Schell's "Art of Game Design"](https://gamedev.stackexchange.com/a/110869)).
+
+I also like how the addition of the left-right "runner" and the arrow keys add a level of strategy over brute multiplication memorization:  does the player solve the problem closest to the bottom or do they select the runner to get the multishot?
 
 ### Languages/Technology
 
-The game is built entirely in HTML, JavaScript, and CSS.
+The game is built entirely in HTML, JavaScript, and CSS.  There are some inline SVG elements, both hard-coded and procedurally built.
 
 ## TODO / Wishlist
 
-- Add a progressive saw-like difficulty ladder
-    - Perhaps exploding problems that take out neighbors, providing a reprieve
-    - Perhaps a temporary power-up that solves all identical problems on-screen (multi-solving)
+- BUG: Select preset, click Delete Preset, preset is green not red.
+- BUG: make preset, new preset is not auto-selected green
+- BUG: When playing a custom game (no preset), game over screen shows fake high score list instead of saying "make a preset to save your high score"
+- Display the high score in the top-left corner during gameplay (or what your current rank is)
 - Improve the inevitable game-over experience; the game-over screen is basic, and currently the problems on-screen turn black when I feel like they should continue to bombard the bottom of the screen for 5 seconds
-- Use local storage so players can make their own presets
-- Use local storage to save high scores (with old-school initials?)
 - Improve how left and right arrows choose different problems.  Currently it just looks at horizontal position, but I'd like to take into account the vertical position, too.  If there's a problem near the bottom of the screen to the right, I'd like the right-arrow to select that one over the one right next to the active problem that's at the top of the screen.
     - Maybe use the mouse like a left-right paddle to select?
 - More sound effects:
@@ -45,22 +46,33 @@ The game is built entirely in HTML, JavaScript, and CSS.
     - Backspace "click"
     - Game over "groan" or explosion
 - Move graphics code from game.js to separate graphics.js file
-- Move the turret around as it targets different problems
-    - Make the turret stand out more?
 - Add a fullscreen toggle button
 - To prevent overlapping and legibility, darken problems that are behind the active problem; restore them when the active problem is solved
 
 ## Known Bugs
 
 - Does not work on mobile: no on-screen keyboard; cannot hover over presets
+    - Add gestures to "draw" the numbers in?  Or an on-screen row of numbers at the bottom to tap?
 - Does not scale to different resolutions well - larger resolutions are easier because the problems take longer to fall
 
 ## Recent Updates
 
-- *October 2025:*
+- *November 2025:*
     - Menu enhancements:
         - Presets are now automatically selected if you choose the corresponding facts
         - Multiple presets are now indicated with a highlight color
+        - Game Over screen now display high scores (if a preset was played) and Play Again or Main Menu buttons
+        - High scores are saved and displayed, one list per saved set
+    - Game enhancements:
+        - Added "runners" - special, fast-moving problems that carry a multishot upgrade
+        - Multishot upgrade - solves multiple problems simultaneously
+    - Graphical enhancements:
+        - Multi-laser when solving multiple problems at once
+        - Screen-shake when solving multiple problems at once
+        - Network "lightning" lines between the solved multiple problems
+        - Balls orbit around the runner and turret when multishot is active
+        - Turret now glows and pulses with every solve, glows green when multishot is active
+        - Turret now moves
 - *September 2025:*
     - Menu enhancements:
         - Hovering over presets now previews what the set is

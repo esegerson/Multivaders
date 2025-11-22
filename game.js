@@ -5,6 +5,7 @@ let hitCeiling = 0;
 let gameLoopInterval = null;
 let statLoopInterval = null;
 let orbiterInterval = null;
+let turretInterval = null;
 let startingVaders = 10;
 let autoSolve = false;
 let autoSolveInProgress = false;
@@ -14,8 +15,24 @@ let showStats = false;
 let timer = 0;
 let elapsedPaused = 0;
 let pausedStart = 0;
+let totalSeconds = 0;
 let overrideSpeed = false;
-let multishotActive = false;
+const vaderRunnerChance = 1 / 10; //This seems really wrong. 1/3 feels like 1/10
+let forceNextRunner = false;
+let multishots = 0;
+const multishotsAwarded = 4;
+let multishotActive = function() { return multishots > 0; };
+
+let keybuffer = [];
+
+function gameDomLoaded() {
+    document.getElementById("gameContainer").addEventListener("animationend", function(e) { 
+        e.target.classList.remove("boom");
+    });
+    document.getElementById("turret").addEventListener("animationend", function(e) { 
+        e.target.classList.remove("pulse");
+    });
+}
 
 function start() {
     const selectedButtons = document.querySelectorAll('.grid button.selected');
@@ -38,11 +55,12 @@ function start() {
     document.querySelectorAll("#gameContainer .vader").forEach(v => v.remove()); // Clear previous vaders
     score = -1;
     incrementScore(); // Start score at 0
-    multishotActive = false;
+    multishots = 0;
+    resetOrbiters();
 
     //Spawn initial vaders
     for (let i = 0; i < startingVaders; i++) {
-        spawnVader(lastId++);
+        spawnVader(lastId++, true);
     }
     let vaders = document.querySelectorAll("#gameContainer .vader");
     for (const vader of vaders) {
@@ -55,10 +73,12 @@ function start() {
     setupOrbiters();
     
     timer = performance.now(); // Start the timer
+    totalSeconds = 0; //This gets set in gameOver(), used for high score display
     spawnVader(lastId++); // Spawn the first vader
-    gameLoopInterval = setInterval(gameLoop, 33); //Start the game loop ~30fps
-    statLoopInterval = setInterval(updateStats, 33); //Update stats ~30fps
-    orbiterInterval = setInterval(updateOrbiters, 16); //Update orbiters ~60fps
+    gameLoopInterval = setInterval(gameLoop, 1000 / 30); //Start the game loop 30fps
+    statLoopInterval = setInterval(updateStats, 1000 / 10); //10fps
+    orbiterInterval = setInterval(updateOrbiters, 1000 / 60); //60fps
+    turretInterval = setInterval(moveTurret, 1000 / 60); //60fps
 
     //Pre-populate multis (decorative background elements)
     const multiContainer = document.querySelector("#gameContainer .background2");
@@ -73,8 +93,7 @@ function start() {
 
     //Debugging
     if (window.location.protocol === "file:") {
-        setTimeout(function() { sendKeyPress("`"); }, 1000);
-        setTimeout(function() { sendKeyPress("PageUp"); }, 5000);
+        //setTimeout(function() { sendKeyPress("`"); }, 1000);
     }
 }
 
@@ -107,12 +126,23 @@ function gameLoop() {
     for (const vader of vaders) {
         let speed = parseFloat(vader.getAttribute("data-speed") || 1);
         if (overrideSpeed) speed = 0;
-        let top = parseFloat(vader.style.top || "-150");
-        if (top < 50 && score < 100) { //Do a fast slide-in so user doesn't have to wait
-            speed = (50 - top) / 5 * speed; //Hustle to get onto the screen
-            if (speed < 0.2) speed = 0.2; // Ensure a minimum speed
+        if (vader.classList.contains("runner")) {
+            let left = parseFloat(vader.style.left);
+            let direction = parseInt(vader.getAttribute("data-dir")) * -1;
+            let newLeft = left + speed * direction;
+            vader.style.left = newLeft + "px";
+            if (vader.classList.contains("active") && !runnerOutOfBounds(vader).canBeActive) {
+                vader.classList.remove("active");
+                getNextActiveVader();
+            }
+        } else {
+            let top = parseFloat(vader.style.top || "-150");
+            if (top < 50 && score < 100) { //Do a fast slide-in so user doesn't have to wait
+                speed = (50 - top) / 5 * speed; //Hustle to get onto the screen
+                if (speed < 0.2) speed = 0.2; // Ensure a minimum speed
+            }
+            vader.style.top = (top + speed) + "px";
         }
-        vader.style.top = (top + speed) + "px";
     }
 
     // Tint the background based on vader positions
@@ -120,10 +150,12 @@ function gameLoop() {
 
     //Cull solved vaders
     for (const vader of vaders) {
-        if (!vader.classList.contains("correct")) continue;
-        let solvedTime = parseFloat(vader.getAttribute("data-solved") || 0);
-        if (solvedTime > 0 && now - solvedTime > 8000) {
-            vader.remove(); // Remove vaders that have been solved for more than 8 seconds
+        if (vader.classList.contains("correct")) {
+            let solvedTime = parseFloat(vader.getAttribute("data-solved") || 0);
+            if (solvedTime > 0 && now - solvedTime > 8000) 
+                vader.remove();
+        } else if (vader.classList.contains("runner") && runnerOutOfBounds(vader).canBeRemoved) {
+            vader.remove();
         }
     }
 
@@ -183,8 +215,11 @@ function sendKeyPress(key) {
 
 function gameOver(vader) {
     if (vader) vader.classList.add("dead");
+    totalSeconds = Math.floor((performance.now() - timer - elapsedPaused) / 1000);
     clearInterval(gameLoopInterval); // Stop the game loop
     clearInterval(statLoopInterval); // Stop the stats loop
+    clearInterval(orbiterInterval); // Stop the orbiter loop
+    clearInterval(turretInterval); // Stop the turret loop
     let music = document.getElementById("gameMusic");
     music.volume = 0.1;
     setTimeout(() => {
@@ -192,16 +227,38 @@ function gameOver(vader) {
         document.getElementById("gameContainer").style.display = "none";
         document.body.removeEventListener("keydown", keyListener);
         document.body.classList.toggle("noscroll");
-        document.getElementById("playAgain").focus();
+
+        //Show high scores
+        document.getElementById("highScoresGameOver").style.display = "block";
+        populateHighScoresUI();
     }, 5000);
 }
 
-function spawnVader(id) {
+function spawnVader(id, init = false) {
+    let isRunner = () => {
+        const chance = (Math.random() / vaderRunnerChance);
+        let msg = chance + "";
+        if (!init && container.querySelectorAll(".runner").length === 0 
+                && !multishotActive()
+                && (forceNextRunner || chance < 1)) {
+            forceNextRunner = false;
+            return true;
+        }
+        return false;
+    };
     let problem = getProblem();
     let vader = createVader(id, problem.factA, problem.factB);
     let container = document.getElementById("vaderContainer");
     if (container.querySelectorAll(".active").length === 0)
         vader.classList.add("active");
+    if (isRunner()) {
+        vader.classList.add("runner");
+        let direction = Math.random() * 2 < 1 ? -1 : 1;
+        vader.style.left = direction < 0 ? "-200px" : window.innerWidth + 100 + "px";
+        vader.style.top = (Math.random() * window.innerHeight * .7) + "px";
+        vader.setAttribute("data-dir", direction);
+        vader.setAttribute("data-speed", parseFloat(vader.getAttribute("data-speed")) * 8);
+    }
     container.appendChild(vader);
     lastVaderSpawned = performance.now();
 }
@@ -211,10 +268,6 @@ function getProblem() {
         alert("No multiplication facts selected.");
         return null;
     }
-    
-    //Currently get completely random problems from selected set.
-    //In the future I may want to temporarilly bias some problems
-    //to emphasize a multi-shot upgrade.
     const randomIndex = Math.floor(Math.random() * selectedProblems.length);
     return selectedProblems[randomIndex];
 }
@@ -231,7 +284,7 @@ function createVader(id, factA, factB) {
     vaderClone.style.left = Math.random() * (window.innerWidth - 100) + "px"; // Random horizontal position
     vaderClone.setAttribute("data-speed", getSpeed());
     const activeVader = document.querySelector("#gameContainer .vader.active");
-    if (multishotActive && activeVader && vaderIsSame(vaderClone, activeVader)) {
+    if (multishotActive() && activeVader && vaderIsSame(vaderClone, activeVader)) {
         vaderClone.classList.add("related");
         vaderClone.querySelector(".result").textContent = activeVader.querySelector(".result").textContent;
     }
@@ -297,22 +350,7 @@ function keyListener(e) {
         setDeadBackgroundStyle(1); // Set background to dead state
         gameOver();
     } else if (e.key === " ") {
-        let gameContainer = document.getElementById("gameContainer");
-        gameContainer.classList.toggle("paused");
-        paused = !paused;
-        if (paused) {
-            clearInterval(gameLoopInterval);
-            document.getElementById("paused").style.display = "block";
-            let music = document.getElementById("gameMusic");
-            music.volume = 0.1; //Lower volume when paused
-            pausedStart = performance.now();
-        } else {
-            gameLoopInterval = setInterval(gameLoop, 33); // Resume the game loop
-            document.getElementById("paused").style.display = "none";
-            let music = document.getElementById("gameMusic");
-            music.volume = 0.2;
-            elapsedPaused += (performance.now() - pausedStart);
-        }
+        keyListenerHelper.doPause(paused);
     } else if (e.key === "Pause") {
         if (paused) return; // Cannot autosolve while paused
         e.preventDefault();
@@ -324,7 +362,7 @@ function keyListener(e) {
         if (result.textContent.length === 0) result.textContent = "\xa0";
         activeVader.classList.remove("correct");
         activeVader.classList.remove("incorrect");
-        if (multishotActive)
+        if (multishotActive())
             for (const v of relatedVaders)
                 v.querySelector(".result").textContent = result.textContent;
     } else if (e.key.length === 1 && e.key >= '0' && e.key <= '9') {
@@ -339,50 +377,27 @@ function keyListener(e) {
             result.textContent += e.key;
             playKeyboardPress(Math.floor(Math.random() * 3));
         }
-        if (multishotActive) { //Copy pressed number to all related vaders
-            for (const v of relatedVaders) 
+        if (multishotActive()) { //Copy pressed number to all related vaders
+            for (const v of relatedVaders) {
                 v.querySelector(".result").textContent = result.textContent;
+                v.classList.remove("incorrect");
+            }
         }
     } else if (e.key === "Enter") {
         if (paused) return; // Cannot type while paused
         if (result.textContent === (activeVader.getAttribute("data-last-val") || "~")) 
             return; //Prevent accidental double-enters on wrong answers which can quickly end the game
-        if (result.textContent === "") { 
+        if (result.textContent === "" || result.textContent === "\u00A0") { //nbsp
             //Nothing entered
-            const specialVader = document.querySelector("#gameContainer .vader.special");
-            if (specialVader != null) {
+            const runner = document.querySelector("#gameContainer .vader.runner");
+            if (runner != null) {
                 //If special vader is in play, grab that one
                 activeVader.classList.remove("active");
-                specialVader.classList.add("active");
-            } else
-                return;
-        }
-        const facts = getFactsFromVader(activeVader);
-        const expectedResult = facts.factA * facts.factB;
-        if (parseInt(result.textContent) === expectedResult) {
-            const vanquishVaders = multishotActive
-                ? [activeVader, ...getRelatedVaders(activeVader)]
-                : [activeVader];
-            for (const [i, v] of vanquishVaders.entries()) {
-                v.classList.remove("incorrect");
-                v.classList.add("correct");
-                v.classList.remove("active");
-                v.setAttribute("data-solved", performance.now());
-                zapLaser(v);
-                setTimeout(incrementScore, i * 100);
-                showScreenTip({ type: "point", classname: "tippoint", text: "+1",
-                    x: parseInt(v.style.left) + v.offsetWidth / 2 + 30,
-                    y: parseInt(v.style.top) + v.offsetHeight - 60
-                });
+                runner.classList.add("active");
             }
-            getNextActiveVader(activeVader.getAttribute("data-id"));
-            playKeyboardPress(3); //3 = the bass harmonic
-        } else {
-            activeVader.setAttribute("data-last-val", result.textContent);
-            activeVader.classList.add("incorrect");
-            let speed = parseFloat(activeVader.getAttribute("data-speed"));
-            activeVader.setAttribute("data-speed", speed * 3); // Increase speed on incorrect answer
+            return;
         }
+        keyListenerHelper.doEnter(activeVader, result);
     } else if (e.key === "`") {
         //Toggle stats display
         showStats = !showStats;
@@ -403,10 +418,70 @@ function keyListener(e) {
             else vader.classList.remove("paused");
     } else if (e.key === "PageDown" && showStats) {
         //Debug: whatever I'm currently testing
-        if (multishotActive)
-            endMultishot();
-        else
-            initMultishot();
+        //forceNextRunner = !forceNextRunner;
+        //spawnVader(lastId++, false);
+    }
+}
+
+class keyListenerHelper {
+    static doEnter(activeVader, result) {
+        const facts = getFactsFromVader(activeVader);
+        const expectedResult = facts.factA * facts.factB;
+        const relatedVaders = multishotActive()
+                ? [activeVader, ...getRelatedVaders(activeVader)]
+                : [activeVader];
+        if (parseInt(result.textContent) === expectedResult) {
+            for (const [i, v] of relatedVaders.entries()) {
+                v.classList.remove("incorrect");
+                v.classList.add("correct");
+                v.classList.remove("active");
+                v.setAttribute("data-solved", performance.now());
+                zapLaser(v, i === 0, relatedVaders.length);
+                setTimeout(incrementScore, i * 100); //Animates multishot better
+                showScreenTip({ type: "point", classname: "tippoint", text: "+1",
+                    x: parseInt(v.style.left) + v.offsetWidth / 2 + 30,
+                    y: parseInt(v.style.top) + v.offsetHeight - 60
+                });
+            }
+            if (multishotActive()) {
+                multishots--;
+                hideOneOrbiter();
+                if (!multishotActive()) endMultishot();
+            }
+            if (activeVader.classList.contains("runner")) {
+                multishots += multishotsAwarded;
+                orbitDetails.movementMode = "transfer";
+                orbitDetails.initTransfer(activeVader);
+            }
+            getNextActiveVader(activeVader.getAttribute("data-id"));
+            playKeyboardPress(3); //3 = the bass harmonic
+        } else {
+            for (const [i, v] of relatedVaders.entries()) {
+                v.setAttribute("data-last-val", result.textContent);
+                v.classList.add("incorrect");
+                let speed = parseFloat(v.getAttribute("data-speed"));
+                v.setAttribute("data-speed", speed * 3); // Increase speed on incorrect answer
+            }
+        }
+    }
+
+    static doPause(paused) {
+        let gameContainer = document.getElementById("gameContainer");
+        gameContainer.classList.toggle("paused");
+        paused = !paused;
+        if (paused) {
+            clearInterval(gameLoopInterval);
+            document.getElementById("paused").style.display = "block";
+            let music = document.getElementById("gameMusic");
+            music.volume = 0.1; //Lower volume when paused
+            pausedStart = performance.now();
+        } else {
+            gameLoopInterval = setInterval(gameLoop, 33); // Resume the game loop
+            document.getElementById("paused").style.display = "none";
+            let music = document.getElementById("gameMusic");
+            music.volume = 0.2;
+            elapsedPaused += (performance.now() - pausedStart);
+        }
     }
 }
 
@@ -417,6 +492,9 @@ function getNextActiveVader() {
     let maxTop = -1000;
     let id = null;
     for (const vader of vaders) {
+        if (vader.classList.contains("runner") && !runnerOutOfBounds(vader).canBeActive) { 
+            continue; //Don't auto-target a runner close to the edges
+        }
         if (parseInt(vader.style.top) > maxTop) {
             maxTop = parseInt(vader.style.top);
             id = vader.getAttribute("data-id");
@@ -424,7 +502,21 @@ function getNextActiveVader() {
     }
     if (id != null) 
         vaders.filter(v => v.getAttribute("data-id") === id)[0].classList.add("active");
-    if (multishotActive) initMultishot();
+    if (multishotActive()) initMultishot();
+}
+
+function runnerOutOfBounds(vader) {
+    const margin = 100;
+    const dir = parseInt(vader.getAttribute("data-dir"));
+    const rect = vader.getBoundingClientRect();
+    let rv = { };
+    rv.fullyVisible = rect.left > 0 && rect.right < window.innerWidth;
+    rv.fullyInvisible = rect.right < -margin || rect.left > window.innerWidth + margin; //Margin for orbiters
+    rv.canBeActive = (dir > 0 && rect.left > 0)
+        || (dir < 0 && rect.right < window.innerWidth);
+    rv.canBeRemoved = (dir > 0 && rect.left < -margin)
+        || (dir < 0 && rect.left > window.innerWidth + margin);
+    return rv;
 }
 
 function selectDifferentVader(direction) {
@@ -450,7 +542,7 @@ function selectDifferentVader(direction) {
     if (nearestVader) {
         activeVader.classList.remove("active");
         nearestVader.classList.add("active");
-        if (multishotActive) initMultishot();
+        if (multishotActive()) initMultishot();
     }
 }
 
@@ -471,7 +563,7 @@ function incrementScore() {
 }
 
 function tintBackground() {
-    let vaders = document.querySelectorAll("#gameContainer .vader:not(.correct)"); //Solved vaders are not counted
+    let vaders = document.querySelectorAll("#gameContainer .vader:not(.correct):not(.runner)");
     let largestTop = Math.max(...Array.from(vaders).map(v => parseFloat(v.style.top || "0")));
     let windowHeight = window.innerHeight - 200;
     let distanceToBottom = windowHeight - largestTop;
@@ -501,6 +593,9 @@ function updateStats() {
     stats.HitCeiling = hitCeiling;
     stats.Speed = (getSpeed(0) * 33).toFixed(0) + "px/s";
     stats.Lifespan = (getEstimatedLifespan() / 33).toFixed(0) + "s";
+    stats.Runner = "force=" + (forceNextRunner ? "on" : "off") + " : " 
+        + document.querySelectorAll(".vader.runner").length;
+    stats.Multishots = multishots + " : " + (multishotActive() ? "ACTIVE" : "off");
     stats.Time = min + ":" + (sec < 10 ? "0" : "") + sec;
     stats.Chord = getChord();
     
@@ -561,12 +656,14 @@ function createMulti(init) {
     return multi;
 }
 
-function zapLaser(targetVader) {
+function zapLaser(targetVader, isFirst, numZapped) {
     let resultElement = targetVader.querySelector(".result");
     let targetX = parseInt(targetVader.style.left) + targetVader.offsetWidth / 2 + 20;
     let targetY = parseInt(targetVader.style.top) + targetVader.offsetHeight - 20;
-    let turretX = window.innerWidth / 2;
-    let turretY = window.innerHeight - 10;
+    const turret = document.getElementById("turret");
+    const turretLocation = getVaderCenter(turret);
+    let turretX = turretLocation.x; //window.innerWidth / 2;
+    let turretY = turretLocation.y; //window.innerHeight - 10;
 
     //Draw
     let g = document.getElementById("sparks");
@@ -580,6 +677,31 @@ function zapLaser(targetVader) {
 
     //Schedule line removal
     setTimeout(() => { svgl.remove(); }, 100);
+
+    if (isFirst) {
+        //Pulse turret
+        const turret = document.querySelector("#gameContainer .turret .circle");
+        turret.classList.remove("pulse");
+        void turret.offsetWidth; //Force reflow to restart animation
+        turret.classList.add("pulse");
+    
+        if (multishotActive() && numZapped > 1) {
+            //Shake screen
+            const screen = document.getElementById("gameContainer");
+            screen.classList.remove("boom");
+            void screen.offsetWidth; //Force reflow to restart animatin
+            screen.classList.add("boom");
+
+            //Draw network lines
+            const n = networkFor(targetVader);
+            drawNetworkFor(targetVader, n);
+            setTimeout(() => { 
+                //Schedule line removal
+                const svg = document.getElementById("networkLines"); 
+                svg.replaceChildren(); //Clear all children
+            }, 100); 
+        }
+    }
 }
 
 function createLaserParticles(g, x1, y1, x2, y2) {
@@ -650,47 +772,21 @@ function vaderIsSame(vader1, vader2) {
 }
 
 function initMultishot() {
-    multishotActive = true;
     const activeVader = document.querySelector("#gameContainer .vader.active");
     const relatedVaders = getRelatedVaders(activeVader);
     for (const v of relatedVaders) {
         v.classList.add("related");
         v.querySelector(".result").textContent = activeVader.querySelector(".result").textContent;
     }
+    document.querySelector("#turret .circle").classList.add("multishot");
 }
 
 function endMultishot() {
-    multishotActive = false;
     const relatedVaders = document.querySelectorAll("#gameContainer .vader.related");
     for (const v of relatedVaders)
         v.classList.remove("related");
-}
-
-const orbiters = [];
-const numOrbiters = 4;
-let orbitConfigs = Array.from({ length: 5 }, (_, i) => ({
-    radiusX: 60 + i * 20,
-    radiusY: 30 + i * 15,
-    rotation: i * Math.PI / 8,
-}));
-let orbitSpeed = 0.05; // Radians per frame
-
-function setupOrbiters() {
-    const gFront = document.getElementById("orbitersFront");
-    const gBehind = document.getElementById("orbitersBehind");
-    for (let i = 0; i < numOrbiters; i++) {
-        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        circle.classList.add("orbiter");
-        circle.setAttribute("r", 5);
-        gBehind.appendChild(circle);
-
-        const config = orbitConfigs[i % orbitConfigs.length];
-        orbiters.push({ 
-            circle, 
-            angle: (i / numOrbiters) * 2 * Math.PI,
-            ...config,
-         });
-    }
+    document.querySelector("#turret .circle").classList.remove("multishot");
+    resetOrbiters();
 }
 
 function getVaderCenter(vader) {
@@ -698,36 +794,6 @@ function getVaderCenter(vader) {
     const x = rect.left + rect.width / 2;
     const y = rect.top + rect.height / 2;
     return { x, y };
-}
-
-function updateOrbiters() {
-    //For now, just test on active vader
-    const activeVader = document.querySelector("#gameContainer .vader.active");
-    if (activeVader == null) return;
-    const center = getVaderCenter(activeVader);
-    const gFront = document.getElementById("orbitersFront");
-    const gBehind = document.getElementById("orbitersBehind");
-
-    orbiters.forEach(o => {
-        o.angle += orbitSpeed;
-
-        //Eliptical parametric equations with rotation
-        const xRaw = o.radiusX * Math.cos(o.angle);
-        const yRaw = o.radiusY * Math.sin(o.angle);
-        const x = center.x + xRaw * Math.cos(o.rotation) - yRaw * Math.sin(o.rotation);
-        const y = center.y + xRaw * Math.sin(o.rotation) + yRaw * Math.cos(o.rotation);
-        const z = (Math.sin(o.angle) + 1) / 2; //0 to 1
-        const r = 4 + z * 6;
-        o.circle.setAttribute("cx", x);
-        o.circle.setAttribute("cy", y);
-        o.circle.setAttribute("r", r);
-
-        const radius = 3 + z * 4;
-        const parent = radius > 5 ? gFront : gBehind;
-        if (o.circle.parentNode !== parent) {
-            parent.appendChild(o.circle);
-        }
-    });
 }
 
 function getFactsFromVader(vader) {
@@ -738,7 +804,7 @@ function getFactsFromVader(vader) {
 }
 
 function networkFor(vader) {
-    return [...document.querySelectorAll("#gameContainer .vader")]
+    return [...document.querySelectorAll("#gameContainer .vader:not(.correct)")]
         .filter(v => vaderIsSame(vader, v));
 }
 
@@ -753,6 +819,7 @@ function drawNetworkFor(vader, network) {
         svgl.setAttribute('y1', vaderCenter.y);
         svgl.setAttribute('x2', vCenter.x);
         svgl.setAttribute('y2', vCenter.y);
+        svgl.setAttribute('stroke', 'url(#fadeLine)');
         g.append(svgl);
 
         //Draw lines to every other node in the network
@@ -764,6 +831,7 @@ function drawNetworkFor(vader, network) {
             svgl2.setAttribute('y1', vCenter.y);
             svgl2.setAttribute('x2', v2Center.x);
             svgl2.setAttribute('y2', v2Center.y);
+            svgl2.setAttribute('stroke', 'url(#fadeLine)');
             g.append(svgl2);
         }
     }

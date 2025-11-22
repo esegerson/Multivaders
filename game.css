@@ -201,7 +201,11 @@ button.delete:hover {
     animation: jiggle 0.1s infinite;
 }
 .vader.dead .result { border-color: black; }
-#gameContainer.paused .vader, .vader.paused { animation-play-state: paused; }
+#gameContainer.paused .vader, .vader.paused, .vader.runner.paused, .vader.runner.paused .result { animation-play-state: paused; }
+.vader.runner { color: var(--vaderRunnerColor); animation: dance 2s infinite ease-in-out, pulseColorPale 1s ease-in-out infinite; }
+.vader.runner .result { border-color: var(--vaderRunnerColor); animation: pulseColorPale 1s ease-in-out infinite; }
+.vader.active.runner { color: var(--vaderActiveRunnerColor); animation: dance 2s infinite ease-in-out, pulseColorActive 1s ease-in-out infinite; }
+.vader.active.runner .result { color: var(--vaderActiveRunnerColor); animation: pulseColorActive 1s ease-in-out infinite; }
 
 @keyframes jiggle { /*death rattle*/
     0%   { transform: rotate(10deg) translate(0, 0); }
@@ -217,6 +221,22 @@ button.delete:hover {
     100% { transform: translate(0, 0); }
 }
 
+#gameContainer.boom { animation: boom 0.5s linear; }
+
+@keyframes boom {
+    0%   { transform: translate(0, -10px); }
+    10%  { transform: translate(0,   9px); }
+    20%  { transform: translate(0,  -8px); }
+    30%  { transform: translate(0,   7px); }
+    40%  { transform: translate(0,  -6px); }
+    50%  { transform: translate(0,   5px); }
+    60%  { transform: translate(0,  -4px); }
+    70%  { transform: translate(0,   3px); }
+    80%  { transform: translate(0,  -2px); }
+    90%  { transform: translate(0,   1px); }
+    100% { transform: translate(0,   0px); }
+}
+
 #paused {
     width: 100vw;
     height: 100vh;
@@ -227,15 +247,20 @@ button.delete:hover {
     left: 0;
     font-size: 3vw;
     margin: 30vh 0;
-    pointer-events: none;;
+    pointer-events: none;
 }
 
 #paused p + p { font-size: 60%; opacity: 0.6; }
 #paused p:last-child { color: yellow; }
 
-#gameOver {
-    margin: 1rem;
+#gameOver, #highScoresMainMenu {
+    height: 100vh;
+    text-align: center;
+    font-size: 1.5rem;
+    background-color: rgba(0,0,0,0.7);
 }
+
+#highScoresMainMenu button { margin-top: 2rem;}
 
 #startGame { font-size: 200%; }
 
@@ -243,7 +268,7 @@ button.delete:hover {
 
 ul.tips > li { line-height: 1.8rem; }
 
-ul.tips > li > span { 
+ul.tips span { 
     font-family: monospace; 
     font-size: 1.1rem; 
     background-color: rgba(0,0,0,0.3);
@@ -280,8 +305,34 @@ ul.tips > li > span {
 #gameContainer .turret {
     /*Visual style of turret is in SVG*/
     position: absolute; 
-    top: calc(100vh - 50px); /*Bottom of screen*/ 
+    top: calc(100vh - 60px); /*Bottom of screen*/ 
     left: calc(50vw - 50px); /*Center of screen*/
+}
+
+#gameContainer .turret .circle {
+    width: 100px;
+    height: 100px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: white;
+    border-radius:50px;
+    filter: blur(20px);
+    z-index: -1;
+}
+
+#gameContainer .turret .circle.multishot {
+    background-color: #0f0;
+}
+
+#gameContainer .turret .circle.pulse {
+    animation: 1s cubic-bezier(0, .75, .08, 1) 1 pulse;
+}
+
+
+@keyframes pulse {
+    0% { filter: blur(30px); transform: scale(2); }
+    100% { filter: blur(20px); transform: scale(1); }
 }
 
 #svgContainer, #svgContainer #svgLaser {
@@ -297,7 +348,7 @@ ul.tips > li > span {
     stroke-width:4px;
 }
 
-#svgContainer svg g#sparks circle {
+#svgContainer svg g#sparks circle, svg#nameSparks circle {
     stroke-opacity: 0;
     fill: url(#laserGrad);
     r: 5px;
@@ -313,9 +364,8 @@ ul.tips > li > span {
 }
 
 g#networkLines line {
-    stroke: white;
-    stroke-width: 2px;
-    opacity: 0.1;
+    stroke-width: 8px;
+    opacity: 0.5;
 }
 
 @keyframes fadeOut {
@@ -341,4 +391,125 @@ g#networkLines line {
 #tipContainer .tippoint {
     font-size: 2rem;
     animation: fadeOut 2s forwards, slideUp 2s forwards;
+}
+
+@keyframes pulseColorPale {
+    0%   { color: var(--vaderColor); border-color: var(--vaderColor); }
+    50%  { color: var(--vaderRunnerColor); border-color: var(--vaderRunnerColor); }
+    100% { color: var(--vaderColor); border-color: var(--vaderColor); }
+}
+
+@keyframes pulseColorActive {
+    0%   { color: var(--vaderActiveColor); border-color: var(--vaderActiveColor); }
+    50%  { color: var(--vaderActiveRunnerColor); border-color: var(--vaderActiveRunnerColor); }
+    100% { color: var(--vaderActiveColor); border-color: var(--vaderActiveColor); }
+}
+
+#gameOver h1 { padding-top: 10rem;}
+
+#initialsInput {
+    text-transform: uppercase;
+}
+
+ol.highscorelist {
+    width: 20rem;
+    margin: 0 auto;
+    padding: 0;
+    background: linear-gradient(
+        315deg,
+        hsl(  0, 100%, 50%),
+        hsl( 30, 100%, 50%),
+        hsl( 60, 100%, 50%),
+        hsl(120, 100%, 40%),
+        hsl(240, 100%, 60%),
+        hsl(275, 100%, 50%),
+        hsl(300, 100%, 50%),
+        hsl(  0, 100%, 50%),
+        hsl( 30, 100%, 50%),
+        hsl( 60, 100%, 50%),
+        hsl(120, 100%, 40%),
+        hsl(240, 100%, 60%),
+        hsl(275, 100%, 50%),
+        hsl(300, 100%, 50%)
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: rainbowShift 8s linear infinite;
+    background-size: 1000%;
+    font-weight: bold;
+}
+
+ol.highscorelist li {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 2fr;
+    align-items: start;
+}
+
+ol.highscorelist li.new {
+    -webkit-text-fill-color: initial;
+    text-shadow: 0 0 1rem;
+    transition: transform 2s ease-out;
+}
+
+ol.highscorelist li.new dd:nth-child(2) {
+    text-transform: uppercase;
+}
+
+ol.highscorelist li.new:not(.full) dd:nth-child(2)::after {
+    content: "_";
+    animation: blink 1s steps(1) infinite;
+}
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+ol.highscorelist li.new.emphasize { animation: popAndReturn 2s ease-out; }
+
+@keyframes popAndReturn {
+    0%   { transform: scale(1.0); }
+    1%   { transform: scale(1.2); }
+    100% { transform: scale(1.0); }
+}
+
+ol.highscorelist li.kicked { 
+    -webkit-text-fill-color: initial;
+    color: red;
+    text-shadow: 0 0 1rem red;
+    position: relative;
+    top: 0;
+    z-index: 1;
+    transition: opacity 5s ease-out, top 5s ease-out;
+}
+
+ol.highscorelist li.kicked.hidden { opacity: 0; top: 3rem; pointer-events: none; }
+
+ol.highscorelist li dl { display: contents; }
+
+ol.highscorelist li dt, ol.highscorelist li dd {
+    margin: 0;
+}
+
+ol.highscorelist li dt { font-size: 1rem; position: relative; top: 0.4rem;}
+
+ol.highscorelist li *:nth-child(2) { letter-spacing: 0.1em; }
+
+ol.highscorelist li dd:last-child { text-align: right; }
+
+@keyframes rainbowShift {
+    0%   { background-position: 0%; }
+    100% { background-position: 66%; } /*This smoothly wraps with 10 entries*/
+}
+
+#highScoresGameOver p { font-size: 1rem; }
+
+#gameOverButtons { margin-top: 1rem; position: relative; z-index: 2; }
+
+#nameSparks { pointer-events: none; }
+
+svg#nameSparks circle {
+    fill: url(#nameDotGrad);
+    r: 3px; 
 }
