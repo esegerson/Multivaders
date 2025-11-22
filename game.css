@@ -513,3 +513,7 @@ svg#nameSparks circle {
     fill: url(#nameDotGrad);
     r: 3px; 
 }
+
+#gameTitle p:last-child { font-size: smaller; padding-bottom: 1rem; }
+#gameTitle p:last-child a { color: #ddd; }
+#gameTitle p:last-child a:hover { color: white; }
