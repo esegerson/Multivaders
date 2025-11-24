@@ -46,6 +46,7 @@ document.addEventListener("DOMContentLoaded", function() {
     updateClearButton();
     refreshCustomPresetButtons();
     gameDomLoaded();
+    funnyMessage(); //For mobile notice
 });
 
 window.addEventListener("load", function() {
@@ -622,4 +623,14 @@ function viewHighScoresMainMenu() {
 function returnToMainMenuFromHighScores() {
     document.getElementById("gameTitle").style.display = "block";
     document.getElementById("highScoresMainMenu").style.display = "none";
+}
+
+function funnyMessage() {
+    //Moved text here so it's not indexed by search engines
+    document.querySelector("#mobileNotice p.small.tiny").innerHTML = 
+        "Best viewed in Netscape Navigator 4.x<br>"
+        + "on a monitor that supports 800x600 with 256 colors.<br>"
+        + "Sign my <u>guestbook</u>. This page viewed <b>17</b> times.<br>"
+        + "Hosted by <u>GeoCities</u>.<br>"
+        + "&copy; 1997</b>";
 }
