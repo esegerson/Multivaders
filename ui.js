@@ -46,6 +46,7 @@ document.addEventListener("DOMContentLoaded", function() {
     updateClearButton();
     refreshCustomPresetButtons();
     gameDomLoaded();
+
     funnyMessage(); //For mobile notice
 });
 
@@ -401,7 +402,7 @@ function saveHighScore() {
 
     //Load existing highscores
     let highscoreList = JSON.parse(localStorage.getItem("highscores"));
-    if (highscoreList == null) highscoreList = [];
+    if (highscoreList == null) highscoreList = defaultHighScores();
     
     //Find or create set entry
     let setEntry = highscoreList.find(s => s.name === setName);
@@ -431,7 +432,7 @@ function saveHighScore() {
 
 function getHighScoresForSet(setName) {
     let highscoreList = JSON.parse(localStorage.getItem("highscores"));
-    if (highscoreList == null) return [];
+    if (highscoreList == null) return defaultHighScores();
     let setEntry = highscoreList.find(s => s.name === setName);
     if (setEntry == null) return defaultHighScores();
     return setEntry.scores;
