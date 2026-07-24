@@ -34,7 +34,7 @@ body.noscroll { overflow: hidden; }
     text-shadow: 0 0 20px rgba(255,0,0,0.5), 0 0 100px red;
 }
 
-#gameTitle { margin: 20px; overflow: scroll; }
+#gameTitle { margin: 20px; overflow: auto; }
 
 .max {
     overflow: hidden;
