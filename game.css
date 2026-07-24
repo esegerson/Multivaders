@@ -17,7 +17,7 @@ body {
 
 body.noscroll { overflow: hidden; }
 
-@media (max-width: 400px) or (max-height: 600px) {
+@media (max-width: 40px) or (max-height: 60px) {
     /*Lock out mobile users, desktop and laptop only*/
     #gameTitle { display: none; }
     #mobileNotice { display: block !important; }
@@ -34,7 +34,7 @@ body.noscroll { overflow: hidden; }
     text-shadow: 0 0 20px rgba(255,0,0,0.5), 0 0 100px red;
 }
 
-#gameTitle { margin: 20px;}
+#gameTitle { margin: 20px; overflow: scroll; }
 
 .max {
     overflow: hidden;
@@ -92,6 +92,12 @@ button.delete:hover {
     grid-template-columns: repeat(13, 1fr);
     gap: 5px;
 }
+@media (max-width: 400px) or (max-height: 600px) {
+    #gameTitle { margin: 2px; }
+    .grid { gap: 2px; }
+    .grid button { font-size: 50%; border-width: 1px; padding: 1px; border-radius: 0; }
+}
+
 .grid button.hover, #presetButtons button.hover {
     /*This is a preview hover from hovering over the set buttons*/
     background-color: #454;

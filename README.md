@@ -6,14 +6,16 @@ This is a quick little game to help students memorize multiplication facts, like
 
 On the title screen, players can select what individual problems they want to work on or they can choose five presets.
 
-## Basic rules and Gameplay
+## Basic Rules and Gameplay
 
 The player must solve the problems by typing in the correct answer. Solving a problem makes the problem vanish and the player is onto another problem. As the problems approach the bottom of the screen, the screen starts to turn red. If a problem hits the bottom of the screen, the game is over. If the player enters the wrong answer, the speed of the problem is tripled (cumulative), making it rush toward the bottom of the screen. Spacebar pauses the game. Escape ends the game. Backspace erases what was written. Tilde reveals some debugger stats. Left and right arrows let the player choose a different problem.
 
-## Play it now!
+## Play It Now!
 
 This is a browser-based game. You can play it here:
 https://esegerson.github.io/Multivaders/
+
+Instructions, controls, and rules are listed on the main menu.
 
 ## Technicals
 
@@ -45,14 +47,13 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
 - Move graphics code from game.js to separate graphics.js file
 - Add a fullscreen toggle button
 - To prevent overlapping and legibility, darken problems that are behind the active problem; restore them when the active problem is solved
+- Add a division mode (`6 ÷ 2 = 3`)
 
 ## Known Bugs
 
-- Does not work on mobile: no on-screen keyboard; cannot hover over presets
-    - Add gestures to "draw" the numbers in?  Or an on-screen row of numbers at the bottom to tap?
 - Does not scale to different resolutions well - larger resolutions are easier because the problems take longer to fall
 - Select preset, click Delete Preset, preset is green not red.
-- make preset, new preset is not auto-selected green
+- Make preset, new preset is not auto-selected green
 
 ## Recent Updates
 
@@ -97,3 +98,39 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
 One asset is used, a royalty-free MP3 file ["Calm Soft Background Music"](https://pixabay.com/music/upbeat-calm-soft-background-music-357212/) by [original_soundtrack](https://pixabay.com/users/original_soundtrack-50153119/), found on [Pixabay.com](https://pixabay.com). Direct download of file is [here](https://cdn.pixabay.com/download/audio/2025/06/09/audio_2feeb02bcd.mp3?filename=calm-soft-background-music-357212.mp3).
 
 All other files were authored by myself.
+
+## Installation
+
+To run the game locally:
+
+1. Clone the repository:
+
+    ```git clone https://github.com/esegerson/Multivaders.git```
+
+2. Navigate to the project directory:
+
+    ```cd Multivaders```
+
+3. Open `index.html` in your browser to play the game.
+
+## Contributing
+
+I am open to your code contributions. I'd love to see what you come up with!
+
+1. Fork the repository.
+2. Create a new branch for your feature or bug fix:
+
+    ```git checkout -b feature-name```
+
+3. Commit your changes and push them to your fork:
+
+    ```git commit -m "Add feature-name"```
+    ```git push origin feature-name```
+
+4. Open a pull request with a description of your changes.
+
+Please ensure your code follows the existing style and includes relevant documentation.
+
+## License
+
+This project is licensed under the [MIT License](license). You are free to use, modify, and distribute the code, provided you include the original license.

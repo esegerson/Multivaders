@@ -271,7 +271,7 @@ function noSelectedPreset() {
 function combinePresets() {
     //Put all hardcoded and custom presets into one object
     //Also, grab a reference to the corresponding button
-    let combinedPresets = JSON.parse(localStorage.getItem("presets"));
+    let combinedPresets = JSON.parse(localStorage.getItem("presets") || "[]");
     for (const p of combinedPresets) 
         p.element = Array.from(document.querySelectorAll("#presetList > button"))
             .find(x => x.textContent === p.name);
