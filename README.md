@@ -1,10 +1,10 @@
 # Multivaders!
 
-This is a quick little game to help students memorize multiplication facts, like `3 × 2 = 6`.  Multiplication problems (called "vaders" in code, like little space invaders) float down the screen. 
+This is a quick little game to help students memorize addition, subtraction, multiplication, and division facts, like `3 × 2 = 6`.  Simple arithmetic problems (called "vaders" in code, like little space invaders) float down the screen. 
 
 ## Title Screen
 
-On the title screen, players can select what individual problems they want to work on or they can choose five presets.
+On the title screen, players can select the operator, visual format, and what individual problems they want to work on (manually or choose from presets).
 
 ## Basic Rules and Gameplay
 
@@ -35,6 +35,10 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
 
 ## TODO / Wishlist
 
+- Operator Expansion:
+    - Format menu:
+        - Add "Surprise Me"
+        - Add "Random"
 - Display the high score in the top-left corner during gameplay (or what your current rank is)
 - Improve the inevitable game-over experience; the game-over screen is basic, and currently the problems on-screen turn black when I feel like they should continue to bombard the bottom of the screen for 5 seconds
 - Improve how left and right arrows choose different problems.  Currently it just looks at horizontal position, but I'd like to take into account the vertical position, too.  If there's a problem near the bottom of the screen to the right, I'd like the right-arrow to select that one over the one right next to the active problem that's at the top of the screen.
@@ -47,16 +51,37 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
 - Move graphics code from game.js to separate graphics.js file
 - Add a fullscreen toggle button
 - To prevent overlapping and legibility, darken problems that are behind the active problem; restore them when the active problem is solved
-- Add a division mode (`6 ÷ 2 = 3`)
 
 ## Known Bugs
 
 - Does not scale to different resolutions well - larger resolutions are easier because the problems take longer to fall
 - Select preset, click Delete Preset, preset is green not red.
 - Make preset, new preset is not auto-selected green
+- A tie in high scores should favor the new score
+- Too many balls around the runner after clicking "Play Again"
+- Stacked line, fraction line and bracket line do not glow when active
+- "Play Again" while multishot is active will start the game with green glow (but no upgrade)
+- Game over kill line seems too high in windowed mode (100px above bottom)
+- Minor display issues on kill screen:
+    - Kill line is too high with some formats
+    - Lines don't change to black with some formats
 
 ## Recent Updates
 
+- *August 2026:*
+    - Game enhancements:
+        - New operators! Addition, Subtraction, and Division have joined the invasion! Zap them all!
+        - New expression formats! In addition to the old "stacked" format, now there is inline (`3 × 2 = 6`), 
+            and for division there are fraction and long-division formats
+        - Slightly increased the maximum rate problems appear (generally only effects gameplay with scores greater than 100)
+        - Experimental: on-screen buttons for typing now provided
+            - Reveal by adding `?experimental` to the URL
+    - Menu enhancements:
+        - New operator selection menu
+        - New format selection menu
+        - Presets are now per-operator (you can define different presets for addition and multiplication)
+        - High scores are now per-operator
+    - Bug fixes: displaying and saving presets and high scores now work for first-time users
 - *November 2025:*
     - Menu enhancements:
         - Presets are now automatically selected if you choose the corresponding facts
@@ -95,7 +120,7 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
 
 ## Assets
 
-One asset is used, a royalty-free MP3 file ["Calm Soft Background Music"](https://pixabay.com/music/upbeat-calm-soft-background-music-357212/) by [original_soundtrack](https://pixabay.com/users/original_soundtrack-50153119/), found on [Pixabay.com](https://pixabay.com). Direct download of file is [here](https://cdn.pixabay.com/download/audio/2025/06/09/audio_2feeb02bcd.mp3?filename=calm-soft-background-music-357212.mp3).
+One asset is used, a royalty-free MP3 file ["Soft - Soft Music"](https://pixabay.com/music/upbeat-calm-soft-background-music-357212/) (originally titled "Calm Soft Background Music") by [Viacheslav Starostin aka original_soundtrack](https://pixabay.com/users/original_soundtrack-50153119/), found on [Pixabay.com](https://pixabay.com). Direct download of file is [here](https://cdn.pixabay.com/download/audio/2025/06/09/audio_2feeb02bcd.mp3?filename=calm-soft-background-music-357212.mp3).
 
 All other files were authored by myself.
 
