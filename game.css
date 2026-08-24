@@ -3,6 +3,8 @@
     --vaderActiveColor: white;
     --vaderRunnerColor: rgba(64, 192, 64, 0.5);
     --vaderActiveRunnerColor: #0f0;
+    --buttonBorderColor: #999; /*closely matches ButtonBorder in Firefox Windows*/
+    --buttonBorderColorHover: #ccc;
 }
 
 html, body { height: 100vh; margin: 0; padding: 0; }
@@ -34,7 +36,13 @@ body.noscroll { overflow: hidden; }
     text-shadow: 0 0 20px rgba(255,0,0,0.5), 0 0 100px red;
 }
 
-#gameTitle { margin: 20px; overflow: auto; }
+#titleSelectOperator, #titleSelectFormat, #gameTitle { margin: 20px; overflow: auto; }
+#titleSelectOperator > p > button.navback { visibility: hidden; }
+#titleSelectOperator > p > button.navback, 
+#titleSelectFormat > p > button.navback,
+#gameTitle > p > button.navback { 
+    margin-right: 1rem; 
+}
 
 .max {
     overflow: hidden;
@@ -43,6 +51,12 @@ body.noscroll { overflow: hidden; }
     left: 0;
     width: 100vw;
     height: 100vh;
+}
+@media (max-width: 400px) or (max-height: 600px) {
+    .max { 
+        overflow: visible; 
+        width: 95vw; /*This seems necessary to prevent unwanted scrollbars on small screens*/
+    }
 }
 
 #gameContainer {
@@ -54,7 +68,6 @@ body.noscroll { overflow: hidden; }
 
 #vaderContainer {
     overflow: hidden;
-
 }
 
 button {
@@ -62,12 +75,104 @@ button {
     color: rgba(255, 255, 255, 0.8);
     border-width: 3px;
     border-radius: 11px;
+    border-color: var(--buttonBorderColor);
+    border-style: outset;
     padding: 10px;
     font-size: 14px;
 }
-button:hover {
+button:not(:disabled):hover {
     background-color: #444;
     color: rgba(255, 255, 255, 1);
+    border-color: var(--buttonBorderColorHover);
+}
+button:active {
+    border-style: inset;
+}
+.format-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background-color: #333;
+    color: rgba(255, 255, 255, 0.8);
+    border: 3px solid #555;
+    border-radius: 11px;
+    border-style: outset;
+    border-color: ButtonBorder;
+    padding: 0.75rem;
+    font-size: 14px;
+    cursor: pointer;
+    min-height: 8.5rem;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+.format-option:hover,
+.format-option:focus-visible {
+    background-color: #444;
+    color: rgba(255, 255, 255, 1);
+    border-color: #777;
+    outline: none;
+}
+.format-option.selected {
+    background-color: #162;
+    border-color: #040;
+}
+#formatSelect {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    max-width: 34rem;
+    margin: 0.75rem auto;
+}
+.format-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 4.25rem;
+    width: 100%;
+    color: inherit;
+    font-family: monospace;
+}
+.format-preview table {
+    border-collapse: collapse;
+    margin: 0 auto;
+    font-size: 1.2rem;
+    line-height: 1.1;
+}
+.format-preview td {
+    padding: 0 0.2rem;
+    text-align: center;
+}
+.format-preview td.factA, .format-preview td.factB, .format-preview td.result { text-align: right; }
+.format-preview .operator,
+.format-preview .equals {
+    font-size: 1.35em;
+}
+.format-preview .factA,
+.format-preview .factB,
+.format-preview .result {
+    font-size: 1.15em;
+}
+.format-preview .result {
+    border-top: 0.08em solid currentColor;
+    padding-top: 0.15em;
+}
+.format-preview.preview-bracket .result,
+.format-preview.preview-bracket .aboveRiser {
+    border-bottom: 0.08em solid currentColor;
+}
+.format-preview.preview-fraction .factA {
+    border-bottom: 0.08em solid currentColor;
+    padding-bottom: 0.2em;
+}
+div[data-format="INLINE"] .format-preview td.result { border: none; padding-top: 0; }
+div[data-format="BRACKET"] .format-preview td.result,
+div[data-format="FRACTION"] .format-preview td.result { border-top: none; }
+.format-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
 }
 button.delete {
     background-color: #800;
@@ -77,7 +182,42 @@ button.delete {
 button.delete:hover {
     background-color: #a00;
 }
-#presetButtons BUTTON:disabled, #startGame:disabled {
+#pregameTitle p.center { margin-top: 3em; text-align: center;}
+#operatorSelect {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  max-width: 18rem;
+  margin: 0.5rem auto;
+  justify-items: stretch;
+}
+#operatorSelect button {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  box-sizing: border-box;
+  font-size: 1rem;
+}
+#operatorSelect button span {
+  display: block;
+  font-size: 4em;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+  animation: wiggle 2s infinite ease-in-out;
+}
+#operatorSelect button:nth-child(1) span { animation-delay: -0.2s; }
+#operatorSelect button:nth-child(2) span { animation-delay: -0.6s; }
+#operatorSelect button:nth-child(3) span { animation-delay: -0.4s; }
+#operatorSelect button:nth-child(4) span { animation-delay: -0.8s; }
+@media (max-width: 480px) {
+  #operatorSelect { max-width: 90vw; gap: 0.25rem; }
+  #operatorSelect button { padding: 0.25rem; }
+}
+#presetButtons BUTTON:disabled, #startGame:disabled, .grid button:disabled {
     background-color: #222;
     color: rgba(255, 255, 255, 0.3);
     border-color: #444;
@@ -105,6 +245,10 @@ button.delete:hover {
 .grid button.selected, #presetButtons button.selected {
     background-color: #162;
     border-color: #040;            
+}
+.grid button:disabled {
+    opacity: 0.9;
+    background-color: rgba(0,0,0,0.3);
 }
 .savePresetContainer {
     align-items: center;
@@ -195,7 +339,7 @@ button.delete:hover {
     top: -200px; /* Start just off-screen */
     color: var(--vaderColor);
     font-family: monospace;
-    font-size: 5em;
+    font-size: 3vh; /*Height-based to keep it fair across screens*/
     text-align: right;
     width: min-content;
     line-height: 0.9em;
@@ -203,12 +347,35 @@ button.delete:hover {
     transition: filter 2s ease-out, opacity 8s ease-out;
     animation: dance 2s infinite ease-in-out;
 }
-.vader .result { border-top: 0.08em solid var(--vaderColor); }
+
+.vader.STACKED .result          { border-top: 0.08em solid var(--vaderColor); }
+.vader.DIVISION.BRACKET .result,
+.vader.DIVISION.BRACKET .aboveRiser { border-bottom: 0.08em solid var(--vaderColor); }
+.vader.DIVISION.FRACTION .factA { border-bottom: 0.08em solid var(--vaderColor); padding-bottom: 0.16em; }
+.vader.DIVISION.FRACTION .factB { text-align: center; }
+.vader.DIVISION.BRACKET table { border-collapse: collapse; }
+.vader.DIVISION.BRACKET td { padding: 0; text-align: right; }
+.vader.DIVISION.BRACKET .bracketRiser, .format-preview .bracketRiser { position: relative; width: 0; }
+.vader.DIVISION.BRACKET .bracketRiser::before, .format-preview .bracketRiser::before {
+    content: "";
+    position: absolute;
+    top: -0.08em;
+    left: -0.34em;
+    width: 0.6em;
+    height: 100%;
+    border: 0.08em solid var(--vaderColor);
+    border-radius: 50%;
+    box-sizing: border-box;
+    clip-path: inset(0 0 0 50%);
+}
+.vader.DIVISION.BRACKET .factA { padding-left: 0.4em; }
+.vader.DIVISION.BRACKET .factB { padding-right: 0.2em; }
+
 .vader.active, .vader.related {
     color: var(--vaderActiveColor);
     text-shadow: 0 0 0.3em rgba(255,255,255,1);
 }
-.vader.active .result, .vader.related .result { border-color: var(--vaderActiveColor); }
+.vader.active .result, .vader.related .result, .vader.active.DIVISION.FRACTION .factA { border-color: var(--vaderActiveColor); }
 .vader.active .operator, .vader.related .operator { animation: wiggle 1s infinite ease-in-out; }
 .vader.correct {
     color: var(--vaderRunnerColor);
@@ -299,7 +466,7 @@ ul.tips span {
     padding: 0.2rem;
 }
 
-#gameContainer > .background2, #gameContainer > #tipContainer {
+#menuContainer > .background2, #gameContainer > .background2, #gameContainer > #tipContainer {
     position: absolute;
     top: 0;
     left: 0;
@@ -314,15 +481,24 @@ ul.tips span {
     z-index: -1;
 }
 
-#gameContainer > .background2 { filter: blur(6px); }
+#menuContainer > .background2, #gameContainer > .background2 { filter: blur(6px); }
 
-#gameContainer > .background2 > .multi {
+#menuContainer > .background2 > .multi, #gameContainer > .background2 > .multi {
     position: absolute;
     animation: wiggle 10s infinite ease-in-out;
 }
 
-#gameContainer > .background2 > .multi:after {
+#menuContainer > .background2 > .multi.ADDITION:after, #gameContainer > .background2 > .multi.ADDITION:after {
+    content: "+";
+}
+#menuContainer > .background2 > .multi.SUBTRACTION:after, #gameContainer > .background2 > .multi.SUBTRACTION:after {
+    content: "-";
+}
+#menuContainer > .background2 > .multi.MULTIPLICATION:after, #gameContainer > .background2 > .multi.MULTIPLICATION:after {
     content: "\00D7"; /*multiplication sign*/
+}
+#menuContainer > .background2 > .multi.DIVISION:after, #gameContainer > .background2 > .multi.DIVISION:after {
+    content: "\00F7"; /*division sign*/
 }
 
 #gameContainer .turret {
@@ -455,7 +631,7 @@ ol.highscorelist {
         hsl(275, 100%, 50%),
         hsl(300, 100%, 50%)
     );
-    -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     animation: rainbowShift 8s linear infinite;
     background-size: 1000%;
@@ -553,3 +729,47 @@ a:hover { color: white; text-shadow: 0 0 5px white; }
     50% { opacity: 0; }
     100% { opacity: 1; }
 }
+
+#inputTable {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    pointer-events: all; /*Cancels out #gameContainer pointer-events:none*/
+    opacity: 0.5;
+    transition: bottom 1s ease;
+}
+#inputTable td {
+    text-align: center;
+    width: 10%;
+}
+#inputTable td button { 
+    width: 100%; 
+    height: 7vw; 
+    max-height: 7vw;
+    font-size: 2vw; 
+    line-height: 0;
+    transition: opacity 1s ease;
+}
+@media (max-width: 600px) {
+    #inputTable td button { 
+        font-size: 4vw; 
+        border-style: none;
+        border-radius: 5px;
+        padding: 0;
+        height: 7vw;
+    }
+    #inputTable td:not(.showhide) button::after { content: '' !important; padding-top: inherit; }
+}
+#inputTable td.delete button { padding-top: 1.5vw; }
+#inputTable td.delete button::after { content: 'Delete'; font-size: 1.2vw; position: relative; top: -1em; display: block; }
+#inputTable td.showhide button { width: 10vw; line-height: 0.5em; }
+#inputTable td.showhide button::after { content: '\1F5AE\A\1F783'; white-space: pre; }
+#inputTable td.enter button { font-size: 4vw; }
+#inputTable td.enter button::after { content: 'Enter'; font-size: 1.2vw; position: relative; top: -1em; display: block; }
+#inputTable.experimental-hide { display: none; }
+#inputTable.hidden { bottom: -2.5rem; }
+#inputTable.hidden td { height: 4rem; }
+#inputTable.hidden td button { opacity: 0; pointer-events: none; }
+#inputTable.hidden td.showhide button { opacity: 1; pointer-events: all; }
+#inputTable.hidden td.showhide button::after { content: '\1F781\A\1F5AE'; white-space: pre; }

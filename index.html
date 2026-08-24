@@ -11,65 +11,143 @@
     <link rel="stylesheet" href="game.css" />
 </head>
 <body>
-    <div id="gameTitle">
-        <h1>Multivaders!</h1>
-        <p>Multivaders is a thrilling space shooter game where you defend your planet from waves of alien invaders. Solve multiplication problems to defeat the enemies!</p>
-        <p>Select what multiplication facts you'd like to work with:</p>
-        <p id="presetButtons">Presets: 
-            <button class="hardcoded" onclick="preset(1)" onmouseover="hoverPreset(this)" onmouseout="clearHoverPreset()">Set A</button> 
-            <button class="hardcoded" onclick="preset(2)" onmouseover="hoverPreset(this)" onmouseout="clearHoverPreset()">Set B</button>
-            <button class="hardcoded" onclick="preset(3)" onmouseover="hoverPreset(this)" onmouseout="clearHoverPreset()">Set C</button>
-            <button class="hardcoded" onclick="preset(4)" onmouseover="hoverPreset(this)" onmouseout="clearHoverPreset()">Set D</button>
-            <button class="hardcoded" onclick="preset(5)" onmouseover="hoverPreset(this)" onmouseout="clearHoverPreset()">Set E</button>
-            <span id="presetList"></span>
-            <span class="savePresetContainer">
-                <button id="btnMakePreset" disabled onclick="openPresetModal()" title="Select a fact to create a preset">&plus; Make Preset</button>
-                <span id="presetSave" style="display: none;">
-                    <input type="text" id="setname" placeholder="Preset Name" maxlength="20"/>
-                    <button onclick="savePreset()" title="Save Preset">&#x2714;</button>
-                    <button onclick="closeNewPresetUi()" title="Cancel">&#x2716;</button>
+    <div id="menuContainer">
+        <div class="background2"></div>
+        <div id="titleSelectOperator">
+            <h1>Multivaders!</h1>
+            <p>Multivaders is a thrilling space shooter game where you defend your planet from waves of alien invaders. Solve math problems to defeat the enemies!</p>
+            <p class="center"><button class="navback">Back</button><b>Step 1 of 3:</b> Select your operator:</p>
+            <p id="operatorSelect">
+                <button onclick="selectOperator('ADDITION')"><span>&plus;</span>Addition</button>
+                <button onclick="selectOperator('SUBTRACTION')"><span>&minus;</span>Subtraction</button>
+                <button onclick="selectOperator('MULTIPLICATION')"><span>&times;</span>Multiplication</button>
+                <button onclick="selectOperator('DIVISION')"><span>&divide;</span>Division</button>
+            </p>
+        </div>
+        <div id="titleSelectFormat" style="display: none;">
+            <h1>Multivaders!</h1>
+            <p>Multivaders is a thrilling space shooter game where you defend your planet from waves of alien invaders. Solve math problems to defeat the enemies!</p>
+            <p class="center"><button class="navback" onclick="backToOperatorSelection()">Back</button><b>Step 2 of 3:</b> Select your format:</p>
+            <div id="formatSelect">
+                <div class="format-option" role="button" tabindex="0" data-format="STACKED">
+                    <div class="format-preview">
+                        <table>
+                            <tr><td class="factA" colspan="2">7</td></tr>
+                            <tr><td class="operator">&#43;</td><td class="factB">3</td></tr>
+                            <tr><td class="result" colspan="2">10</td></tr>
+                        </table>
+                    </div>
+                    <span class="format-label">Stacked</span>
+                </div>
+                <div class="format-option" role="button" tabindex="0" data-format="INLINE">
+                    <div class="format-preview">
+                        <table>
+                            <tr>
+                                <td class="factA">7</td>
+                                <td class="operator">&#43;</td>
+                                <td class="factB">3</td>
+                                <td class="equals">=</td>
+                                <td class="result">10</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <span class="format-label">Inline</span>
+                </div>
+                <div class="format-option division-only" role="button" tabindex="0" data-format="BRACKET">
+                    <div class="format-preview preview-bracket">
+                        <table>
+                            <tr>
+                                <td></td>
+                                <td class="aboveRiser"></td>
+                                <td class="result">2</td>
+                            </tr>
+                            <tr>
+                                <td class="factB">3</td>
+                                <td class="bracketRiser"></td>
+                                <td class="factA">6</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <span class="format-label">Bracket</span>
+                </div>
+                <div class="format-option division-only" role="button" tabindex="0" data-format="FRACTION">
+                    <div class="format-preview preview-fraction">
+                        <table>
+                            <tr>
+                                <td class="factA">6</td>
+                                <td class="equals" rowspan="2">=</td>
+                                <td class="result" rowspan="2">2</td>
+                            </tr>
+                            <tr>
+                                <td class="factB">3</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <span class="format-label">Fraction</span>
+                </div>
+                <!-- <div class="format-option division-only" role="button" tabindex="0" data-format="ALGEBRAIC">Algebraic</div> -->
+            </div>
+        </div>
+        <div id="gameTitle" style="display: none;">
+            <h1>Multivaders!</h1>
+            <p>Multivaders is a thrilling space shooter game where y defend your planet from waves of alien invaders. Solve math problems to defeat the enemies!</p>
+            <p><button class="navback" onclick="backToFormatSelection()">Back</button><b>Step 3 of 3:</b> Select what <b id="opDisplay"></b> facts you'd like to work with:</p>
+            <p id="presetButtons">Presets: 
+                <button class="hardcoded" onclick="preset(1)" onmouseover="hoverPreset(this)" onmouseout="clearHoverPreset()">Set A</button> 
+                <button class="hardcoded" onclick="preset(2)" onmouseover="hoverPreset(this)" onmouseout="clearHoverPreset()">Set B</button>
+                <button class="hardcoded" onclick="preset(3)" onmouseover="hoverPreset(this)" onmouseout="clearHoverPreset()">Set C</button>
+                <button class="hardcoded" onclick="preset(4)" onmouseover="hoverPreset(this)" onmouseout="clearHoverPreset()">Set D</button>
+                <button class="hardcoded" onclick="preset(5)" onmouseover="hoverPreset(this)" onmouseout="clearHoverPreset()">Set E</button>
+                <span id="presetList"></span>
+                <span class="savePresetContainer">
+                    <button id="btnMakePreset" disabled onclick="openPresetModal()" title="Select a fact to create a preset">&plus; Make Preset</button>
+                    <span id="presetSave" style="display: none;">
+                        <input type="text" id="setname" placeholder="Preset Name" maxlength="20"/>
+                        <button onclick="savePreset()" title="Save Preset">&#x2714;</button>
+                        <button onclick="closeNewPresetUi()" title="Cancel">&#x2716;</button>
+                    </span>
                 </span>
-            </span>
-            <button id="btnDeletePreset" disabled onclick="deletePreset(this)" title="No custom presets to delete">&minus; Delete Preset</button>
-            <button id="btnClear" disabled onclick="clearSelection()" title="No facts to clear">Clear</button>
-        </p>
-        <div class="grid"></div>
-        <p>
-            <button id="startGame" onclick="start();" disabled title="Select at least one fact to play">Start Game</button> 
-            <button id="btnViewHighScores" onclick="viewHighScoresMainMenu()" style="display: none">View High Scores</button>
-            <span id="setNote" style="display: none;">High scores are saved only with a preset; select or make a preset to save your high score.</span>
-        </p>
-        <p>Tips:</p>
-        <ul class="tips">
-            <li>Type <span>numbers</span> to complete the problems</li>
-            <li>Press <span>Enter</span> to submit your answer</li>
-            <li>Answering incorrectly will make the problem speed up!</li>
-            <li>Game over when the problem touches the bottom of the screen</li>
-            <li>Press <span>Backspace</span> to erase</li>
-            <li>Press <span>Spacebar</span> to pause</li>
-            <li>Press <span>Escape</span> to quit</li>
-            <li>Press <span>Left</span> or <span>Right</span> to target a different problem</li>
-            <li>Problems moving left or right are "runners"&mdash;solve them to activate a multishot upgrade!
-                <ul><li>The upgrade is good for four problems, so choose wisely, if you can</li>
-                    <li>This upgrade solves all similar problems on the screen at the same time</li>
-                    <li>Works best on a crowded screen</li>
-                    <li>If you haven't typed anything, press <span>Enter</span> to quickly select the "runner"</span></li>
-                </ul>
-            </li>
-            <li><span>1</span> point for every problem solved</li>
-            <li><span>4</span> extra points if you clear the screen</li>
-            <li><span>8</span> extra points if you clear the screen soon after the last clear</li>
-            <li>The game gets harder the more points you score!  Can you beat <span>100</span>?</span></li>
-            <li>You will need an attached <i>physical keyboard</i> to play this game (like on a desktop or laptop);
-                this game does not work on phones or tablets</li>
-        </ul>
+                <button id="btnDeletePreset" disabled onclick="deletePreset(this)" title="No custom presets to delete">&minus; Delete Preset</button>
+                <button id="btnClear" disabled onclick="clearSelection()" title="No facts to clear">Clear</button>
+            </p>
+            <div class="grid"></div>
+            <p>
+                <button id="startGame" onclick="start();" disabled title="Select at least one fact to play">Start Game</button> 
+                <button id="btnViewHighScores" onclick="viewHighScoresMainMenu()" style="display: none">View High Scores</button>
+                <span id="setNote" style="display: none;">High scores are saved only with a preset; select or make a preset to save your high score.</span>
+            </p>
+            <p>Tips:</p>
+            <ul class="tips">
+                <li>Type <span>numbers</span> to complete the problems</li>
+                <li>Press <span>Enter</span> to submit your answer</li>
+                <li>Answering incorrectly will make the problem speed up!</li>
+                <li>Game over when the problem touches the bottom of the screen</li>
+                <li>Press <span>Backspace</span> to erase</li>
+                <li>Press <span>Spacebar</span> to pause</li>
+                <li>Press <span>Escape</span> to quit</li>
+                <li>Press <span>Left</span> or <span>Right</span> to target a different problem</li>
+                <li>Problems moving left or right are "runners"&mdash;solve them to activate a multishot upgrade!
+                    <ul><li>The upgrade is good for four problems, so choose wisely, if you can</li>
+                        <li>This upgrade solves all similar problems on the screen at the same time</li>
+                        <li>Works best on a crowded screen</li>
+                        <li>If you haven't typed anything, press <span>Enter</span> to quickly select the "runner"</span></li>
+                    </ul>
+                </li>
+                <li><span>1</span> point for every problem solved</li>
+                <li><span>4</span> extra points if you clear the screen</li>
+                <li><span>8</span> extra points if you clear the screen soon after the last clear</li>
+                <li>The game gets harder the more points you score!  Can you beat <span>100</span>?</span></li>
+                <li>You will need an attached <i>physical keyboard</i> to play this game (like on a desktop or laptop);
+                    this game does not work on phones or tablets</li>
+            </ul>
 
-        <!--<p>Coming Soon:</p>
-        <ul class="tips">
-            <li></li>
-        </ul>-->
+            <!--<p>Coming Soon:</p>
+            <ul class="tips">
+                <li></li>
+            </ul>-->
 
-        <p><a href="https://github.com/esegerson/Multivaders" target="code">View the code</a> that makes this game.</p>
+            <p><a href="https://github.com/esegerson/Multivaders" target="code">View the code</a> that makes this game.</p>
+        </div>
     </div>
 
     <div id="gameContainer" class="max" style="display: none;">
@@ -122,7 +200,7 @@
                 </svg>
             </div>
         </div>
-        <div class="background">&#215;</div>
+        <div class="background"></div>
         <div class="background2"></div>
         <div id="statsContainer"></div>
         <div id="vaderContainer"></div>
@@ -131,6 +209,29 @@
                 <g id="orbitersBehind" />
             </svg>
         </div>
+        <table id="inputTable" class="hidden experimental-hide">
+            <tbody>
+                <tr>
+                    <td><button data-key="1">1</button></td>
+                    <td><button data-key="2">2</button></td>
+                    <td><button data-key="3">3</button></td>
+                    <td><button data-key="4">4</button></td>
+                    <td><button data-key="5">5</button></td>
+                    <td><button data-key="6">6</button></td>
+                    <td><button data-key="7">7</button></td>
+                    <td><button data-key="8">8</button></td>
+                    <td><button data-key="9">9</button></td>
+                    <td><button data-key="0">0</button></td>
+                </tr>
+                <tr>
+                    <td><button data-key="l" title="Select/Move Left">&#x1F808;</button></td>
+                    <td class="delete"><button data-key="d" title="Delete/Backspace">&#x232B;</button></td>
+                    <td class="showhide" colspan="6"><button data-key="x" title="Display Keyboard"></button></td>
+                    <td class="enter"><button data-key="e" title="Enter/Submit">&#x21B5;</button></td>
+                    <td><button data-key="r" title="Select/Move Right">&#x1F80A;</button></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
     <div id="gameOver" style="display: none;">
@@ -191,11 +292,120 @@
     </div>
 
     <div id="templates" style="display: none;">
-        <div id="vaderTemplate" class="vader">
+        <!--ADDITION-->
+        <div class="vaderTemplate vader ADDITION STACKED">
+            <table>
+                <tr><td class="factA" colspan="2"></td></tr>
+                <tr><td class="operator">&#43;</td><td class="factB"></td></tr>
+                <tr><td class="result" colspan="2">&nbsp;</td></tr>
+            </table>
+        </div>
+        <div class="vaderTemplate vader ADDITION INLINE">
+            <table>
+                <tr>
+                    <td class="factA"></td>
+                    <td class="operator">&#43;</td>
+                    <td class="factB"></td>
+                    <td class="equals">=</td>
+                    <td class="result">&nbsp;</td>
+                </tr>
+            </table>
+        </div>
+
+        <!--SUBTRACTION-->
+        <div class="vaderTemplate vader SUBTRACTION STACKED">
+            <table>
+                <tr><td class="factA" colspan="2"></td></tr> <!--minuend-->
+                <tr><td class="operator">&#8722;</td><td class="factB"></td></tr> <!--subtrahend-->
+                <tr><td class="result" colspan="2">&nbsp;</td></tr> <!--difference-->
+            </table>
+        </div>
+        <div class="vaderTemplate vader SUBTRACTION INLINE">
+            <table>
+                <tr>
+                    <td class="factA"></td> <!--minuend-->
+                    <td class="operator">&#8722;</td>
+                    <td class="factB"></td> <!--subtrahend-->
+                    <td class="equals">=</td>
+                    <td class="result">&nbsp;</td> <!--difference-->
+                </tr>
+            </table>
+        </div>
+
+        <!--MULTIPLICATION-->
+        <div class="vaderTemplate vader MULTIPLICATION STACKED">
             <table>
                 <tr><td class="factA" colspan="2"></td></tr>
                 <tr><td class="operator">&#215;</td><td class="factB"></td></tr>
                 <tr><td class="result" colspan="2">&nbsp;</td></tr>
+            </table>
+        </div>
+        <div class="vaderTemplate vader MULTIPLICATION INLINE">
+            <table>
+                <tr>
+                    <td class="factA"></td>
+                    <td class="operator">&#215;</td>
+                    <td class="factB"></td>
+                    <td class="equals">=</td>
+                    <td class="result">&nbsp;</td>
+                </tr>
+            </table>
+        </div>
+
+        <!--DIVISION-->
+        <div class="vaderTemplate vader DIVISION STACKED">
+            <table>
+                <tr><td class="factA" colspan="2"></td></tr> <!--dividend-->
+                <tr><td class="operator">&#247;</td><td class="factB"></td></tr> <!--divisor-->
+                <tr><td class="result" colspan="2">&nbsp;</td></tr> <!--quotient-->
+            </table>
+        </div>
+        <div class="vaderTemplate vader DIVISION INLINE">
+            <table>
+                <tr>
+                    <td class="factA"></td> <!--dividend-->
+                    <td class="operator">&#247;</td>
+                    <td class="factB"></td> <!--divisor-->
+                    <td class="equals">=</td>
+                    <td class="result">&nbsp;</td> <!--quotient-->
+                </tr>
+            </table>
+        </div>
+        <div class="vaderTemplate vader DIVISION BRACKET">
+            <table>
+                <tr>
+                    <td></td>
+                    <td class="aboveRiser"></td>
+                    <td class="result">&nbsp;</td> <!--quotient-->
+                </tr>
+                <tr>
+                    <td class="factB"></td> <!--divisor-->
+                    <td class="bracketRiser"></td>
+                    <td class="factA"></td> <!--dividend-->
+                </tr>
+            </table>
+        </div>
+        <div class="vaderTemplate vader DIVISION FRACTION">
+            <table>
+                <tr>
+                    <td class="factA"></td> <!--dividend-->
+                    <td class="equals" rowspan="2">=</td>
+                    <td class="result" rowspan="2">&nbsp;</td> <!--quotient-->
+                </tr> 
+                <tr>
+                    <td class="factB"></td> <!--divisor-->
+                </tr>
+            </table>
+        </div>
+        <div class="vaderTemplate vader DIVISION ALGEBRAIC">
+            <table>
+                <tr>
+                    <td class="factA"></td>
+                    <td class="operator">&#215;</td>
+                    <td class="result">&nbsp;</td>
+                    <td class="equals">=</td>
+                    <td class="factB"></td>
+                </tr>
             </table>
         </div>
     </div>

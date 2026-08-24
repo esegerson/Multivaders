@@ -32,6 +32,9 @@ function gameDomLoaded() {
     document.getElementById("turret").addEventListener("animationend", function(e) { 
         e.target.classList.remove("pulse");
     });
+    document.querySelectorAll("#inputTable button").forEach(b => {
+        b.addEventListener("click", onScreenKeyboardClick);
+    });
 }
 
 function start() {
@@ -284,7 +287,9 @@ function getProblem() {
 }
 
 function createVader(id, factA, factB) {
-    let vaderTemplate = document.getElementById("vaderTemplate");
+    let vaderTemplate = document.querySelector("#templates > .vaderTemplate." + selectedOperator + "." + selectedFormat);
+    if (vaderTemplate === null) //TODO: remove after development
+        throw new Error("No vader template found for operator " + selectedOperator + " and format " + selectedFormat);
     let vaderClone = vaderTemplate.cloneNode(true);
     vaderClone.querySelector(".factA").textContent = factA;
     vaderClone.querySelector(".factB").textContent = factB;
@@ -305,9 +310,13 @@ function createVader(id, factA, factB) {
 function getSpeed(variance = 1) {
     //Variance = 1 allows some randomness to the speed,
     //but that's annoying when displaying a speed stat, so variance = 0 kills that
-    let difficulty = score / 3;
+    const difficulty = score / 3;
     let rv = Math.round((Math.random() * variance * difficulty / 2 + difficulty) * 10) / 200;
     if (rv < 0.2) rv = 0.2; // Ensure a minimum speed
+
+    //Scale speed based on screen height (4K fullscreen ideal = 1.0 base)
+    rv *= (window.innerHeight / 2160); //Totally arbitrary, this is just what I've been used to, may change later
+
     return rv; // Speed in pixels per frame (33ms)
 }
 
@@ -334,8 +343,8 @@ function getDelay() {
         and by 100 points, the delay is down to 1 second, which is insanely difficult.
     */
     let seconds = 460 / (score + 20) - 2.87 - hitCeiling;
-    if (seconds < 0.9 && hitCeiling == 0) seconds = 0.9; // Ensure a minimum delay of 1 second
-    if (seconds < 0.7 && hitCeiling > 0) seconds = 0.7; // If the user is hitting the ceiling, allow a faster rate
+    if (seconds < 0.8 && hitCeiling == 0) seconds = 0.7; // Ensure a minimum delay of 1 second
+    if (seconds < 0.6 && hitCeiling > 0) seconds = 0.6; // If the user is hitting the ceiling, allow a faster rate
     return seconds * 1000;
 }
 
@@ -436,8 +445,16 @@ function keyListener(e) {
 
 class keyListenerHelper {
     static doEnter(activeVader, result) {
+        const getExpectedResult = (factA, factB) => {
+            switch (selectedOperator) {
+                case Operator.ADDITION:         return factA + factB;
+                case Operator.SUBTRACTION:      return factA - factB;
+                case Operator.MULTIPLICATION:   return factA * factB;
+                case Operator.DIVISION:         return factA / factB; //Need to ensure factB is never zero
+            }
+        };
         const facts = getFactsFromVader(activeVader);
-        const expectedResult = facts.factA * facts.factB;
+        const expectedResult = getExpectedResult(facts.factA, facts.factB);
         const relatedVaders = multishotActive()
                 ? [activeVader, ...getRelatedVaders(activeVader)]
                 : [activeVader];
@@ -631,11 +648,13 @@ function setDeadBackgroundStyle(o) {
         "linear-gradient(to bottom, rgba(0,0,0,0), rgba(255,0,0," + o + ")), linear-gradient(to bottom, #000, #459)";
 }
 
-function manageBackgroundMultis() {
+function manageBackgroundMultis(isGameBg = true) {
     //A multi is just a visual decoration, a large "×" character that floats up the screen
     const maxNumMultis = 20 + score / 5; //When score = 100, maxNumMultis = 40
     const multiWidth = 100;
-    const bgContainer = document.querySelector("#gameContainer .background2");
+    const bgContainer = isGameBg 
+        ? document.querySelector("#gameContainer .background2")
+        : document.querySelector("#menuContainer .background2");
         
     //Spawn
     let numMultis = bgContainer.querySelectorAll(".multi").length;
@@ -648,7 +667,8 @@ function manageBackgroundMultis() {
         if (overrideSpeed) speed = 0;
         top -= speed;
         multi.style.top = top + "px";
-        if (top < multiWidth * -1) multi.remove();
+        if (top < multiWidth * -1) 
+            multi.remove();
     }
 }
 
@@ -658,6 +678,7 @@ function createMulti(init) {
     const top = init ? Math.round(Math.random() * window.innerHeight) : window.innerHeight;
     let multi = document.createElement("div");
     multi.classList.add("multi");
+    multi.classList.add(selectedOperator);
     multi.style.left = left + "px";
     multi.style.top = top + "px";
     multi.style.fontSize = (Math.random() * 5 + 10) + "rem";
