@@ -122,7 +122,7 @@ const hardcodedPresets = [
 
 let selectedOperator = Operator.MULTIPLICATION;
 let selectedOperatorRandom = false;
-let selectedFormat = Format.BRACKET;
+let selectedFormat = "";
 let selectedFormatRandom = false;
 let selectedProblems = [];
 let selectedSetName = "";
@@ -131,7 +131,15 @@ let menuLoopInterval = null;
 
 window.addEventListener("load", function() {
     if (window.location.protocol === "file:")
-        console.clear(); //Helps with debugging; don't care about all the GET 200s
+        setTimeout(() => console.clear(), 1000); //Helps with debugging; don't care about all the GET 200s
+});
+
+window.addEventListener("keydown", function(e) {
+    //Global listener for consistency
+    if (e.key === "F11") {
+        toggleFullscreen();
+        e.preventDefault(); //Don't undo toggle
+    }
 });
 
 function normalizePreset(preset, fallbackOperator = Operator.MULTIPLICATION) {
@@ -237,13 +245,14 @@ function updateFormatSelection() {
     document.querySelectorAll("#formatSelect .format-option").forEach(option => {
         option.classList.toggle("selected", selectedFormat === Format[option.dataset.format]);
     });
+    updateStartButton();
 }
 
 function selectOperator(operator) {
     selectedOperator = Operator[operator];
     document.getElementById("titleSelectOperator").style.display = "none";
     updateFormatOptionVisibility();
-    document.getElementById("titleSelectFormat").style.display = "block";
+    document.getElementById("gameTitle").style.display = "block";
     generateFactsGrid();
     document.getElementById("opDisplay").textContent = operator.toLowerCase();
 
@@ -274,6 +283,10 @@ function selectOperator(operator) {
     //Fix format preview operator
     document.querySelectorAll(".format-preview td.operator").forEach(td => td.innerHTML = bgSymbol());
 
+    //Pre-select Stacked
+    document.querySelectorAll("#formatSelect .format-option[data-format=STACKED]")[0].classList.add("selected");
+    selectFormat("STACKED");
+
     //Fix format preview facts
     document.querySelectorAll(".format-preview td.factA").forEach( td => td.innerText = exampleNum(0));
     document.querySelectorAll(".format-preview td.factB").forEach( td => td.innerText = exampleNum(1));
@@ -294,20 +307,14 @@ function menuLoop() {
 function selectFormat(format) {
     selectedFormat = Format[format];
     updateFormatSelection();
-    document.getElementById("titleSelectFormat").style.display = "none";
     document.getElementById("gameTitle").style.display = "block";
 }
 
 function backToOperatorSelection() {
-    document.getElementById("titleSelectFormat").style.display = "none";
+    document.getElementById("gameTitle").style.display = "none";
     document.getElementById("titleSelectOperator").style.display = "block";
     clearInterval(menuLoopInterval);
     document.querySelector("#menuContainer .background2").innerHTML = "";
-}
-
-function backToFormatSelection() {
-    document.getElementById("gameTitle").style.display = "none";
-    document.getElementById("titleSelectFormat").style.display = "block";
 }
 
 function generateFactsGrid() {
@@ -330,7 +337,7 @@ function generateFactsGrid() {
         }
     };
 
-    //Generate 12x12 buttons
+    //Generate 13x13 buttons (includes zero)
     const maxFactor = 12;
     const gridContainer = document.querySelector('.grid');
     gridContainer.innerHTML = ''; //Clear existing buttons
@@ -363,6 +370,7 @@ function generateFactsGrid() {
     updateClearButton();
     refreshCustomPresetButtons();
     gameDomLoaded();
+    updateStartButton();
 }
 
 function preset(set) {
@@ -631,7 +639,7 @@ function isArraySetSubset(a, b) {
 
 function updateStartButton() {
     const selectedFacts = selectedFactsToArray();
-    document.getElementById("startGame").disabled = selectedFacts.length === 0;
+    document.getElementById("startGame").disabled = selectedFacts.length === 0 || selectedFormat === "";
     document.getElementById("startGame").setAttribute("title", 
         selectedFacts.length === 0 ? "Select at least one fact to play" : "Play!");
 
@@ -936,6 +944,28 @@ function returnToMainMenuFromHighScores() {
     document.getElementById("highScoresMainMenu").style.display = "none";
 }
 
+function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+            alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+        });
+    } else {
+        document.exitFullscreen();
+    }
+}
+
+function enableOnScreenKeyboard() {
+    var osk = document.getElementById("inputTable");
+    if (osk.style.display === "none") {
+        osk.style.display = "";
+        setTimeout(() => {
+            osk.classList.remove("hidden");
+        }, 200);
+    } else {
+        osk.style.display = "none";
+    }
+}
+
 function toggleOnScreenKeyboard() {
     const keyboard = document.getElementById("inputTable");
     keyboard.classList.toggle("hidden");
@@ -959,6 +989,12 @@ function onScreenKeyboardClick(event) {
             break;
         case "x": //Show-hide
             toggleOnScreenKeyboard();
+            break;
+        case " ":
+            sendKeyPress(" ");
+            break;
+        case "q":
+            sendKeyPress("Escape");
             break;
         default: //Digits
             const digit = parseInt(key);

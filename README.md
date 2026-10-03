@@ -62,20 +62,34 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
 - Stacked line, fraction line and bracket line do not glow when active
 - "Play Again" while multishot is active will start the game with green glow (but no upgrade)
 - Game over kill line seems too high in windowed mode (100px above bottom)
+- Add a performance mode for mobile
+    - Reduce particles
+    - Possibly detect frame rate issues
 - Minor display issues on kill screen:
     - Kill line is too high with some formats
     - Lines don't change to black with some formats
 
 ## Recent Updates
 
+- *October 2026:*
+    - Quality-of-Life Enhancements:
+        - Fullscreen button added
+        - On-screen keyboard added
+        - Moved the format selection to be less annoying
+        - Turret design now reflects the selected operator
+    - Bug fixes:
+        - Game no longer insta-ends when exiting fullscreen
+        - Play Again button properly resets the game now
+        - Improved consistency with the game-over detection: problems now must actually touch the bottom of the screen for the game to be over
+        - Problems no longer go beyond the right side of the screen (partially hidden)
+        - "Runner" can no longer be targeted and shot over and over in certain situations
+        - Many other minor bug fixes
 - *August 2026:*
     - Game enhancements:
         - New operators! Addition, Subtraction, and Division have joined the invasion! Zap them all!
         - New expression formats! In addition to the old "stacked" format, now there is inline (`3 × 2 = 6`), 
             and for division there are fraction and long-division formats
         - Slightly increased the maximum rate problems appear (generally only effects gameplay with scores greater than 100)
-        - Experimental: on-screen buttons for typing now provided
-            - Reveal by adding `?experimental` to the URL
     - Menu enhancements:
         - New operator selection menu
         - New format selection menu

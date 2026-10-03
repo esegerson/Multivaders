@@ -15,6 +15,7 @@ body {
     background-attachment: fixed;
     color: white;
     font-family: sans-serif;
+    user-select: none;
 }
 
 body.noscroll { overflow: hidden; }
@@ -37,10 +38,10 @@ body.noscroll { overflow: hidden; }
 }
 
 #titleSelectOperator, #titleSelectFormat, #gameTitle { margin: 20px; overflow: auto; }
-#titleSelectOperator > p > button.navback { visibility: hidden; }
-#titleSelectOperator > p > button.navback, 
-#titleSelectFormat > p > button.navback,
-#gameTitle > p > button.navback { 
+#titleSelectOperator button.navback { visibility: hidden; }
+#titleSelectOperator button.navback, 
+#titleSelectFormat button.navback,
+#gameTitle button.navback { 
     margin-right: 1rem; 
 }
 
@@ -119,10 +120,9 @@ button:active {
 }
 #formatSelect {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 0.75rem;
-    max-width: 34rem;
-    margin: 0.75rem auto;
+    max-width: 54rem;
 }
 .format-preview {
     display: flex;
@@ -188,7 +188,6 @@ button.delete:hover {
   grid-template-columns: repeat(2, 1fr);
   gap: 0.5rem;
   max-width: 18rem;
-  margin: 0.5rem auto;
   justify-items: stretch;
 }
 #operatorSelect button {
@@ -285,6 +284,27 @@ button.delete:hover {
 
 .score, #score2 { color: yellow; font-size: 1.5rem; }
 
+button.fullscreen {
+    width: 1.5em;
+    height: 1.5em;
+    font-size: 2em;
+    line-height: 0.7em;
+    padding: 0;
+    pointer-events: all;
+    cursor: pointer;
+}
+
+#gameTitle button.fullscreen {
+    margin-bottom: 0.5em;
+    margin-right: 0.2em;
+}
+
+#gameContainer button.fullscreen {
+    position: absolute;
+    top: 1vh;
+    right: 2.5vh;
+}
+
 #statsContainer {
     position: absolute;
     bottom: 0;
@@ -370,12 +390,14 @@ button.delete:hover {
 }
 .vader.DIVISION.BRACKET .factA { padding-left: 0.4em; }
 .vader.DIVISION.BRACKET .factB { padding-right: 0.2em; }
+.vader.DIVISION.BRACKET.active .bracketRiser::before { border-color: var(--vaderActiveColor); }
+.vader.DIVISION.BRACKET.active .result { border-bottom-color: var(--vaderActiveColor); }
 
 .vader.active, .vader.related {
     color: var(--vaderActiveColor);
     text-shadow: 0 0 0.3em rgba(255,255,255,1);
 }
-.vader.active .result, .vader.related .result, .vader.active.DIVISION.FRACTION .factA { border-color: var(--vaderActiveColor); }
+.vader.active .result, .vader.related .result, .vader.active.DIVISION.FRACTION .factA, .vader.related.DIVISION.FRACTION .factA { border-color: var(--vaderActiveColor); }
 .vader.active .operator, .vader.related .operator { animation: wiggle 1s infinite ease-in-out; }
 .vader.correct {
     color: var(--vaderRunnerColor);
@@ -385,6 +407,9 @@ button.delete:hover {
 .vader.incorrect { color: #f00; }
 .vader.correct .result { border-color: #0f0; }
 .vader.incorrect .result { border-color: #f00;}
+.vader.DIVISION.BRACKET.incorrect .result { border-bottom-color: #f00; }
+.vader.DIVISION.BRACKET.incorrect .bracketRiser::before { border-color: #f00; }
+.vader.DIVISION.FRACTION.incorrect .factA { border-bottom-color: #f00; }
 .vader.dead {
     color: black;
     text-shadow: 0 0 0.3rem purple;
@@ -394,8 +419,10 @@ button.delete:hover {
 #gameContainer.paused .vader, .vader.paused, .vader.runner.paused, .vader.runner.paused .result { animation-play-state: paused; }
 .vader.runner { color: var(--vaderRunnerColor); animation: dance 2s infinite ease-in-out, pulseColorPale 1s ease-in-out infinite; }
 .vader.runner .result { border-color: var(--vaderRunnerColor); animation: pulseColorPale 1s ease-in-out infinite; }
+.vader.DIVISION.BRACKET.runner .bracketRiser::before { border-color: var(--vaderRunnerColor); animation: pulseColorPale 1s ease-in-out infinite; }
 .vader.active.runner { color: var(--vaderActiveRunnerColor); animation: dance 2s infinite ease-in-out, pulseColorActive 1s ease-in-out infinite; }
 .vader.active.runner .result { color: var(--vaderActiveRunnerColor); animation: pulseColorActive 1s ease-in-out infinite; }
+.vader.DIVISION.BRACKET.runner.active .bracketRiser::before { border-color: var(--vaderRunnerColor); animation: pulseColorActive 1s ease-in-out infinite; }
 
 @keyframes jiggle { /*death rattle*/
     0%   { transform: rotate(10deg) translate(0, 0); }
@@ -407,7 +434,7 @@ button.delete:hover {
 
 @keyframes dance { /*bob up & down*/
     0%   { transform: translate(0, 0); }
-    50%  { transform: translate(0, -10px); }
+    50%  { transform: translate(0, -0.5vh); }
     100% { transform: translate(0, 0); }
 }
 
@@ -527,7 +554,6 @@ ul.tips span {
 #gameContainer .turret .circle.pulse {
     animation: 1s cubic-bezier(0, .75, .08, 1) 1 pulse;
 }
-
 
 @keyframes pulse {
     0% { filter: blur(30px); transform: scale(2); }
@@ -763,7 +789,7 @@ a:hover { color: white; text-shadow: 0 0 5px white; }
 }
 #inputTable td.delete button { padding-top: 1.5vw; }
 #inputTable td.delete button::after { content: 'Delete'; font-size: 1.2vw; position: relative; top: -1em; display: block; }
-#inputTable td.showhide button { width: 10vw; line-height: 0.5em; }
+#inputTable td.showhide button, #showOSK button { width: 10vw; line-height: 0.5em; }
 #inputTable td.showhide button::after { content: '\1F5AE\A\1F783'; white-space: pre; }
 #inputTable td.enter button { font-size: 4vw; }
 #inputTable td.enter button::after { content: 'Enter'; font-size: 1.2vw; position: relative; top: -1em; display: block; }
@@ -773,3 +799,7 @@ a:hover { color: white; text-shadow: 0 0 5px white; }
 #inputTable.hidden td button { opacity: 0; pointer-events: none; }
 #inputTable.hidden td.showhide button { opacity: 1; pointer-events: all; }
 #inputTable.hidden td.showhide button::after { content: '\1F781\A\1F5AE'; white-space: pre; }
+
+#showOSK button { margin: 0 0.2em 0.2em 0; width: 1.5em; height: 1.5em; font-size: 2em; }
+#showOSK button::after { content: '\1F5AE'; white-space: pre; }
+#showOSK span { opacity: 0.5; }

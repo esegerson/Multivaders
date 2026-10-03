@@ -6,7 +6,7 @@ const orbitDetails = {
         radiusY: 30 + i * 15,
         rotation: i * Math.PI / 8,
     })),
-    orbitSpeed: 0.05, // Radians per frame
+    orbitSpeed: 0.05, //Radians per frame
     movementMode: "orbit", //or "transfer" or "turret"
     steeringStrength: 2, //Smaller = slower turn, larger = snappier
     targetTransferSpeed: 20,
@@ -30,6 +30,7 @@ const orbitDetails = {
 };
 
 function setupOrbiters() {
+    orbitDetails.orbiters = []; //Reset
     const gFront = document.getElementById("orbitersFront");
     const gBehind = document.getElementById("orbitersBehind");
     for (let i = 0; i < orbitDetails.numOrbiters; i++) {

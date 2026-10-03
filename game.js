@@ -22,6 +22,9 @@ let forceNextRunner = false;
 let multishots = 0;
 const multishotsAwarded = 4;
 let multishotActive = function() { return multishots > 0; };
+let priorScreenHeight = window.innerHeight;
+let priorScreenWidth = window.innerWidth;
+let justExitedFullscreen = false;
 
 let keybuffer = [];
 
@@ -54,12 +57,18 @@ function start() {
     }));
 
     //Init
+    window.scrollTo({ top: 0 }); //Fixes some weirdness when scrolled on menu
     document.body.classList.toggle("noscroll");
     document.querySelectorAll("#gameContainer .vader").forEach(v => v.remove()); // Clear previous vaders
     score = -1;
-    incrementScore(); // Start score at 0
-    multishots = 0;
+    incrementScore(); //Start score at 0
     resetOrbiters();
+    multishots = 0;
+    hitCeiling = 0;
+    lastId = 0;
+
+    //Construct turret
+    setTurretOperatorSign(selectedOperator);
 
     //Spawn initial vaders
     for (let i = 0; i < startingVaders; i++) {
@@ -75,7 +84,7 @@ function start() {
 
     setupOrbiters();
     
-    timer = performance.now(); // Start the timer
+    timer = performance.now(); //Start the timer
     totalSeconds = 0; //This gets set in gameOver(), used for high score display
     spawnVader(lastId++); // Spawn the first vader
     gameLoopInterval = setInterval(gameLoop, 1000 / 30); //Start the game loop 30fps
@@ -125,14 +134,41 @@ function gameLoop() {
         if (!overrideSpeed) spawnVader(lastId++);
     }
 
+    //Detect if screen height got smaller (resized window or exiting fullscreen)
+    if (window.innerHeight != priorScreenHeight) {
+        //Adjust vader positions to account for the reduced screen height
+        let screenReduction = priorScreenHeight - window.innerHeight;
+        //Strategy: If prior screen was 100px and new screen is 50px, 50/100 = 0.5, multiply all vader tops by this.
+        for (const vader of vaders) {
+            let top = parseFloat(vader.style.top || "0");
+            let newTop = top * (window.innerHeight / priorScreenHeight);
+            vader.style.top = newTop + "px";
+        }
+    }
+    priorScreenHeight = window.innerHeight;
+
+    //Detect if screen width got smaller (resized window or exiting fullscreen)
+    if (window.innerWidth != priorScreenWidth) {
+        //Adjust vader positions to account for the reduced screen width
+        let screenReduction = priorScreenWidth - window.innerWidth;
+        //Strategy: If prior screen was 100px and new screen is 50px, 50/100 = 0.5, multiply all vader lefts by this.
+        for (const vader of vaders) {
+            let left = parseFloat(vader.style.left || "0");
+            let newLeft = left * (window.innerWidth / priorScreenWidth);
+            vader.style.left = newLeft + "px";
+        }
+    }
+    priorScreenWidth = window.innerWidth;
+
     //Move all vaders down
     for (const vader of vaders) {
         let speed = parseFloat(vader.getAttribute("data-speed") || 1);
-        if (overrideSpeed) speed = 0;
+        let speedNominal = speed / 2160 * window.innerHeight; //Original design was calibrated to a 4K monitor
+        if (overrideSpeed) speedNominal = 0;
         if (vader.classList.contains("runner")) {
             let left = parseFloat(vader.style.left);
             let direction = parseInt(vader.getAttribute("data-dir")) * -1;
-            let newLeft = left + speed * direction;
+            let newLeft = left + speedNominal * direction;
             vader.style.left = newLeft + "px";
             if (vader.classList.contains("active") && !runnerOutOfBounds(vader).canBeActive) {
                 vader.classList.remove("active");
@@ -141,10 +177,10 @@ function gameLoop() {
         } else {
             let top = parseFloat(vader.style.top || "-150");
             if (top < 50 && score < 100) { //Do a fast slide-in so user doesn't have to wait
-                speed = (50 - top) / 5 * speed; //Hustle to get onto the screen
-                if (speed < 0.2) speed = 0.2; // Ensure a minimum speed
+                speedNominal = (50 - top) / 5 * speedNominal; //Hustle to get onto the screen
+                if (speedNominal < 0.2) speedNominal = 0.2; // Ensure a minimum speed
             }
-            vader.style.top = (top + speed) + "px";
+            vader.style.top = (top + speedNominal) + "px";
         }
     }
 
@@ -163,11 +199,13 @@ function gameLoop() {
     }
 
     //Check for game over condition
-    let windowHeight = window.innerHeight - 180;
+    let windowHeight = window.innerHeight;
     for (const vader of vaders) {
         if (vader.classList.contains("correct")) continue; // Skip solved vaders
         let top = parseFloat(vader.style.top || "-150");
-        if (top > windowHeight) {
+        let height = vader.offsetHeight || 100;
+        let bottom = top + height;
+        if (bottom > windowHeight) {
             // Game over condition: a vader has reached the bottom
             gameOver(vader);
             return;
@@ -176,6 +214,14 @@ function gameLoop() {
 
     //Autosolve (secret mode)
     if (autoSolve) {
+        let getSolution = (factA, factB) => {
+            switch (selectedOperator) {
+                case Operator.ADDITION:         return factA + factB;
+                case Operator.SUBTRACTION:      return factA - factB;
+                case Operator.MULTIPLICATION:   return factA * factB;
+                case Operator.DIVISION:         return factA / factB;
+            }
+        };
         let solvedVaders = document.querySelectorAll("#gameContainer .vader.correct");
         let lastSolve = Math.max(
             ... Array.from(solvedVaders).map(v => parseInt(v.getAttribute("data-solved") || 0))
@@ -190,7 +236,7 @@ function gameLoop() {
             autoSolveInProgress = true;
             let activeVader = document.querySelector("#gameContainer .vader.active");
             let facts = getFactsFromVader(activeVader);
-            let result = facts.factA * facts.factB;
+            let result = getSolution(facts.factA, facts.factB);
             let delay = 0;
             for (let c of result.toString()) {
                 setTimeout(() => { sendKeyPress(c); }, delay);
@@ -287,6 +333,8 @@ function getProblem() {
 }
 
 function createVader(id, factA, factB) {
+    let sampleVader = document.querySelector("#vaderContainer .vader");
+    let sampleVaderWidth = sampleVader ? sampleVader.offsetWidth : 200;
     let vaderTemplate = document.querySelector("#templates > .vaderTemplate." + selectedOperator + "." + selectedFormat);
     if (vaderTemplate === null) //TODO: remove after development
         throw new Error("No vader template found for operator " + selectedOperator + " and format " + selectedFormat);
@@ -297,7 +345,8 @@ function createVader(id, factA, factB) {
     vaderClone.id = "vader-" + id; // Unique ID for the vader
     vaderClone.setAttribute("data-id", id);
     vaderClone.style.top = "-132px"; // Start above the viewport
-    vaderClone.style.left = Math.random() * (window.innerWidth - 100) + "px"; // Random horizontal position
+    let xpos = Math.random() * (window.innerWidth - sampleVaderWidth) * 0.94 + window.innerWidth * 0.03;
+    vaderClone.style.left = xpos + "px"; // Random horizontal position
     vaderClone.setAttribute("data-speed", getSpeed());
     const activeVader = document.querySelector("#gameContainer .vader.active");
     if (multishotActive() && activeVader && vaderIsSame(vaderClone, activeVader)) {
@@ -315,14 +364,16 @@ function getSpeed(variance = 1) {
     if (rv < 0.2) rv = 0.2; // Ensure a minimum speed
 
     //Scale speed based on screen height (4K fullscreen ideal = 1.0 base)
-    rv *= (window.innerHeight / 2160); //Totally arbitrary, this is just what I've been used to, may change later
+    rv *= (window.innerHeight / 2160); //Game was originally calibrated on a 4K screen, fullscreen
 
     return rv; // Speed in pixels per frame (33ms)
 }
 
 function getEstimatedLifespan() {
+    let sampleVader = document.querySelector("#gameContainer .vader");
+    let sampleVaderHeight = sampleVader ? sampleVader.offsetHeight : 200;
     let v = getSpeed(0); //px / s
-    let h = window.innerHeight - 180; //px
+    let h = window.innerHeight - sampleVaderHeight;
     return h / v; //s
 }
 
@@ -343,8 +394,8 @@ function getDelay() {
         and by 100 points, the delay is down to 1 second, which is insanely difficult.
     */
     let seconds = 460 / (score + 20) - 2.87 - hitCeiling;
-    if (seconds < 0.8 && hitCeiling == 0) seconds = 0.7; // Ensure a minimum delay of 1 second
-    if (seconds < 0.6 && hitCeiling > 0) seconds = 0.6; // If the user is hitting the ceiling, allow a faster rate
+    if (seconds < 0.4 && hitCeiling > 0) seconds = 0.4; // If the user is hitting the ceiling, allow a faster rate
+    if (seconds < 0.7 && hitCeiling == 0) seconds = 0.7; // Ensure a minimum delay
     return seconds * 1000;
 }
 
@@ -356,7 +407,7 @@ function keyListener(e) {
     let paused = isPaused();
     const activeVader = document.querySelector(".active");
     const relatedVaders = getRelatedVaders(activeVader);
-    const result = activeVader.querySelector(".result");
+    const result = activeVader ? activeVader.querySelector(".result") : "";
     if (document.querySelector(".vader.dead")) {
         return; // If a vader is dead, ignore all key presses
     } else if (e.key === "Escape") {
@@ -378,6 +429,7 @@ function keyListener(e) {
     } else if (e.key === "Backspace") {
         if (paused) return; // Cannot type while paused
         e.preventDefault();
+        if (activeVader === null) return; //Nothing to do (rare edge case)
         result.textContent = result.textContent.slice(0, -1);
         if (result.textContent.length === 0) result.textContent = "\xa0";
         activeVader.classList.remove("correct");
@@ -388,6 +440,7 @@ function keyListener(e) {
     } else if (e.key.length === 1 && e.key >= '0' && e.key <= '9') {
         if (paused) return; // Cannot type while paused
         e.preventDefault();
+        if (activeVader === null) return; //Nothing to do (rare edge case)
         if (activeVader.classList.contains("incorrect")) {
             result.textContent = ""; // Reset if previously incorrect
             activeVader.classList.remove("incorrect");
@@ -405,6 +458,7 @@ function keyListener(e) {
         }
     } else if (e.key === "Enter") {
         if (paused) return; // Cannot type while paused
+        if (activeVader === null) return; //Nothing to do (rare edge case)
         if (result.textContent === (activeVader.getAttribute("data-last-val") || "~")) 
             return; //Prevent accidental double-enters on wrong answers which can quickly end the game
         if (result.textContent === "" || result.textContent === "\u00A0") { //nbsp
@@ -476,7 +530,9 @@ class keyListenerHelper {
                 hideOneOrbiter();
                 if (!multishotActive()) endMultishot();
             }
-            if (activeVader.classList.contains("runner")) {
+            if (activeVader.classList.contains("runner") && !multishotActive()) { 
+                //Above condition: shouldn't be possible to shoot runner while multishot is active, 
+                //but somehow it happens.
                 multishots += multishotsAwarded;
                 orbitDetails.movementMode = "transfer";
                 orbitDetails.initTransfer(activeVader);
@@ -504,7 +560,7 @@ class keyListenerHelper {
             music.volume = 0.1; //Lower volume when paused
             pausedStart = performance.now();
         } else {
-            gameLoopInterval = setInterval(gameLoop, 33); // Resume the game loop
+            gameLoopInterval = setInterval(gameLoop, 1000 / 33); // Resume the game loop
             document.getElementById("paused").style.display = "none";
             let music = document.getElementById("gameMusic");
             music.volume = 0.2;
@@ -592,11 +648,14 @@ function incrementScore() {
 
 function tintBackground() {
     let vaders = document.querySelectorAll("#gameContainer .vader:not(.correct):not(.runner)");
-    let largestTop = Math.max(...Array.from(vaders).map(v => parseFloat(v.style.top || "0")));
-    let windowHeight = window.innerHeight - 200;
+    let largestTop = Math.max(...Array.from(vaders).map(v => 
+        parseFloat(v.style.top || "0") + v.offsetHeight
+    ));
+    let windowHeight = window.innerHeight;
+    let startRed = windowHeight / 3; //Start red tinting when vaders are mostly down the screen
     let distanceToBottom = windowHeight - largestTop;
-    if (distanceToBottom < 400) {
-        let o = (400 - distanceToBottom) / 400;
+    if (distanceToBottom < startRed) {
+        let o = (startRed - distanceToBottom) / startRed;
         setDeadBackgroundStyle(o);
             
     } else {
@@ -867,4 +926,35 @@ function drawNetworkFor(vader, network) {
             g.append(svgl2);
         }
     }
+}
+
+function setTurretOperatorSign(operator) {
+    const operatorPaths = {
+        ADDITION: ["turretHoriz", "turretVert"],
+        SUBTRACTION: ["turretHoriz"],
+        MULTIPLICATION: ["turretMultFwdSlash", "turretMultBckSlash"],
+        DIVISION: ["turretHoriz","turretDivDotUpper", "turretDivDotLower"]
+    };
+
+    const allIds = [
+        "turretMultFwdSlash",
+        "turretMultBckSlash",
+        "turretHoriz",
+        "turretVert",
+        "turretDivDotUpper",
+        "turretDivDotLower"
+    ];
+
+    //Hide everything first
+    allIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = "none";
+    });
+
+    //Show only the selected operator
+    const visibleIds = operatorPaths[operator] || [];
+    visibleIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = "block";
+    });
 }
