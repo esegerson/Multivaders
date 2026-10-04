@@ -49,19 +49,13 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
     - Backspace "click"
     - Game over "groan" or explosion
 - Move graphics code from game.js to separate graphics.js file
-- Add a fullscreen toggle button
 - To prevent overlapping and legibility, darken problems that are behind the active problem; restore them when the active problem is solved
 
 ## Known Bugs
 
-- Does not scale to different resolutions well - larger resolutions are easier because the problems take longer to fall
 - Select preset, click Delete Preset, preset is green not red.
 - Make preset, new preset is not auto-selected green
 - A tie in high scores should favor the new score
-- Too many balls around the runner after clicking "Play Again"
-- Stacked line, fraction line and bracket line do not glow when active
-- "Play Again" while multishot is active will start the game with green glow (but no upgrade)
-- Game over kill line seems too high in windowed mode (100px above bottom)
 - Add a performance mode for mobile
     - Reduce particles
     - Possibly detect frame rate issues
