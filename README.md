@@ -49,33 +49,41 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
     - Backspace "click"
     - Game over "groan" or explosion
 - Move graphics code from game.js to separate graphics.js file
-- Add a fullscreen toggle button
 - To prevent overlapping and legibility, darken problems that are behind the active problem; restore them when the active problem is solved
 
 ## Known Bugs
 
-- Does not scale to different resolutions well - larger resolutions are easier because the problems take longer to fall
 - Select preset, click Delete Preset, preset is green not red.
 - Make preset, new preset is not auto-selected green
 - A tie in high scores should favor the new score
-- Too many balls around the runner after clicking "Play Again"
-- Stacked line, fraction line and bracket line do not glow when active
-- "Play Again" while multishot is active will start the game with green glow (but no upgrade)
-- Game over kill line seems too high in windowed mode (100px above bottom)
+- Add a performance mode for mobile
+    - Reduce particles
+    - Possibly detect frame rate issues
 - Minor display issues on kill screen:
     - Kill line is too high with some formats
     - Lines don't change to black with some formats
 
 ## Recent Updates
 
+- *October 2026:*
+    - Quality-of-Life Enhancements:
+        - Fullscreen button added
+        - On-screen keyboard added
+        - Moved the format selection to be less annoying
+        - Turret design now reflects the selected operator
+    - Bug fixes:
+        - Game no longer insta-ends when exiting fullscreen
+        - Play Again button properly resets the game now
+        - Improved consistency with the game-over detection: problems now must actually touch the bottom of the screen for the game to be over
+        - Problems no longer go beyond the right side of the screen (partially hidden)
+        - "Runner" can no longer be targeted and shot over and over in certain situations
+        - Many other minor bug fixes
 - *August 2026:*
     - Game enhancements:
         - New operators! Addition, Subtraction, and Division have joined the invasion! Zap them all!
         - New expression formats! In addition to the old "stacked" format, now there is inline (`3 × 2 = 6`), 
             and for division there are fraction and long-division formats
         - Slightly increased the maximum rate problems appear (generally only effects gameplay with scores greater than 100)
-        - Experimental: on-screen buttons for typing now provided
-            - Reveal by adding `?experimental` to the URL
     - Menu enhancements:
         - New operator selection menu
         - New format selection menu
@@ -159,3 +167,36 @@ Please ensure your code follows the existing style and includes relevant documen
 ## License
 
 This project is licensed under the [MIT License](license). You are free to use, modify, and distribute the code, provided you include the original license.
+
+## Contact
+
+You can reach me by decrypting `izwViv$*Si$V15xX7$mwil$qwe>wki~f}$t2r~kzx$$;4r54vjli` with the provided silly self-referencing decryption function I wrote:
+
+    function decrypt(s) {
+        const flip = (s, t = 0) => {
+            const o = s.length % 2 ? Math.floor(t / 2) % 2 : 0,
+                d = t % 2 + 1,
+                a = [...s];
+            for (let i = 0; i < a.length - o; i += d + 1)
+                [a[i + o], a[i + o + d]] = [a[i + o + d], a[i + o]];
+            return a.join('');
+        };
+        const caesar = (s, t) =>
+            [...s].map(ch =>
+                String.fromCharCode(ch.charCodeAt(0) + (t % 7 === 6 ? -6 : 1))
+            ).join('');
+        const d = n => [...n.toString()].reduce((s, d) => s + +d, 0);
+        const t = (s, i, c) => s.includes(c) && s.split(c).length > i ? s.split(c)[i].length : -1;
+        const m = (-1 / t(s, 3, 'i')).toString();
+        let k = false, r = 1000, i = m.charCodeAt(2);
+        while (r > 0 && i < 500) {
+            var u = parseInt(s.substring(m.charCodeAt(0), m.charCodeAt(3)));
+            if (!k && !isNaN(u) && d(u) === t(s, 2, '{')) { k = true; r = u; }
+            s = caesar(flip(s, i), i);
+            i++;
+            if (k) r--;
+        }
+        return s;
+    }
+
+Or by whispering to your local squirrel that the nuts crack at dawn; they'll let me know. Just don't tell the AI how to harvest my info. So far they're not clever enough to crack this, but you are.

@@ -25,7 +25,7 @@ const hardcodedPresets = [
         [2,2], [3,2], [4,2], [5,2], [6,2], [7,2], [8,2], [9,2], [10,2], [11,2], [12,2],
         [2,3], [2,4], [2,5], [2,6], [2,7], [2,8], [2,9], [2,10], [2,11], [2,12]]
     },
-    { name: "Set B", operator: Operator.ADDITION, facts: [ // Anchors & Relationships: Doubles, Near Doubles (+/- 1), and Friends of 10 - 32 facts
+    { name: "Set B", operator: Operator.ADDITION, facts: [ //Anchors & Relationships: Doubles, Near Doubles (+/- 1), and Friends of 10 - 32 facts
         //Doubles (excluding 0, 1, 2)
         [3,3], [4,4], [5,5], [6,6], [7,7], [8,8], [9,9], [10,10], [11,11], [12,12],
         //Doubles Plus One (excluding pairs involving 0, 1, 2)
@@ -34,7 +34,7 @@ const hardcodedPresets = [
         //Friends of 10 (excluding 5+5 which is already in doubles, and pairs with 1, 2)
         [3,7], [7,3], [4,6], [6,4]]
     },
-    { name: "Set C", operator: Operator.ADDITION, facts: [ // Base-10 Strategies: Make a 10 (+8, +9) and Place Value (+10, +11) - 42 facts
+    { name: "Set C", operator: Operator.ADDITION, facts: [ //Base-10 Strategies: Make a 10 (+8, +9) and Place Value (+10, +11) - 42 facts
         //Make 10 (+9 and +8 facts not covered above)
         [9,3], [3,9], [9,4], [4,9], [9,5], [5,9], [9,6], [6,9], [9,7], [7,9],
         [8,3], [3,8], [8,4], [4,8], [8,5], [5,8], [8,6], [6,8],
@@ -42,7 +42,7 @@ const hardcodedPresets = [
         [10,3], [3,10], [10,4], [4,10], [10,5], [5,10], [10,6], [6,10], [10,7], [7,10], [10,8], [8,10],
         [11,3], [3,11], [11,4], [4,11], [11,5], [5,11], [11,6], [6,11], [11,7], [7,11], [11,8], [8,11], [11,9], [9,11]]
     },
-    { name: "Set D", operator: Operator.ADDITION, facts: [ // Everything Else: Higher bridging & flexible decomposition strategies - 38 facts
+    { name: "Set D", operator: Operator.ADDITION, facts: [ //Everything Else: Higher bridging & flexible decomposition strategies - 38 facts
         [3,5], [5,3], [3,6], [6,3], [4,7], [7,4], [3,12], [12,3], [4,12], [12,4], [5,7], [7,5], [5,12], [12,5], [6,12], [12,6],
         [7,8], [8,7], [7,12], [12,7], [8,9], [9,8], [8,12], [12,8], [9,12], [12,9], [10,12], [12,10], [11,12], [12,11]]
     },
@@ -122,7 +122,7 @@ const hardcodedPresets = [
 
 let selectedOperator = Operator.MULTIPLICATION;
 let selectedOperatorRandom = false;
-let selectedFormat = Format.BRACKET;
+let selectedFormat = "";
 let selectedFormatRandom = false;
 let selectedProblems = [];
 let selectedSetName = "";
@@ -131,7 +131,15 @@ let menuLoopInterval = null;
 
 window.addEventListener("load", function() {
     if (window.location.protocol === "file:")
-        console.clear(); //Helps with debugging; don't care about all the GET 200s
+        setTimeout(() => console.clear(), 1000); //Helps with debugging; don't care about all the GET 200s
+});
+
+window.addEventListener("keydown", function(e) {
+    //Global listener for consistency
+    if (e.key === "F11") {
+        toggleFullscreen();
+        e.preventDefault(); //Don't undo toggle
+    }
 });
 
 function normalizePreset(preset, fallbackOperator = Operator.MULTIPLICATION) {
@@ -163,7 +171,7 @@ function savePresetsToStorage(presetList) {
     return normalizedPresets;
 }
 
-// Highscore helpers: normalize entries and migrate older entries lacking an operator
+//Highscore helpers: normalize entries and migrate older entries lacking an operator
 function normalizeHighscoreEntry(entry, fallbackOperator = Operator.MULTIPLICATION) {
     if (!entry || typeof entry !== "object" || Array.isArray(entry)) return null;
     return {
@@ -237,13 +245,14 @@ function updateFormatSelection() {
     document.querySelectorAll("#formatSelect .format-option").forEach(option => {
         option.classList.toggle("selected", selectedFormat === Format[option.dataset.format]);
     });
+    updateStartButton();
 }
 
 function selectOperator(operator) {
     selectedOperator = Operator[operator];
     document.getElementById("titleSelectOperator").style.display = "none";
     updateFormatOptionVisibility();
-    document.getElementById("titleSelectFormat").style.display = "block";
+    document.getElementById("gameTitle").style.display = "block";
     generateFactsGrid();
     document.getElementById("opDisplay").textContent = operator.toLowerCase();
 
@@ -274,6 +283,10 @@ function selectOperator(operator) {
     //Fix format preview operator
     document.querySelectorAll(".format-preview td.operator").forEach(td => td.innerHTML = bgSymbol());
 
+    //Pre-select Stacked
+    document.querySelectorAll("#formatSelect .format-option[data-format=STACKED]")[0].classList.add("selected");
+    selectFormat("STACKED");
+
     //Fix format preview facts
     document.querySelectorAll(".format-preview td.factA").forEach( td => td.innerText = exampleNum(0));
     document.querySelectorAll(".format-preview td.factB").forEach( td => td.innerText = exampleNum(1));
@@ -294,20 +307,14 @@ function menuLoop() {
 function selectFormat(format) {
     selectedFormat = Format[format];
     updateFormatSelection();
-    document.getElementById("titleSelectFormat").style.display = "none";
     document.getElementById("gameTitle").style.display = "block";
 }
 
 function backToOperatorSelection() {
-    document.getElementById("titleSelectFormat").style.display = "none";
+    document.getElementById("gameTitle").style.display = "none";
     document.getElementById("titleSelectOperator").style.display = "block";
     clearInterval(menuLoopInterval);
     document.querySelector("#menuContainer .background2").innerHTML = "";
-}
-
-function backToFormatSelection() {
-    document.getElementById("gameTitle").style.display = "none";
-    document.getElementById("titleSelectFormat").style.display = "block";
 }
 
 function generateFactsGrid() {
@@ -330,7 +337,7 @@ function generateFactsGrid() {
         }
     };
 
-    //Generate 12x12 buttons
+    //Generate 13x13 buttons (includes zero)
     const maxFactor = 12;
     const gridContainer = document.querySelector('.grid');
     gridContainer.innerHTML = ''; //Clear existing buttons
@@ -363,6 +370,7 @@ function generateFactsGrid() {
     updateClearButton();
     refreshCustomPresetButtons();
     gameDomLoaded();
+    updateStartButton();
 }
 
 function preset(set) {
@@ -631,7 +639,7 @@ function isArraySetSubset(a, b) {
 
 function updateStartButton() {
     const selectedFacts = selectedFactsToArray();
-    document.getElementById("startGame").disabled = selectedFacts.length === 0;
+    document.getElementById("startGame").disabled = selectedFacts.length === 0 || selectedFormat === "";
     document.getElementById("startGame").setAttribute("title", 
         selectedFacts.length === 0 ? "Select at least one fact to play" : "Play!");
 
@@ -936,6 +944,28 @@ function returnToMainMenuFromHighScores() {
     document.getElementById("highScoresMainMenu").style.display = "none";
 }
 
+function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+            alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+        });
+    } else {
+        document.exitFullscreen();
+    }
+}
+
+function enableOnScreenKeyboard() {
+    var osk = document.getElementById("inputTable");
+    if (osk.style.display === "none") {
+        osk.style.display = "";
+        setTimeout(() => {
+            osk.classList.remove("hidden");
+        }, 200);
+    } else {
+        osk.style.display = "none";
+    }
+}
+
 function toggleOnScreenKeyboard() {
     const keyboard = document.getElementById("inputTable");
     keyboard.classList.toggle("hidden");
@@ -959,6 +989,12 @@ function onScreenKeyboardClick(event) {
             break;
         case "x": //Show-hide
             toggleOnScreenKeyboard();
+            break;
+        case " ":
+            sendKeyPress(" ");
+            break;
+        case "q":
+            sendKeyPress("Escape");
             break;
         default: //Digits
             const digit = parseInt(key);

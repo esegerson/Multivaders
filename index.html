@@ -16,7 +16,7 @@
         <div id="titleSelectOperator">
             <h1>Multivaders!</h1>
             <p>Multivaders is a thrilling space shooter game where you defend your planet from waves of alien invaders. Solve math problems to defeat the enemies!</p>
-            <p class="center"><button class="navback">Back</button><b>Step 1 of 3:</b> Select your operator:</p>
+            <h2>Select your operator:</h2>
             <p id="operatorSelect">
                 <button onclick="selectOperator('ADDITION')"><span>&plus;</span>Addition</button>
                 <button onclick="selectOperator('SUBTRACTION')"><span>&minus;</span>Subtraction</button>
@@ -24,12 +24,32 @@
                 <button onclick="selectOperator('DIVISION')"><span>&divide;</span>Division</button>
             </p>
         </div>
-        <div id="titleSelectFormat" style="display: none;">
+        <div id="gameTitle" style="display: none;">
             <h1>Multivaders!</h1>
             <p>Multivaders is a thrilling space shooter game where you defend your planet from waves of alien invaders. Solve math problems to defeat the enemies!</p>
-            <p class="center"><button class="navback" onclick="backToOperatorSelection()">Back</button><b>Step 2 of 3:</b> Select your format:</p>
+            <p><button class="navback" onclick="backToOperatorSelection()">Change Operator</button> Select what <b id="opDisplay"></b> facts you'd like to zap:</p>
+            <p id="presetButtons">Presets: 
+                <button class="hardcoded" onclick="preset(1)" onmouseover="hoverPreset(this)" onmouseout="clearHoverPreset()">Set A</button> 
+                <button class="hardcoded" onclick="preset(2)" onmouseover="hoverPreset(this)" onmouseout="clearHoverPreset()">Set B</button>
+                <button class="hardcoded" onclick="preset(3)" onmouseover="hoverPreset(this)" onmouseout="clearHoverPreset()">Set C</button>
+                <button class="hardcoded" onclick="preset(4)" onmouseover="hoverPreset(this)" onmouseout="clearHoverPreset()">Set D</button>
+                <button class="hardcoded" onclick="preset(5)" onmouseover="hoverPreset(this)" onmouseout="clearHoverPreset()">Set E</button>
+                <span id="presetList"></span>
+                <span class="savePresetContainer">
+                    <button id="btnMakePreset" disabled onclick="openPresetModal()" title="Select a fact to create a preset">&plus; Make Preset</button>
+                    <span id="presetSave" style="display: none;">
+                        <input type="text" id="setname" placeholder="Preset Name" maxlength="20"/>
+                        <button onclick="savePreset()" title="Save Preset">&#x2714;</button>
+                        <button onclick="closeNewPresetUi()" title="Cancel">&#x2716;</button>
+                    </span>
+                </span>
+                <button id="btnDeletePreset" disabled onclick="deletePreset(this)" title="No custom presets to delete">&minus; Delete Preset</button>
+                <button id="btnClear" disabled onclick="clearSelection()" title="No facts to clear">Clear</button>
+            </p>
+            <div class="grid"></div>
+            <h2>Select Format:</h2>
             <div id="formatSelect">
-                <div class="format-option" role="button" tabindex="0" data-format="STACKED">
+                <div class="format-option selected" role="button" tabindex="0" data-format="STACKED">
                     <div class="format-preview">
                         <table>
                             <tr><td class="factA" colspan="2">7</td></tr>
@@ -87,31 +107,13 @@
                 </div>
                 <!-- <div class="format-option division-only" role="button" tabindex="0" data-format="ALGEBRAIC">Algebraic</div> -->
             </div>
-        </div>
-        <div id="gameTitle" style="display: none;">
-            <h1>Multivaders!</h1>
-            <p>Multivaders is a thrilling space shooter game where y defend your planet from waves of alien invaders. Solve math problems to defeat the enemies!</p>
-            <p><button class="navback" onclick="backToFormatSelection()">Back</button><b>Step 3 of 3:</b> Select what <b id="opDisplay"></b> facts you'd like to work with:</p>
-            <p id="presetButtons">Presets: 
-                <button class="hardcoded" onclick="preset(1)" onmouseover="hoverPreset(this)" onmouseout="clearHoverPreset()">Set A</button> 
-                <button class="hardcoded" onclick="preset(2)" onmouseover="hoverPreset(this)" onmouseout="clearHoverPreset()">Set B</button>
-                <button class="hardcoded" onclick="preset(3)" onmouseover="hoverPreset(this)" onmouseout="clearHoverPreset()">Set C</button>
-                <button class="hardcoded" onclick="preset(4)" onmouseover="hoverPreset(this)" onmouseout="clearHoverPreset()">Set D</button>
-                <button class="hardcoded" onclick="preset(5)" onmouseover="hoverPreset(this)" onmouseout="clearHoverPreset()">Set E</button>
-                <span id="presetList"></span>
-                <span class="savePresetContainer">
-                    <button id="btnMakePreset" disabled onclick="openPresetModal()" title="Select a fact to create a preset">&plus; Make Preset</button>
-                    <span id="presetSave" style="display: none;">
-                        <input type="text" id="setname" placeholder="Preset Name" maxlength="20"/>
-                        <button onclick="savePreset()" title="Save Preset">&#x2714;</button>
-                        <button onclick="closeNewPresetUi()" title="Cancel">&#x2716;</button>
-                    </span>
-                </span>
-                <button id="btnDeletePreset" disabled onclick="deletePreset(this)" title="No custom presets to delete">&minus; Delete Preset</button>
-                <button id="btnClear" disabled onclick="clearSelection()" title="No facts to clear">Clear</button>
-            </p>
-            <div class="grid"></div>
             <p>
+                <div id="showOSK" class="showhide">
+                    <button onclick="enableOnScreenKeyboard()" title="Show Keyboard"></button> Toggle On-Screen Keyboard <span>(helpful for mobile or tablet)</span>
+                </div>
+                <div>
+                    <button class="fullscreen" onclick="toggleFullscreen()" title="Toggle Fullscreen">&#x26F6;</button> Toggle Fullscreen
+                </div>
                 <button id="startGame" onclick="start();" disabled title="Select at least one fact to play">Start Game</button> 
                 <button id="btnViewHighScores" onclick="viewHighScoresMainMenu()" style="display: none">View High Scores</button>
                 <span id="setNote" style="display: none;">High scores are saved only with a preset; select or make a preset to save your high score.</span>
@@ -151,6 +153,7 @@
     </div>
 
     <div id="gameContainer" class="max" style="display: none;">
+        <button class="fullscreen" onclick="toggleFullscreen()" title="Toggle Fullscreen">&#x26F6;</button>
         <div class="score">Score: <span id="score">0</span></div>
         <div id="tipContainer"></div>
         <div class="decoration">
@@ -176,26 +179,46 @@
             </div>
             <div class="turret" id="turret">
                 <div class="circle"></div>
-                <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg" aria-label="Turret">
                     <defs>
+                        <!-- Clip everything to a circle so the turret behaves like a round badge -->
                         <clipPath id="myClip">
                             <ellipse cx="50" cy="50" rx="50" ry="50" id="svg_2"/>
                         </clipPath>
+
+                        <!-- Green circular base color: tweak the gradient stops to make it lighter/darker -->
                         <radialGradient cy="0.36406" cx="0.42969" spreadMethod="pad" id="radgrad">
                             <stop offset="0" stop-color="#3f7f00"/>
                             <stop offset="1" stop-opacity="0.99609" stop-color="#2b5600"/>
                         </radialGradient>
-                        <!-- The filter region is expanded to accommodate the large shadow -->
+
+                        <!-- Huge drop-shadow makes the turret feel elevated; adjust stdDeviation to soften/harden it -->
                         <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
                             <feDropShadow dx="0" dy="0" stdDeviation="100" flood-color="#000" flood-opacity="0.9"/>
                         </filter>
                     </defs>
+
+                    <!-- Everything here is clipped to the circle and given a shadow -->
                     <g clip-path="url(#myClip)" filter="url(#shadow)">
+                        <!-- Main circular body -->
                         <g>
                             <ellipse fill="url(#radgrad)" cx="50" cy="50" id="ball" rx="50" ry="50"/>
                         </g>
-                        <path d="m10.75,81c2.5,-27.75 43.25,-73 64.75,-74c21.5,-1 42.25,2.25 9.75,7c-32.5,4.75 -58,59.25 -61.25,78.5c-3.25,19.25 -15.75,16.25 -13.25,-11.5z" fill="#000"/>
-                        <path d="m93.30566,79.5c-2.78931,-27.75 -48.25498,-73 -72.24301,-74c-23.98803,-1 -47.13926,2.25 -10.87829,7c36.26097,4.75 64.71189,59.25 68.33798,78.5c3.6261,19.25 17.57262,16.25 14.78332,-11.5z" fill="#000"/>
+
+                        <!--MULTIPLICATION-->
+                        <path id="turretMultFwdSlash" d="m10.75,81c2.5,-27.75 43.25,-73 64.75,-74c21.5,-1 42.25,2.25 9.75,7c-32.5,4.75 -58,59.25 -61.25,78.5c-3.25,19.25 -15.75,16.25 -13.25,-11.5z" fill="#000"/>
+                        <path id="turretMultBckSlash" d="m93.30566,79.5c-2.78931,-27.75 -48.25498,-73 -72.24301,-74c-23.98803,-1 -47.13926,2.25 -10.87829,7c36.26097,4.75 64.71189,59.25 68.33798,78.5c3.6261,19.25 17.57262,16.25 14.78332,-11.5z" fill="#000"/>
+
+                        <!--ADDITION-->
+                        <path id="turretHoriz" d="m 3.553 25.575 c 31.966 7.49 68.611 7.662 93.416 -0.334 c -4.249 3.243 -1.99 5.571 2.499 13.416 c -27.971 12.115 -62.21 12.032 -86.026 1.209 c -0.874 -11.213 -5.125 -2.869 -11 -4.5 z" fill="#000" transform="translate(93.999 33.265) scale(1.24 1.24) translate(-93.999 -33.265) translate(5.582 57.338) scale(0.988 0.988) translate(-5.582 -57.338) translate(105.801 29.69) scale(1.039 1.039) translate(-105.801 -29.69) rotate(178.672 56.404 35.961) rotate(0.585 50.955 36.555)"/>
+                        <path id="turretVert" d="m 15.548 0.81 c 38.27 -7.402 69.474 1.028 93.82 6.495 c -4.249 3.243 -1.99 5.571 -0.664 9.749 c -26.727 2.252 -55.462 0.059 -92.124 -6.341 c 0.105 -1.203 -1.585 -1.544 -1.334 -3.472 z" fill="#000" transform="translate(18 18) translate(93.999 33.265) scale(1.24 1.24) translate(-93.999 -33.265) translate(5.582 57.338) scale(0.988 0.988) translate(-5.582 -57.338) translate(105.801 29.69) scale(1.039 1.039) translate(-105.801 -29.69) rotate(82.648 42.492 9.391)"/>
+
+                        <!--SUBTRACTION-->
+                        <!--Use just horizontal above-->
+                        
+                        <!--DIVISION (just the top and bottom dots)-->
+                        <path id="turretDivDotUpper" d="M40.01 68.39 C39.67 64.62 39.17 57.93 38.76 52.26 C42.35 51.22 58.06 50.24 61.38 50.63 C61.33 53.78 61.34 61.84 61.25 66.26 C57.29 66.8 43.6 67.79 40.01 68.39 Z" fill="#000"/>
+                        <path id="turretDivDotLower" d="M58.38 16.38 C57.17 9.65 56.93 8.44 55.51 3 C50.84 2.44 41.4 3.53 37.85 4.5 C38.05 11.35 37.93 12.82 37.85 17.63 C43.27 16.7 53.84 16.25 58.38 16.38 Z" fill="#000"/>
                     </g>
                 </svg>
             </div>
@@ -209,29 +232,6 @@
                 <g id="orbitersBehind" />
             </svg>
         </div>
-        <table id="inputTable" class="hidden experimental-hide">
-            <tbody>
-                <tr>
-                    <td><button data-key="1">1</button></td>
-                    <td><button data-key="2">2</button></td>
-                    <td><button data-key="3">3</button></td>
-                    <td><button data-key="4">4</button></td>
-                    <td><button data-key="5">5</button></td>
-                    <td><button data-key="6">6</button></td>
-                    <td><button data-key="7">7</button></td>
-                    <td><button data-key="8">8</button></td>
-                    <td><button data-key="9">9</button></td>
-                    <td><button data-key="0">0</button></td>
-                </tr>
-                <tr>
-                    <td><button data-key="l" title="Select/Move Left">&#x1F808;</button></td>
-                    <td class="delete"><button data-key="d" title="Delete/Backspace">&#x232B;</button></td>
-                    <td class="showhide" colspan="6"><button data-key="x" title="Display Keyboard"></button></td>
-                    <td class="enter"><button data-key="e" title="Enter/Submit">&#x21B5;</button></td>
-                    <td><button data-key="r" title="Select/Move Right">&#x1F80A;</button></td>
-                </tr>
-            </tbody>
-        </table>
     </div>
 
     <div id="gameOver" style="display: none;">
@@ -269,6 +269,34 @@
         <p>Press spacebar to continue</p>
         <p>Score: <span id="pauseScore"></span></p>
     </div>
+
+    <table id="inputTable" class="hidden" style="display: none;">
+        <tbody>
+            <tr>
+                <td><button data-key="1">1</button></td>
+                <td><button data-key="2">2</button></td>
+                <td><button data-key="3">3</button></td>
+                <td><button data-key="4">4</button></td>
+                <td><button data-key="5">5</button></td>
+                <td><button data-key="6">6</button></td>
+                <td><button data-key="7">7</button></td>
+                <td><button data-key="8">8</button></td>
+                <td><button data-key="9">9</button></td>
+                <td><button data-key="0">0</button></td>
+            </tr>
+            <tr>
+                <td><button data-key="l" title="Select/Move Left">&#x1F808;</button></td>
+                <td class="delete"><button data-key="d" title="Delete/Backspace">&#x232B;</button></td>
+                <td><button data-key=" " title="Pause">Pause</button></td>
+                <td><button data-key="q" title="End Game">Quit</button></td>
+                <td class="showhide" colspan="2"><button data-key="x" title="Display Keyboard"></button></td>
+                <td></td>
+                <td></td>
+                <td class="enter"><button data-key="e" title="Enter/Submit">&#x21B5;</button></td>
+                <td><button data-key="r" title="Select/Move Right">&#x1F80A;</button></td>
+            </tr>
+        </tbody>
+    </table>
 
     <div id="highScoresMainMenu" style="display: none;">
         <div class="container">
