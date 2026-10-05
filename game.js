@@ -48,7 +48,6 @@ function start() {
     }
     document.getElementById('gameTitle').style.display = 'none';
     document.getElementById('gameContainer').style.display = 'block';
-    // Here you can initialize the game with the selected multiplication facts
     document.getElementsByTagName("body")[0].addEventListener("keydown", keyListener);
     console.log("Starting game with selected facts:", Array.from(selectedButtons).map(btn => btn.textContent));
     selectedProblems = Array.from(selectedButtons).map(btn => ({
@@ -59,7 +58,7 @@ function start() {
     //Init
     window.scrollTo({ top: 0 }); //Fixes some weirdness when scrolled on menu
     document.body.classList.toggle("noscroll");
-    document.querySelectorAll("#gameContainer .vader").forEach(v => v.remove()); // Clear previous vaders
+    document.querySelectorAll("#gameContainer .vader").forEach(v => v.remove()); //Clear previous vaders
     score = -1;
     incrementScore(); //Start score at 0
     resetOrbiters();
@@ -76,17 +75,17 @@ function start() {
     }
     let vaders = document.querySelectorAll("#gameContainer .vader");
     for (const vader of vaders) {
-        vader.style.top = Math.random() * window.innerHeight / 2 + "px"; // Randomize initial position above the viewport
-        vader.style.animationDelay = Math.random() * 2 + "s"; // Randomize initial animation delay
+        vader.style.top = Math.random() * window.innerHeight / 2 + "px"; //Randomize initial position above the viewport
+        vader.style.animationDelay = Math.random() * 2 + "s"; //Randomize initial animation delay
         vader.classList.remove("active");
     }
-    getNextActiveVader(); // Set the first active vader
+    getNextActiveVader(); //Set the first active vader
 
     setupOrbiters();
     
     timer = performance.now(); //Start the timer
     totalSeconds = 0; //This gets set in gameOver(), used for high score display
-    spawnVader(lastId++); // Spawn the first vader
+    spawnVader(lastId++); //Spawn the first vader
     gameLoopInterval = setInterval(gameLoop, 1000 / 30); //Start the game loop 30fps
     statLoopInterval = setInterval(updateStats, 1000 / 10); //10fps
     orbiterInterval = setInterval(updateOrbiters, 1000 / 60); //60fps
@@ -178,13 +177,12 @@ function gameLoop() {
             let top = parseFloat(vader.style.top || "-150");
             if (top < 50 && score < 100) { //Do a fast slide-in so user doesn't have to wait
                 speedNominal = (50 - top) / 5 * speedNominal; //Hustle to get onto the screen
-                if (speedNominal < 0.2) speedNominal = 0.2; // Ensure a minimum speed
+                if (speedNominal < 0.2) speedNominal = 0.2; //Ensure a minimum speed
             }
             vader.style.top = (top + speedNominal) + "px";
         }
     }
 
-    // Tint the background based on vader positions
     tintBackground(); 
 
     //Cull solved vaders
@@ -201,12 +199,11 @@ function gameLoop() {
     //Check for game over condition
     let windowHeight = window.innerHeight;
     for (const vader of vaders) {
-        if (vader.classList.contains("correct")) continue; // Skip solved vaders
+        if (vader.classList.contains("correct")) continue; //Skip solved vaders
         let top = parseFloat(vader.style.top || "-150");
         let height = vader.offsetHeight || 100;
         let bottom = top + height;
         if (bottom > windowHeight) {
-            // Game over condition: a vader has reached the bottom
             gameOver(vader);
             return;
         }
@@ -265,10 +262,10 @@ function sendKeyPress(key) {
 function gameOver(vader) {
     if (vader) vader.classList.add("dead");
     totalSeconds = Math.floor((performance.now() - timer - elapsedPaused) / 1000);
-    clearInterval(gameLoopInterval); // Stop the game loop
-    clearInterval(statLoopInterval); // Stop the stats loop
-    clearInterval(orbiterInterval); // Stop the orbiter loop
-    clearInterval(turretInterval); // Stop the turret loop
+    clearInterval(gameLoopInterval);
+    clearInterval(statLoopInterval);
+    clearInterval(orbiterInterval);
+    clearInterval(turretInterval);
     let music = document.getElementById("gameMusic");
     music.volume = 0.1;
     setTimeout(() => {
@@ -341,12 +338,12 @@ function createVader(id, factA, factB) {
     let vaderClone = vaderTemplate.cloneNode(true);
     vaderClone.querySelector(".factA").textContent = factA;
     vaderClone.querySelector(".factB").textContent = factB;
-    vaderClone.querySelector(".result").textContent = "\xa0"; // Non-breaking space
-    vaderClone.id = "vader-" + id; // Unique ID for the vader
+    vaderClone.querySelector(".result").textContent = "\xa0"; //Non-breaking space
+    vaderClone.id = "vader-" + id; //Unique ID for the vader
     vaderClone.setAttribute("data-id", id);
-    vaderClone.style.top = "-132px"; // Start above the viewport
+    vaderClone.style.top = "-132px"; //Start above the viewport
     let xpos = Math.random() * (window.innerWidth - sampleVaderWidth) * 0.94 + window.innerWidth * 0.03;
-    vaderClone.style.left = xpos + "px"; // Random horizontal position
+    vaderClone.style.left = xpos + "px"; //Random horizontal position
     vaderClone.setAttribute("data-speed", getSpeed());
     const activeVader = document.querySelector("#gameContainer .vader.active");
     if (multishotActive() && activeVader && vaderIsSame(vaderClone, activeVader)) {
@@ -361,12 +358,12 @@ function getSpeed(variance = 1) {
     //but that's annoying when displaying a speed stat, so variance = 0 kills that
     const difficulty = score / 3;
     let rv = Math.round((Math.random() * variance * difficulty / 2 + difficulty) * 10) / 200;
-    if (rv < 0.2) rv = 0.2; // Ensure a minimum speed
+    if (rv < 0.2) rv = 0.2; //Ensure a minimum speed
 
     //Scale speed based on screen height (4K fullscreen ideal = 1.0 base)
     rv *= (window.innerHeight / 2160); //Game was originally calibrated on a 4K screen, fullscreen
 
-    return rv; // Speed in pixels per frame (33ms)
+    return rv; //Speed in pixels per frame (33ms)
 }
 
 function getEstimatedLifespan() {
@@ -394,8 +391,8 @@ function getDelay() {
         and by 100 points, the delay is down to 1 second, which is insanely difficult.
     */
     let seconds = 460 / (score + 20) - 2.87 - hitCeiling;
-    if (seconds < 0.4 && hitCeiling > 0) seconds = 0.4; // If the user is hitting the ceiling, allow a faster rate
-    if (seconds < 0.7 && hitCeiling == 0) seconds = 0.7; // Ensure a minimum delay
+    if (seconds < 0.4 && hitCeiling > 0) seconds = 0.4; //If the user is hitting the ceiling, allow a faster rate
+    if (seconds < 0.7 && hitCeiling == 0) seconds = 0.7; //Ensure a minimum delay
     return seconds * 1000;
 }
 
@@ -409,25 +406,25 @@ function keyListener(e) {
     const relatedVaders = getRelatedVaders(activeVader);
     const result = activeVader ? activeVader.querySelector(".result") : "";
     if (document.querySelector(".vader.dead")) {
-        return; // If a vader is dead, ignore all key presses
+        return; //If a vader is dead, ignore all key presses
     } else if (e.key === "Escape") {
-        if (paused) return; // Cannot quit while paused
+        if (paused) return; //Cannot quit while paused
         for (const vader of document.querySelectorAll("#gameContainer .vader:not(.correct)")) {
             vader.classList.remove("active");
             vader.classList.remove("correct");
             vader.classList.remove("incorrect");
             vader.classList.add("dead");
         }
-        setDeadBackgroundStyle(1); // Set background to dead state
+        setDeadBackgroundStyle(1); //Set background to dead state
         gameOver();
     } else if (e.key === " ") {
         keyListenerHelper.doPause(paused);
     } else if (e.key === "Pause") {
-        if (paused) return; // Cannot autosolve while paused
+        if (paused) return; //Cannot autosolve while paused
         e.preventDefault();
-        autoSolve = !autoSolve; // Toggle auto-solve mode
+        autoSolve = !autoSolve; //Toggle auto-solve mode
     } else if (e.key === "Backspace") {
-        if (paused) return; // Cannot type while paused
+        if (paused) return; //Cannot type while paused
         e.preventDefault();
         if (activeVader === null) return; //Nothing to do (rare edge case)
         result.textContent = result.textContent.slice(0, -1);
@@ -438,11 +435,11 @@ function keyListener(e) {
             for (const v of relatedVaders)
                 v.querySelector(".result").textContent = result.textContent;
     } else if (e.key.length === 1 && e.key >= '0' && e.key <= '9') {
-        if (paused) return; // Cannot type while paused
+        if (paused) return; //Cannot type while paused
         e.preventDefault();
         if (activeVader === null) return; //Nothing to do (rare edge case)
         if (activeVader.classList.contains("incorrect")) {
-            result.textContent = ""; // Reset if previously incorrect
+            result.textContent = ""; //Reset if previously incorrect
             activeVader.classList.remove("incorrect");
         }
         if (result.textContent.length === 1 && result.textContent === "\xa0") result.textContent = "";
@@ -457,7 +454,7 @@ function keyListener(e) {
             }
         }
     } else if (e.key === "Enter") {
-        if (paused) return; // Cannot type while paused
+        if (paused) return; //Cannot type while paused
         if (activeVader === null) return; //Nothing to do (rare edge case)
         if (result.textContent === (activeVader.getAttribute("data-last-val") || "~")) 
             return; //Prevent accidental double-enters on wrong answers which can quickly end the game
@@ -477,11 +474,11 @@ function keyListener(e) {
         showStats = !showStats;
     } else if (e.key === "ArrowLeft" || e.key === "a") {
         //Left
-        if (paused) return; // Cannot play while paused
+        if (paused) return; //Cannot play while paused
         selectDifferentVader(-1);
     } else if (e.key === "ArrowRight" || e.key === "d") {
         //Right
-        if (paused) return; // Cannot play while paused
+        if (paused) return; //Cannot play while paused
         selectDifferentVader(1);
     } else if (e.key === "PageUp" && showStats) {
         //Debug: Stop vaders only when stats are shown
@@ -544,7 +541,7 @@ class keyListenerHelper {
                 v.setAttribute("data-last-val", result.textContent);
                 v.classList.add("incorrect");
                 let speed = parseFloat(v.getAttribute("data-speed"));
-                v.setAttribute("data-speed", speed * 3); // Increase speed on incorrect answer
+                v.setAttribute("data-speed", speed * 3); //Increase speed on incorrect answer
             }
         }
     }
@@ -560,7 +557,7 @@ class keyListenerHelper {
             music.volume = 0.1; //Lower volume when paused
             pausedStart = performance.now();
         } else {
-            gameLoopInterval = setInterval(gameLoop, 1000 / 33); // Resume the game loop
+            gameLoopInterval = setInterval(gameLoop, 1000 / 33); //Resume the game loop
             document.getElementById("paused").style.display = "none";
             let music = document.getElementById("gameMusic");
             music.volume = 0.2;

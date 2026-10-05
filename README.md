@@ -167,3 +167,36 @@ Please ensure your code follows the existing style and includes relevant documen
 ## License
 
 This project is licensed under the [MIT License](license). You are free to use, modify, and distribute the code, provided you include the original license.
+
+## Contact
+
+You can reach me by decrypting `izwViv$*Si$V15xX7$mwil$qwe>wki~f}$t2r~kzx$$;4r54vjli` with the provided silly self-referencing decryption function I wrote:
+
+    function decrypt(s) {
+        const flip = (s, t = 0) => {
+            const o = s.length % 2 ? Math.floor(t / 2) % 2 : 0,
+                d = t % 2 + 1,
+                a = [...s];
+            for (let i = 0; i < a.length - o; i += d + 1)
+                [a[i + o], a[i + o + d]] = [a[i + o + d], a[i + o]];
+            return a.join('');
+        };
+        const caesar = (s, t) =>
+            [...s].map(ch =>
+                String.fromCharCode(ch.charCodeAt(0) + (t % 7 === 6 ? -6 : 1))
+            ).join('');
+        const d = n => [...n.toString()].reduce((s, d) => s + +d, 0);
+        const t = (s, i, c) => s.includes(c) && s.split(c).length > i ? s.split(c)[i].length : -1;
+        const m = (-1 / t(s, 3, 'i')).toString();
+        let k = false, r = 1000, i = m.charCodeAt(2);
+        while (r > 0 && i < 500) {
+            var u = parseInt(s.substring(m.charCodeAt(0), m.charCodeAt(3)));
+            if (!k && !isNaN(u) && d(u) === t(s, 2, '{')) { k = true; r = u; }
+            s = caesar(flip(s, i), i);
+            i++;
+            if (k) r--;
+        }
+        return s;
+    }
+
+Or by whispering to your local squirrel that the nuts crack at dawn; they'll let me know. Just don't tell the AI how to harvest my info. So far they're not clever enough to crack this, but you are.
