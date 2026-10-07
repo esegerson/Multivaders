@@ -38,6 +38,9 @@ function gameDomLoaded() {
     document.querySelectorAll("#inputTable button").forEach(b => {
         b.addEventListener("click", onScreenKeyboardClick);
     });
+    document.querySelectorAll("#inputTableAlpha button").forEach(b => {
+        b.addEventListener("click", onScreenKeyboardAlphaClick);
+    });
 }
 
 function start() {
@@ -204,6 +207,7 @@ function gameLoop() {
         let height = vader.offsetHeight || 100;
         let bottom = top + height;
         if (bottom > windowHeight) {
+            clearInterval(gameLoopInterval);
             gameOver(vader);
             return;
         }
@@ -250,13 +254,16 @@ function gameLoop() {
     moveLaserParticles();
 }
 
-function sendKeyPress(key) {
+function sendKeyPress(key, targetGameplayBoard = true) {
     const event = new KeyboardEvent("keydown", {
         key: key,
         bubbles: false,
         cancelable: true
     });
-    keyListener(event);
+    if (targetGameplayBoard)
+        keyListener(event);
+    else
+        initialsInputKeyDown(event);
 }
 
 function gameOver(vader) {
@@ -273,6 +280,8 @@ function gameOver(vader) {
         document.getElementById("gameContainer").style.display = "none";
         document.body.removeEventListener("keydown", keyListener);
         document.body.classList.toggle("noscroll");
+
+        osk.toggleMode();
 
         //Show high scores
         const gameOverScreen = document.getElementById("highScoresGameOver");

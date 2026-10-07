@@ -128,10 +128,45 @@ let selectedProblems = [];
 let selectedSetName = "";
 const defaultInitials = "\u2013\u2013\u2013"; //EN DASH x3
 let menuLoopInterval = null;
+const osk = {
+    isOn: false, //On-screen keyboard (either numeric or alpha)
+    isNumeric: true, //When false, is alpha for initials entry
+    numericEl: null,
+    alphaEl: null,
+    bind: function() {
+        this.numericEl = document.getElementById("inputTable");
+        this.alphaEl = document.getElementById("inputTableAlpha");
+    },
+    toggleOn: function() {
+        this.isOn = !this.isOn;
+        this.setState(this.isOn, this.isNumeric);
+    },
+    toggleMode: function() {
+        this.isNumeric = !this.isNumeric;
+        this.setState(this.isOn, this.isNumeric);
+    },
+    setState: function(isOn, isNumeric) {
+        this.isOn = isOn;
+        this.isNumeric = isNumeric;
+        if (isOn) {
+            if (isNumeric) {
+                this.numericEl.classList.remove("hidden");
+                this.alphaEl.classList.add("hidden");
+            } else {
+                this.numericEl.classList.add("hidden");
+                this.alphaEl.classList.remove("hidden");
+            }
+        } else {
+            this.numericEl.classList.add("hidden");
+            this.alphaEl.classList.add("hidden");
+        }
+    }
+}
 
 window.addEventListener("load", function() {
-    if (window.location.protocol === "file:")
+    if (window.location.protocol === "file:" || window.location.host.indexOf("192.168") > -1)
         setTimeout(() => console.clear(), 1000); //Helps with debugging; don't care about all the GET 200s
+    osk.bind();
 });
 
 window.addEventListener("keydown", function(e) {
@@ -215,7 +250,6 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById("inputTable")?.classList.remove("experimental-hide");
     }
 
-    funnyMessage(); //For mobile notice
     bindFormatOptions();
     updateFormatOptionVisibility();
     updateFormatSelection();
@@ -929,6 +963,7 @@ function moveNameParticles() {
 function playAgain() {
     document.getElementById("gameContainer").style.display = "block";
     document.getElementById("gameOver").style.display = "none";
+    osk.toggleMode();
     start();
 }
 
@@ -954,28 +989,11 @@ function toggleFullscreen() {
     }
 }
 
-function enableOnScreenKeyboard() {
-    var osk = document.getElementById("inputTable");
-    if (osk.style.display === "none") {
-        osk.style.display = "";
-        setTimeout(() => {
-            osk.classList.remove("hidden");
-        }, 200);
-    } else {
-        osk.style.display = "none";
-    }
-}
-
-function toggleOnScreenKeyboard() {
-    const keyboard = document.getElementById("inputTable");
-    keyboard.classList.toggle("hidden");
-}
-
 function onScreenKeyboardClick(event) {
     const button = event.target;
     const key = button.getAttribute("data-key");
     switch (key) {
-        case "l":
+        case "l": //That's an "L", not a one
             sendKeyPress("ArrowLeft");
             break;
         case "r":
@@ -987,14 +1005,14 @@ function onScreenKeyboardClick(event) {
         case "e":
             sendKeyPress("Enter");
             break;
-        case "x": //Show-hide
-            toggleOnScreenKeyboard();
-            break;
         case " ":
             sendKeyPress(" ");
             break;
         case "q":
             sendKeyPress("Escape");
+            break;
+        case "~":
+            sendKeyPress("`");
             break;
         default: //Digits
             const digit = parseInt(key);
@@ -1003,12 +1021,21 @@ function onScreenKeyboardClick(event) {
     }
 }
 
-function funnyMessage() {
-    //Moved text here so it's not indexed by search engines
-    document.querySelector("#mobileNotice p.small.tiny").innerHTML = 
-        "Best viewed in Netscape Navigator 4.x<br>"
-        + "on a monitor that supports 800x600 with 256 colors.<br>"
-        + "Sign my <u>guestbook</u>. This page viewed <b>17</b> times.<br>"
-        + "Hosted by <u>GeoCities</u>.<br>"
-        + "&copy; 1997</b>";
+function onScreenKeyboardAlphaClick(event) {
+    const button = event.target;
+    const key = button.getAttribute("data-key");
+    switch (key) {
+        case "2":
+            sendKeyPress("Enter", false);
+            break;
+        case "3":
+            sendKeyPress("Backspace", false);
+            break;
+        case " ":
+            sendKeyPress(" ", false);
+            break;
+        default: //Letters
+            sendKeyPress(key, false);
+            break;
+    }
 }

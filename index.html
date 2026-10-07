@@ -108,10 +108,14 @@
                 <!-- <div class="format-option division-only" role="button" tabindex="0" data-format="ALGEBRAIC">Algebraic</div> -->
             </div>
             <p>
-                <div id="showOSK" class="showhide">
-                    <button onclick="enableOnScreenKeyboard()" title="Show Keyboard"></button> Toggle On-Screen Keyboard <span>(helpful for mobile or tablet)</span>
+                <div id="showOSK">
+                    <button onclick="osk.toggleOn()" title="Toggle Keyboard">
+                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 32">
+                            <path d="M34 4h-32c-1.1 0-2 0.9-2 2v20c0 1.1 0.9 2 2 2h32c1.1 0 2-0.9 2-2v-20c0-1.1-0.9-2-2-2zM20 8h4v4h-4v-4zM26 14v4h-4v-4h4zM14 8h4v4h-4v-4zM20 14v4h-4v-4h4zM8 8h4v4h-4v-4zM14 14v4h-4v-4h4zM4 8h2v4h-2v-4zM4 14h4v4h-4v-4zM6 24h-2v-4h2v4zM24 24h-16v-4h16v4zM32 24h-6v-4h6v4zM32 18h-4v-4h4v4zM32 12h-6v-4h6v4z" fill="#fff"></path>
+                        </svg>
+                    </button> Toggle On-Screen Keyboard <span>(helpful for mobile)</span>
                 </div>
-                <div>
+                <div id="goFullScreen">
                     <button class="fullscreen" onclick="toggleFullscreen()" title="Toggle Fullscreen">&#x26F6;</button> Toggle Fullscreen
                 </div>
                 <button id="startGame" onclick="start();" disabled title="Select at least one fact to play">Start Game</button> 
@@ -139,9 +143,7 @@
                 <li><span>4</span> extra points if you clear the screen</li>
                 <li><span>8</span> extra points if you clear the screen soon after the last clear</li>
                 <li>The game gets harder the more points you score!  Can you beat <span>100</span>?</span></li>
-                <li>You will need an attached <i>physical keyboard</i> to play this game (like on a desktop or laptop);
-                    this game does not work on phones or tablets</li>
-            </ul>
+4            </ul>
 
             <!--<p>Coming Soon:</p>
             <ul class="tips">
@@ -153,7 +155,14 @@
     </div>
 
     <div id="gameContainer" class="max" style="display: none;">
-        <button class="fullscreen" onclick="toggleFullscreen()" title="Toggle Fullscreen">&#x26F6;</button>
+        <div id="toggleContainer">
+            <button class="toggleOsk" onclick="osk.toggleOn()" title="Toggle Keyboard">
+                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 32">
+                    <path d="M34 4h-32c-1.1 0-2 0.9-2 2v20c0 1.1 0.9 2 2 2h32c1.1 0 2-0.9 2-2v-20c0-1.1-0.9-2-2-2zM20 8h4v4h-4v-4zM26 14v4h-4v-4h4zM14 8h4v4h-4v-4zM20 14v4h-4v-4h4zM8 8h4v4h-4v-4zM14 14v4h-4v-4h4zM4 8h2v4h-2v-4zM4 14h4v4h-4v-4zM6 24h-2v-4h2v4zM24 24h-16v-4h16v4zM32 24h-6v-4h6v4zM32 18h-4v-4h4v4zM32 12h-6v-4h6v4z" fill="#fff"></path>
+                </svg>
+            </button>
+            <button class="fullscreen" onclick="toggleFullscreen()" title="Toggle Fullscreen">&#x26F6;</button>
+        </div>
         <div class="score">Score: <span id="score">0</span></div>
         <div id="tipContainer"></div>
         <div class="decoration">
@@ -270,30 +279,110 @@
         <p>Score: <span id="pauseScore"></span></p>
     </div>
 
-    <table id="inputTable" class="hidden" style="display: none;">
+    <table id="inputTable" class="keyboard hidden">
         <tbody>
+            <tr>
+                <td colspan="4"></td>
+                <td class="debug"><button data-key="~"></button></td>
+            </tr>
+            <tr>
+                <td><button data-key="q" title="End Game">Quit</button></td>
+            </tr>
+            <tr>
+                <td><button data-key=" " title="Pause">Pause</button></td>
+                <td class="delete"><button data-key="d" title="Delete/Backspace">&#x232B;</button></td>
+                <td><button data-key="7">7</button></td>
+                <td><button data-key="8">8</button></td>
+                <td><button data-key="9">9</button></td>
+            </tr>
+            <tr>
+                <td colspan="2" rowspan="2" class="enter left">
+                    <button data-key="e" title="Enter/Submit">
+                        <span>Enter</span>
+                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+                            <path d="M1 16l15 15v-11h16v-16h-8v8h-8v-11z" fill="#fff"/>
+                        </svg>
+                    </button>
+                </td>
+                <td><button data-key="4">4</button></td>
+                <td><button data-key="5">5</button></td>
+                <td><button data-key="6">6</button></td>
+            </tr>
             <tr>
                 <td><button data-key="1">1</button></td>
                 <td><button data-key="2">2</button></td>
                 <td><button data-key="3">3</button></td>
-                <td><button data-key="4">4</button></td>
-                <td><button data-key="5">5</button></td>
-                <td><button data-key="6">6</button></td>
-                <td><button data-key="7">7</button></td>
-                <td><button data-key="8">8</button></td>
-                <td><button data-key="9">9</button></td>
-                <td><button data-key="0">0</button></td>
             </tr>
             <tr>
-                <td><button data-key="l" title="Select/Move Left">&#x1F808;</button></td>
-                <td class="delete"><button data-key="d" title="Delete/Backspace">&#x232B;</button></td>
-                <td><button data-key=" " title="Pause">Pause</button></td>
-                <td><button data-key="q" title="End Game">Quit</button></td>
-                <td class="showhide" colspan="2"><button data-key="x" title="Display Keyboard"></button></td>
-                <td></td>
-                <td></td>
-                <td class="enter"><button data-key="e" title="Enter/Submit">&#x21B5;</button></td>
-                <td><button data-key="r" title="Select/Move Right">&#x1F80A;</button></td>
+                <td>
+                    <button data-key="l" title="Select/Move Left">
+                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+                        <path d="M1 16l15 15v-9h16v-12h-16v-9z" fill="#fff"></path>
+                    </svg>
+                    </button>
+                </td>
+                <td>
+                    <button data-key="r" title="Select/Move Right">
+                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+                            <path d="M31 16l-15-15v9h-16v12h16v9z" fill="#fff"></path>
+                        </svg>
+                    </button>
+                </td>
+                <td colspan="2"><button data-key="0">0</button></td>
+                <td class="enter">
+                    <button data-key="e" title="Enter/Submit">
+                        <span>Enter</span>
+                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+                            <path d="M1 16l15 15v-11h16v-16h-8v8h-8v-11z" fill="#fff"/>
+                        </svg>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table id="inputTableAlpha" class="keyboard hidden">
+        <tbody>
+            <tr>
+                <td><button data-key="q">Q</button></td>
+                <td><button data-key="w">W</button></td>
+                <td><button data-key="e">E</button></td>
+                <td><button data-key="r">R</button></td>
+                <td><button data-key="t">T</button></td>
+                <td><button data-key="y">Y</button></td>
+                <td><button data-key="u">U</button></td>
+                <td><button data-key="i">I</button></td>
+                <td><button data-key="o">O</button></td>
+                <td><button data-key="p">P</button></td>
+            </tr>
+            <tr>
+                <td><button data-key="a">A</button></td>
+                <td><button data-key="s">S</button></td>
+                <td><button data-key="d">D</button></td>
+                <td><button data-key="f">F</button></td>
+                <td><button data-key="g">G</button></td>
+                <td><button data-key="h">H</button></td>
+                <td><button data-key="j">J</button></td>
+                <td><button data-key="k">K</button></td>
+                <td><button data-key="l">L</button></td>
+                <td rowspan="2" class="enter" title="Enter/Submit">
+                    <button data-key="2">
+                        <span>Enter</span>
+                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+                            <path d="M1 16l15 15v-11h16v-16h-8v8h-8v-11z" fill="#fff"/>
+                        </svg>
+                    </button>
+                </td>
+            </tr>
+            <tr>
+                <td><button data-key="z">Z</button></td>
+                <td><button data-key="x">X</button></td>
+                <td><button data-key="c">C</button></td>
+                <td><button data-key="v">V</button></td>
+                <td><button data-key="b">B</button></td>
+                <td><button data-key="n">N</button></td>
+                <td><button data-key="m">M</button></td>
+                <td colspan="2"><button data-key="3" title="Backspace">&#x232B;<span>Backspace</span></button></td>
             </tr>
         </tbody>
     </table>
@@ -309,14 +398,6 @@
             </ol>
             <button onclick="returnToMainMenuFromHighScores();">Main Menu</button>
         </div>
-    </div>
-
-    <div id="mobileNotice" style="display: none;">
-        <h1>Multivaders!</h1>
-        <p>Multivaders is a thrilling space shooter game where you defend your planet from waves of alien invaders. Solve multiplication problems to defeat the enemies!</p>
-        <p class="err">This game is not optimized for mobile devices. Please play on a desktop or laptop with an attached <i>physical keyboard</i> for the best experience.</p>
-        <p class="small"><a href="https://github.com/esegerson/Multivaders" target="code">View the code</a> that makes this game.</p>
-        <p class="small tiny"></p>
     </div>
 
     <div id="templates" style="display: none;">

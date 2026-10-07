@@ -50,18 +50,15 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
     - Game over "groan" or explosion
 - Move graphics code from game.js to separate graphics.js file
 - To prevent overlapping and legibility, darken problems that are behind the active problem; restore them when the active problem is solved
+- Add a performance mode for mobile
+    - Reduce particles
+    - Possibly detect frame rate issues
 
 ## Known Bugs
 
 - Select preset, click Delete Preset, preset is green not red.
 - Make preset, new preset is not auto-selected green
-- A tie in high scores should favor the new score
-- Add a performance mode for mobile
-    - Reduce particles
-    - Possibly detect frame rate issues
-- Minor display issues on kill screen:
-    - Kill line is too high with some formats
-    - Lines don't change to black with some formats
+- A tie in high scores should favor the new score (especially if other entry is "---")
 
 ## Recent Updates
 
@@ -90,47 +87,19 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
         - Presets are now per-operator (you can define different presets for addition and multiplication)
         - High scores are now per-operator
     - Bug fixes: displaying and saving presets and high scores now work for first-time users
-- *November 2025:*
-    - Menu enhancements:
-        - Presets are now automatically selected if you choose the corresponding facts
-        - Multiple presets are now indicated with a highlight color
-        - Game Over screen now display high scores (if a preset was played) and Play Again or Main Menu buttons
-        - High scores are saved and displayed, one list per saved set
-    - Game enhancements:
-        - Added "runners" - special, fast-moving problems that carry a multishot upgrade
-        - Multishot upgrade - solves multiple problems simultaneously
-    - Graphical enhancements:
-        - Multi-laser when solving multiple problems at once
-        - Screen-shake when solving multiple problems at once
-        - Network "lightning" lines between the solved multiple problems
-        - Balls orbit around the runner and turret when multishot is active
-        - Turret now glows and pulses with every solve, glows green when multishot is active
-        - Turret now moves
-- *September 2025:*
-    - Menu enhancements:
-        - Hovering over presets now previews what the set is
-        - Can now create your own custom sets
-            - Suggestions: perfect squares, 1-digit answers, 3-digit answers, all 7s, draw a picture
-    - Game enhancements:
-        - Score elements are now yellow
-        - Zapped problems display "+1"
-        - Clear the screen to display "Clear! +4" and play a chime sound
-- *August 2025:*
-    - Game enhancements:
-        - Clear the screen for an extra 4 points
-        - Select a different problem with arrow keys
-        - Difficulty progression tweaked (now harder)
-        - Wrong answers triple in speed instead of double
-    - Graphical enhancements:
-        - Added a turret that zaps problems
-- *July 2025:*
-    - Initial release, core gameplay complete
 
 ## Assets
 
 One asset is used, a royalty-free MP3 file ["Soft - Soft Music"](https://pixabay.com/music/upbeat-calm-soft-background-music-357212/) (originally titled "Calm Soft Background Music") by [Viacheslav Starostin aka original_soundtrack](https://pixabay.com/users/original_soundtrack-50153119/), found on [Pixabay.com](https://pixabay.com). Direct download of file is [here](https://cdn.pixabay.com/download/audio/2025/06/09/audio_2feeb02bcd.mp3?filename=calm-soft-background-music-357212.mp3).
 
 All other files were authored by myself.
+
+### SVG Editors
+
+I used a combination of these two online editors to compose the various SVG:
+
+https://svgvectorlab.com/
+https://svgflow.net/svg-editor
 
 ## Installation
 
