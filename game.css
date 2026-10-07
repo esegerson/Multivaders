@@ -20,23 +20,6 @@ body {
 
 body.noscroll { overflow: hidden; }
 
-@media (max-width: 40px) or (max-height: 60px) {
-    /*Lock out mobile users, desktop and laptop only*/
-    #gameTitle { display: none; }
-    #mobileNotice { display: block !important; }
-}
-
-#mobileNotice {
-    text-align: center; 
-    padding: 20px; 
-}
-
-#mobileNotice .err {
-    color: red;
-    font-weight: bold;
-    text-shadow: 0 0 20px rgba(255,0,0,0.5), 0 0 100px red;
-}
-
 #titleSelectOperator, #titleSelectFormat, #gameTitle { margin: 20px; overflow: auto; }
 #titleSelectOperator button.navback { visibility: hidden; }
 #titleSelectOperator button.navback, 
@@ -285,13 +268,8 @@ button.delete:hover {
 .score, #score2 { color: yellow; font-size: 1.5rem; }
 
 button.fullscreen {
-    width: 1.5em;
-    height: 1.5em;
-    font-size: 2em;
-    line-height: 0.7em;
     padding: 0;
-    pointer-events: all;
-    cursor: pointer;
+    
 }
 
 #gameTitle button.fullscreen {
@@ -299,10 +277,19 @@ button.fullscreen {
     margin-right: 0.2em;
 }
 
-#gameContainer button.fullscreen {
+#gameContainer #toggleContainer {
     position: absolute;
     top: 1vh;
     right: 2.5vh;
+}
+
+#gameContainer #toggleContainer button {
+    width: 1.5em;
+    height: 1.5em;
+    font-size: 2em;
+    line-height: 0.5em;
+    pointer-events: all;
+    cursor: pointer;
 }
 
 #statsContainer {
@@ -416,6 +403,9 @@ button.fullscreen {
     animation: jiggle 0.1s infinite;
 }
 .vader.dead .result { border-color: black; }
+.vader.dead.DIVISION.BRACKET .result,
+.vader.dead.DIVISION.BRACKET .bracketRiser::before,
+.vader.dead.DIVISION.FRACTION .factA { border-color: black; }
 #gameContainer.paused .vader, .vader.paused, .vader.runner.paused, .vader.runner.paused .result { animation-play-state: paused; }
 .vader.runner { color: var(--vaderRunnerColor); animation: dance 2s infinite ease-in-out, pulseColorPale 1s ease-in-out infinite; }
 .vader.runner .result { border-color: var(--vaderRunnerColor); animation: pulseColorPale 1s ease-in-out infinite; }
@@ -475,6 +465,7 @@ button.fullscreen {
     text-align: center;
     font-size: 1.5rem;
     background-color: rgba(0,0,0,0.7);
+    overflow: hidden;
 }
 
 #highScoresMainMenu button { margin-top: 2rem;}
@@ -508,7 +499,10 @@ ul.tips span {
     z-index: -1;
 }
 
-#menuContainer > .background2, #gameContainer > .background2 { filter: blur(6px); }
+#menuContainer > .background2, #gameContainer > .background2 {
+    filter: blur(6px);
+    overflow: clip; 
+}
 
 #menuContainer > .background2 > .multi, #gameContainer > .background2 > .multi {
     position: absolute;
@@ -756,7 +750,7 @@ a:hover { color: white; text-shadow: 0 0 5px white; }
     100% { opacity: 1; }
 }
 
-#inputTable {
+.keyboard {
     position: fixed;
     left: 0;
     bottom: 0;
@@ -765,11 +759,11 @@ a:hover { color: white; text-shadow: 0 0 5px white; }
     opacity: 0.5;
     transition: bottom 1s ease;
 }
-#inputTable td {
+.keyboard td {
     text-align: center;
     width: 10%;
 }
-#inputTable td button { 
+.keyboard td button { 
     width: 100%; 
     height: 7vw; 
     max-height: 7vw;
@@ -778,28 +772,38 @@ a:hover { color: white; text-shadow: 0 0 5px white; }
     transition: opacity 1s ease;
 }
 @media (max-width: 600px) {
-    #inputTable td button { 
+    .keyboard td button { 
         font-size: 4vw; 
         border-style: none;
         border-radius: 5px;
         padding: 0;
         height: 7vw;
     }
-    #inputTable td:not(.showhide) button::after { content: '' !important; padding-top: inherit; }
 }
-#inputTable td.delete button { padding-top: 1.5vw; }
-#inputTable td.delete button::after { content: 'Delete'; font-size: 1.2vw; position: relative; top: -1em; display: block; }
-#inputTable td.showhide button, #showOSK button { width: 10vw; line-height: 0.5em; }
-#inputTable td.showhide button::after { content: '\1F5AE\A\1F783'; white-space: pre; }
-#inputTable td.enter button { font-size: 4vw; }
-#inputTable td.enter button::after { content: 'Enter'; font-size: 1.2vw; position: relative; top: -1em; display: block; }
-#inputTable.experimental-hide { display: none; }
-#inputTable.hidden { bottom: -2.5rem; }
-#inputTable.hidden td { height: 4rem; }
-#inputTable.hidden td button { opacity: 0; pointer-events: none; }
-#inputTable.hidden td.showhide button { opacity: 1; pointer-events: all; }
-#inputTable.hidden td.showhide button::after { content: '\1F781\A\1F5AE'; white-space: pre; }
+.keyboard td button > * { pointer-events: none; } /*SVG was blocking clicks*/
+.keyboard button svg { height: 3vw; }
+.keyboard#inputTable td.enter button, .keyboard#inputTableAlpha td.enter button { font-size: 4vw; }
+.keyboard#inputTable td.enter button > span, .keyboard#inputTableAlpha td.enter button > span { font-size: 0.5em; display: block; margin: 0.5em 0; }
+.keyboard td.enter.left button, .keyboard#inputTableAlpha td.enter button { max-height: none; height: 14vw;}
+.keyboard td.debug button { border: none; background: none;}
+.keyboard.experimental-hide { display: none; }
+.keyboard.hidden { bottom: -2.5rem; pointer-events: none; }
+.keyboard.hidden td button { opacity: 0; pointer-events: none; }
+.keyboard button[title=Backspace] span { 
+    margin-left: 0.5em; 
+    display: inline-block;
+    vertical-align: top;
+}
+@media (max-width: 600px) {
+    .keyboard button[title=Backspace] span { font-size: 0.5em; }
+}
 
-#showOSK button { margin: 0 0.2em 0.2em 0; width: 1.5em; height: 1.5em; font-size: 2em; }
-#showOSK button::after { content: '\1F5AE'; white-space: pre; }
+#showOSK button, #goFullScreen button { 
+    margin: 0 0.2em 0.2em 0; 
+    width: 1.5em; 
+    height: 1.5em; 
+    font-size: 2em; 
+    padding-top: 0; 
+}
 #showOSK span { opacity: 0.5; }
+

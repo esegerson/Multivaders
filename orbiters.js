@@ -147,9 +147,9 @@ function resetOrbiters() {
 function moveTurret() {
     if (isPaused()) return;
 
-    const maxSpeed = 5;       // cap velocity
-    const maxAccel = 0.05;     // cap acceleration
-    const gain = 0.01;        // how strongly desiredVx responds to distance
+    const maxSpeed = 5;     //cap velocity
+    const maxAccel = 0.05;  //cap acceleration
+    const gain = 0.01;      //how strongly desiredVx responds to distance
 
     const turret = document.getElementById("turret");
     const vader = document.querySelector(".vader.active");
@@ -167,17 +167,17 @@ function moveTurret() {
     let dist = target.x - current.x;
     let vx = parseFloat(turret.getAttribute("data-vx") ?? 0);
 
-    // Desired velocity scales with distance (asymptotic)
+    //Desired velocity scales with distance (asymptotic)
     let desiredVx = Math.max(-maxSpeed, Math.min(maxSpeed, dist * gain));
 
-    // Compute acceleration toward desired velocity
+    //Compute acceleration toward desired velocity
     let ax = desiredVx - vx;
-    ax = Math.max(-maxAccel, Math.min(maxAccel, ax)); // clamp acceleration
+    ax = Math.max(-maxAccel, Math.min(maxAccel, ax)); //clamp acceleration
 
-    // Apply acceleration
+    //Apply acceleration
     vx += ax;
 
-    // Optional snap-to-zero when extremely close
+    //Optional snap-to-zero when extremely close
     if (Math.abs(dist) < 0.5 && Math.abs(vx) < 0.05) {
         vx = 0;
     }
