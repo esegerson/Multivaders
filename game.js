@@ -900,6 +900,11 @@ function endMultishot() {
     for (const v of relatedVaders)
         v.classList.remove("related");
     document.querySelector("#turret .circle").classList.remove("multishot");
+    const oldRunner = document.querySelector("#gameContainer .vader.runner");
+    if (oldRunner != null)
+        oldRunner.style.top = "-1000px"; //Push to above screen so orbiters not visible
+    //Above, hacky fix for when multishot is used up before runner fades away, 
+    //balls would start orbiting a nearly-invisible runner
     resetOrbiters();
 }
 
