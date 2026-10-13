@@ -485,7 +485,7 @@ function keyListener(e) {
             return; //Prevent accidental double-enters on wrong answers which can quickly end the game
         if (result.textContent === "" || result.textContent === "\u00A0") { //nbsp
             //Nothing entered
-            const runner = document.querySelector("#gameContainer .vader.runner");
+            const runner = document.querySelector("#gameContainer .vader.runner:not(.correct)");
             if (runner != null) {
                 //If special vader is in play, grab that one
                 activeVader.classList.remove("active");
