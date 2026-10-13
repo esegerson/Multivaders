@@ -829,3 +829,4 @@ a:hover { color: white; text-shadow: 0 0 5px white; }
 }
 #showOSK span { opacity: 0.5; }
 
+.hide-cursor { cursor: none !important; }
