@@ -69,6 +69,8 @@ function start() {
     multishots = 0;
     hitCeiling = 0;
     lastId = 0;
+    priorScreenHeight = window.innerHeight;
+    priorScreenWidth = window.innerWidth;
 
     //Construct turret
     setTurretOperatorSign(selectedOperator);
@@ -329,7 +331,7 @@ function spawnVader(id, init = false) {
     let problem = getProblem();
     let vader = createVader(id, problem.factA, problem.factB);
     let container = document.getElementById("vaderContainer");
-    if (container.querySelectorAll(".active").length === 0)
+    if (container.querySelectorAll("#gameContainer .active").length === 0)
         vader.classList.add("active");
     if (isRunner()) {
         vader.classList.add("runner");
@@ -353,7 +355,7 @@ function getProblem() {
 }
 
 function createVader(id, factA, factB) {
-    let sampleVader = document.querySelector("#vaderContainer .vader");
+    let sampleVader = document.querySelector("#gameContainer .vader");
     let sampleVaderWidth = sampleVader ? sampleVader.offsetWidth : 200;
     let vaderTemplate = document.querySelector("#templates > .vaderTemplate." + selectedOperator + "." + selectedFormat);
     if (vaderTemplate === null) //TODO: remove after development
@@ -425,10 +427,10 @@ function isPaused() {
 
 function keyListener(e) {
     let paused = isPaused();
-    const activeVader = document.querySelector(".active");
+    const activeVader = document.querySelector("#gameContainer .active");
     const relatedVaders = getRelatedVaders(activeVader);
     const result = activeVader ? activeVader.querySelector(".result") : "";
-    if (document.querySelector(".vader.dead")) {
+    if (document.querySelector("#gameContainer .vader.dead")) {
         return; //If a vader is dead, ignore all key presses
     } else if (e.key === "Escape") {
         if (paused) return; //Cannot quit while paused
@@ -702,7 +704,7 @@ function updateStats() {
     stats.Speed = (getSpeed(0) * 33).toFixed(0) + "px/s";
     stats.Lifespan = (getEstimatedLifespan() / 33).toFixed(0) + "s";
     stats.Runner = "force=" + (forceNextRunner ? "on" : "off") + " : " 
-        + document.querySelectorAll(".vader.runner").length;
+        + document.querySelectorAll("#gameContainer .vader.runner").length;
     stats.Multishots = multishots + " : " + (multishotActive() ? "ACTIVE" : "off");
     stats.Time = min + ":" + (sec < 10 ? "0" : "") + sec;
     stats.Chord = getChord();

@@ -524,6 +524,8 @@ ul.tips span {
     overflow: clip; 
 }
 
+#menuContainer > .background2 { position: fixed; }
+
 #menuContainer > .background2 > .multi, #gameContainer > .background2 > .multi {
     position: absolute;
     animation: wiggle 10s infinite ease-in-out;
