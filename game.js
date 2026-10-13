@@ -298,6 +298,7 @@ function gameOver(vader) {
             gameOverScreen.querySelector("h2").style.display = "none";
             gameOverScreen.querySelector("h3").style.display = "none";
             document.getElementById("noset").style.display = "block";
+            document.getElementById("btnPlayAgain").focus();
             gameOverScreen.querySelector("ol.highscorelist").style.display = "none";
             document.getElementById("gameOverButtons").style.display = "block";
         }

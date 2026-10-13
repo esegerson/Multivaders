@@ -730,6 +730,7 @@ function updatePresetButtons() {
 function submitHighScore() {
     saveHighScore();
     document.getElementById("gameOverButtons").style.display = "inline-block";
+    document.getElementById("btnPlayAgain").focus();
 }
 
 function defaultHighScores() {
@@ -893,6 +894,7 @@ function populateHighScoresUI() {
     h2GameOver.style.display = selectedSetName === "" ? "none" : "block";
     pNewHighScore.style.display = isHS ? "block" : "none";
     btns.style.display = isHS ? "none" : "inline-block";
+    if (!isHS) document.getElementById("btnPlayAgain").focus();
 
     //Add listeners for initials input if needed
     if (isHS && newMarked) document.addEventListener("keydown", initialsInputKeyDown);
