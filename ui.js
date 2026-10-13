@@ -128,6 +128,7 @@ let selectedProblems = [];
 let selectedSetName = "";
 const defaultInitials = "\u2013\u2013\u2013"; //EN DASH x3
 let menuLoopInterval = null;
+let hideCursorTimer = 0;
 const osk = {
     isOn: false, //On-screen keyboard (either numeric or alpha)
     isNumeric: true, //When false, is alpha for initials entry
@@ -167,6 +168,11 @@ window.addEventListener("load", function() {
     if (window.location.protocol === "file:" || window.location.host.indexOf("192.168") > -1)
         setTimeout(() => console.clear(), 1000); //Helps with debugging; don't care about all the GET 200s
     osk.bind();
+
+    ['mousemove','mousedown','touchstart'].forEach(e =>
+        window.addEventListener(e, resetHideCursorTimer, { passive: true })
+    );
+    resetHideCursorTimer();
 });
 
 window.addEventListener("keydown", function(e) {
@@ -176,6 +182,23 @@ window.addEventListener("keydown", function(e) {
         e.preventDefault(); //Don't undo toggle
     }
 });
+
+function resetHideCursorTimer() {
+    document.documentElement.classList.remove("hide-cursor");
+    clearTimeout(hideCursorTimer);
+    hideCursorTimer = setTimeout(() => {
+        const gameIsActive = document.getElementById("gameContainer").style.display === "block"
+            && document.querySelectorAll("#gameContainer .vader").length > 0
+            && !isPaused();
+        if (gameIsActive)
+            document.documentElement.classList.add('hide-cursor');
+    }, 4000);
+}
+
+function displayMouse() {
+    clearTimeout(hideCursorTimer);
+    document.documentElement.classList.remove("hide-cursor");
+}
 
 function normalizePreset(preset, fallbackOperator = Operator.MULTIPLICATION) {
     if (!preset || typeof preset !== "object" || Array.isArray(preset)) return null;
@@ -707,6 +730,7 @@ function updatePresetButtons() {
 function submitHighScore() {
     saveHighScore();
     document.getElementById("gameOverButtons").style.display = "inline-block";
+    document.getElementById("btnPlayAgain").focus();
 }
 
 function defaultHighScores() {
@@ -870,6 +894,7 @@ function populateHighScoresUI() {
     h2GameOver.style.display = selectedSetName === "" ? "none" : "block";
     pNewHighScore.style.display = isHS ? "block" : "none";
     btns.style.display = isHS ? "none" : "inline-block";
+    if (!isHS) document.getElementById("btnPlayAgain").focus();
 
     //Add listeners for initials input if needed
     if (isHS && newMarked) document.addEventListener("keydown", initialsInputKeyDown);
@@ -977,6 +1002,16 @@ function viewHighScoresMainMenu() {
 function returnToMainMenuFromHighScores() {
     document.getElementById("gameTitle").style.display = "block";
     document.getElementById("highScoresMainMenu").style.display = "none";
+}
+
+function returnToMainMenuFromGameOver() {
+    document.getElementById("gameTitle").style.display = "block";
+    document.getElementById("gameOver").style.display = "none";
+    let music = document.getElementById("gameMusic");
+    music.pause();
+    music.currentTime = 0;
+    document.querySelectorAll("#gameContainer .vader").forEach(v => v.remove()); //Clear vaders
+    tintBackground(); 
 }
 
 function toggleFullscreen() {

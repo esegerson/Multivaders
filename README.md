@@ -68,12 +68,16 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
         - On-screen keyboard added
         - Moved the format selection to be less annoying
         - Turret design now reflects the selected operator
+        - At game over, score is now displayed bigly
+        - Mouse cursor now hides during gameplay
+        - Play Again button is now selectable via keyboard (press Enter or Space)
     - Bug fixes:
         - Game no longer insta-ends when exiting fullscreen
         - Play Again button properly resets the game now
         - Improved consistency with the game-over detection: problems now must actually touch the bottom of the screen for the game to be over
         - Problems no longer go beyond the right side of the screen (partially hidden)
         - "Runner" can no longer be targeted and shot over and over in certain situations
+        - Graphical glitch with runner power-up balls is now fixed
         - Many other minor bug fixes
 - *August 2026:*
     - Game enhancements:

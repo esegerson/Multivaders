@@ -64,10 +64,13 @@ function start() {
     document.querySelectorAll("#gameContainer .vader").forEach(v => v.remove()); //Clear previous vaders
     score = -1;
     incrementScore(); //Start score at 0
+    resetBigScore();
     resetOrbiters();
     multishots = 0;
     hitCeiling = 0;
     lastId = 0;
+    priorScreenHeight = window.innerHeight;
+    priorScreenWidth = window.innerWidth;
 
     //Construct turret
     setTurretOperatorSign(selectedOperator);
@@ -186,7 +189,7 @@ function gameLoop() {
         }
     }
 
-    tintBackground(); 
+    tintBackground();
 
     //Cull solved vaders
     for (const vader of vaders) {
@@ -275,6 +278,7 @@ function gameOver(vader) {
     clearInterval(turretInterval);
     let music = document.getElementById("gameMusic");
     music.volume = 0.1;
+    showBigScore();
     setTimeout(() => {
         document.getElementById("gameOver").style.display = "block";
         document.getElementById("gameContainer").style.display = "none";
@@ -294,10 +298,23 @@ function gameOver(vader) {
             gameOverScreen.querySelector("h2").style.display = "none";
             gameOverScreen.querySelector("h3").style.display = "none";
             document.getElementById("noset").style.display = "block";
+            document.getElementById("btnPlayAgain").focus();
             gameOverScreen.querySelector("ol.highscorelist").style.display = "none";
             document.getElementById("gameOverButtons").style.display = "block";
         }
     }, 5000);
+}
+
+function resetBigScore() {
+    const big = document.getElementById("bigscore");
+    big.classList.add("hidden");
+    setTimeout(function() { big.classList.remove("shrink"); }, 2000);
+}
+
+function showBigScore() {
+    const big = document.getElementById("bigscore");
+    big.classList.remove("hidden");
+    big.classList.add("shrink");
 }
 
 function spawnVader(id, init = false) {
@@ -315,7 +332,7 @@ function spawnVader(id, init = false) {
     let problem = getProblem();
     let vader = createVader(id, problem.factA, problem.factB);
     let container = document.getElementById("vaderContainer");
-    if (container.querySelectorAll(".active").length === 0)
+    if (container.querySelectorAll("#gameContainer .active").length === 0)
         vader.classList.add("active");
     if (isRunner()) {
         vader.classList.add("runner");
@@ -339,7 +356,7 @@ function getProblem() {
 }
 
 function createVader(id, factA, factB) {
-    let sampleVader = document.querySelector("#vaderContainer .vader");
+    let sampleVader = document.querySelector("#gameContainer .vader");
     let sampleVaderWidth = sampleVader ? sampleVader.offsetWidth : 200;
     let vaderTemplate = document.querySelector("#templates > .vaderTemplate." + selectedOperator + "." + selectedFormat);
     if (vaderTemplate === null) //TODO: remove after development
@@ -411,10 +428,10 @@ function isPaused() {
 
 function keyListener(e) {
     let paused = isPaused();
-    const activeVader = document.querySelector(".active");
+    const activeVader = document.querySelector("#gameContainer .active");
     const relatedVaders = getRelatedVaders(activeVader);
     const result = activeVader ? activeVader.querySelector(".result") : "";
-    if (document.querySelector(".vader.dead")) {
+    if (document.querySelector("#gameContainer .vader.dead")) {
         return; //If a vader is dead, ignore all key presses
     } else if (e.key === "Escape") {
         if (paused) return; //Cannot quit while paused
@@ -469,7 +486,7 @@ function keyListener(e) {
             return; //Prevent accidental double-enters on wrong answers which can quickly end the game
         if (result.textContent === "" || result.textContent === "\u00A0") { //nbsp
             //Nothing entered
-            const runner = document.querySelector("#gameContainer .vader.runner");
+            const runner = document.querySelector("#gameContainer .vader.runner:not(.correct)");
             if (runner != null) {
                 //If special vader is in play, grab that one
                 activeVader.classList.remove("active");
@@ -650,6 +667,7 @@ function incrementScore() {
     document.getElementById("score").textContent = score;
     document.getElementById("score2").textContent = score;
     document.getElementById("pauseScore").textContent = score;
+    document.getElementById("bigscore").textContent = score;
 }
 
 function tintBackground() {
@@ -687,7 +705,7 @@ function updateStats() {
     stats.Speed = (getSpeed(0) * 33).toFixed(0) + "px/s";
     stats.Lifespan = (getEstimatedLifespan() / 33).toFixed(0) + "s";
     stats.Runner = "force=" + (forceNextRunner ? "on" : "off") + " : " 
-        + document.querySelectorAll(".vader.runner").length;
+        + document.querySelectorAll("#gameContainer .vader.runner").length;
     stats.Multishots = multishots + " : " + (multishotActive() ? "ACTIVE" : "off");
     stats.Time = min + ":" + (sec < 10 ? "0" : "") + sec;
     stats.Chord = getChord();
@@ -883,6 +901,11 @@ function endMultishot() {
     for (const v of relatedVaders)
         v.classList.remove("related");
     document.querySelector("#turret .circle").classList.remove("multishot");
+    const oldRunner = document.querySelector("#gameContainer .vader.runner");
+    if (oldRunner != null)
+        oldRunner.style.top = "-1000px"; //Push to above screen so orbiters not visible
+    //Above, hacky fix for when multishot is used up before runner fades away, 
+    //balls would start orbiting a nearly-invisible runner
     resetOrbiters();
 }
 

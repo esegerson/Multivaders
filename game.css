@@ -107,6 +107,9 @@ button:active {
     gap: 0.75rem;
     max-width: 54rem;
 }
+@media (max-width: 600px) {
+    #formatSelect { grid-template-columns: repeat(2, minmax(0, 1fr)); }   
+}
 .format-preview {
     display: flex;
     align-items: center;
@@ -265,7 +268,24 @@ button.delete:hover {
     margin: 1rem;
 }
 
-.score, #score2 { color: yellow; font-size: 1.5rem; }
+.score, #score2, #bigscore { color: yellow; font-size: 1.5rem; }
+#bigscore { 
+    display: block; 
+    position: absolute; 
+    width: 100%; 
+    text-align: center; 
+    font-size: 120vh; 
+    font-weight: bold;
+    text-shadow: 0 0 3vh white;
+    line-height: 0.6em;
+    transition: all 3s ease-out;
+}
+#bigscore.hidden { visibility: hidden; }
+#bigscore.shrink { 
+    font-size: 10vh; 
+    line-height: 10em;
+    opacity: 0;
+}
 
 button.fullscreen {
     padding: 0;
@@ -503,6 +523,8 @@ ul.tips span {
     filter: blur(6px);
     overflow: clip; 
 }
+
+#menuContainer > .background2 { position: fixed; }
 
 #menuContainer > .background2 > .multi, #gameContainer > .background2 > .multi {
     position: absolute;
@@ -807,3 +829,4 @@ a:hover { color: white; text-shadow: 0 0 5px white; }
 }
 #showOSK span { opacity: 0.5; }
 
+.hide-cursor { cursor: none !important; }

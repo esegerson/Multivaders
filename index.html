@@ -163,7 +163,7 @@
             </button>
             <button class="fullscreen" onclick="toggleFullscreen()" title="Toggle Fullscreen">&#x26F6;</button>
         </div>
-        <div class="score">Score: <span id="score">0</span></div>
+        <div class="score">Score: <span id="score">0</span><span id="bigscore" class="hidden"></span></div>
         <div id="tipContainer"></div>
         <div class="decoration">
             <div id="svgContainer">
@@ -269,7 +269,7 @@
         </div>
         <div id="gameOverButtons" style="display: none;">
             <button id="btnPlayAgain" onclick="playAgain();">Play Again</button>
-            <button id="btnMainMenu" onclick="location.reload();">Main Menu</button>        
+            <button id="btnMainMenu" onclick="returnToMainMenuFromGameOver()">Main Menu</button>        
         </div>
     </div>
 
