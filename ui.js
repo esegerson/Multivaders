@@ -1002,6 +1002,16 @@ function returnToMainMenuFromHighScores() {
     document.getElementById("highScoresMainMenu").style.display = "none";
 }
 
+function returnToMainMenuFromGameOver() {
+    document.getElementById("gameTitle").style.display = "block";
+    document.getElementById("gameOver").style.display = "none";
+    let music = document.getElementById("gameMusic");
+    music.pause();
+    music.currentTime = 0;
+    document.querySelectorAll("#gameContainer .vader").forEach(v => v.remove()); //Clear vaders
+    tintBackground(); 
+}
+
 function toggleFullscreen() {
     if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen().catch(err => {
