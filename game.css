@@ -268,7 +268,24 @@ button.delete:hover {
     margin: 1rem;
 }
 
-.score, #score2 { color: yellow; font-size: 1.5rem; }
+.score, #score2, #bigscore { color: yellow; font-size: 1.5rem; }
+#bigscore { 
+    display: block; 
+    position: absolute; 
+    width: 100%; 
+    text-align: center; 
+    font-size: 120vh; 
+    font-weight: bold;
+    text-shadow: 0 0 3vh white;
+    line-height: 0.6em;
+    transition: all 3s ease-out;
+}
+#bigscore.hidden { visibility: hidden; }
+#bigscore.shrink { 
+    font-size: 10vh; 
+    line-height: 10em;
+    opacity: 0;
+}
 
 button.fullscreen {
     padding: 0;

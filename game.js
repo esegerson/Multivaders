@@ -64,6 +64,7 @@ function start() {
     document.querySelectorAll("#gameContainer .vader").forEach(v => v.remove()); //Clear previous vaders
     score = -1;
     incrementScore(); //Start score at 0
+    resetBigScore();
     resetOrbiters();
     multishots = 0;
     hitCeiling = 0;
@@ -186,7 +187,7 @@ function gameLoop() {
         }
     }
 
-    tintBackground(); 
+    tintBackground();
 
     //Cull solved vaders
     for (const vader of vaders) {
@@ -275,6 +276,7 @@ function gameOver(vader) {
     clearInterval(turretInterval);
     let music = document.getElementById("gameMusic");
     music.volume = 0.1;
+    showBigScore();
     setTimeout(() => {
         document.getElementById("gameOver").style.display = "block";
         document.getElementById("gameContainer").style.display = "none";
@@ -298,6 +300,18 @@ function gameOver(vader) {
             document.getElementById("gameOverButtons").style.display = "block";
         }
     }, 5000);
+}
+
+function resetBigScore() {
+    const big = document.getElementById("bigscore");
+    big.classList.add("hidden");
+    setTimeout(function() { big.classList.remove("shrink"); }, 2000);
+}
+
+function showBigScore() {
+    const big = document.getElementById("bigscore");
+    big.classList.remove("hidden");
+    big.classList.add("shrink");
 }
 
 function spawnVader(id, init = false) {
@@ -650,6 +664,7 @@ function incrementScore() {
     document.getElementById("score").textContent = score;
     document.getElementById("score2").textContent = score;
     document.getElementById("pauseScore").textContent = score;
+    document.getElementById("bigscore").textContent = score;
 }
 
 function tintBackground() {
