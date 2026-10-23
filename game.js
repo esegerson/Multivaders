@@ -9,6 +9,9 @@ let turretInterval = null;
 let startingVaders = 10;
 let autoSolve = false;
 let autoSolveInProgress = false;
+let lastFrameTimestamp = 0;
+let frameTimeMs = 0;
+const idealCoreGameLoopFramesPerSec = 30;
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 let stats = [];
 let showStats = false;
@@ -25,6 +28,8 @@ let multishotActive = function() { return multishots > 0; };
 let priorScreenHeight = window.innerHeight;
 let priorScreenWidth = window.innerWidth;
 let justExitedFullscreen = false;
+const graphicsMode = { Normal: 1, LowGraphics: 2 }
+let selectedGraphicsMode = graphicsMode.Normal;
 
 let keybuffer = [];
 
@@ -51,7 +56,7 @@ function start() {
     }
     document.getElementById('gameTitle').style.display = 'none';
     document.getElementById('gameContainer').style.display = 'block';
-    document.getElementsByTagName("body")[0].addEventListener("keydown", keyListener);
+    document.body.addEventListener("keydown", keyListener);
     console.log("Starting game with selected facts:", Array.from(selectedButtons).map(btn => btn.textContent));
     selectedProblems = Array.from(selectedButtons).map(btn => ({
         factA: btn.getAttribute("data-fact-a"),
@@ -71,6 +76,7 @@ function start() {
     lastId = 0;
     priorScreenHeight = window.innerHeight;
     priorScreenWidth = window.innerWidth;
+    lastGraphicsModeAutoSwitch = performance.now();
 
     //Construct turret
     setTurretOperatorSign(selectedOperator);
@@ -92,30 +98,34 @@ function start() {
     timer = performance.now(); //Start the timer
     totalSeconds = 0; //This gets set in gameOver(), used for high score display
     spawnVader(lastId++); //Spawn the first vader
-    gameLoopInterval = setInterval(gameLoop, 1000 / 30); //Start the game loop 30fps
+    gameLoopInterval = setInterval(gameLoop, 1000 / idealCoreGameLoopFramesPerSec); //Start the game loop
     statLoopInterval = setInterval(updateStats, 1000 / 10); //10fps
     orbiterInterval = setInterval(updateOrbiters, 1000 / 60); //60fps
     turretInterval = setInterval(moveTurret, 1000 / 60); //60fps
 
     //Pre-populate multis (decorative background elements)
-    const multiContainer = document.querySelector("#gameContainer .background2");
-    for (let i = 0; i < 20; i++) {
+    const multiContainer = document.querySelector("#menuContainer .background2");
+    const multis = multiContainer.querySelectorAll(".multi");
+    while (multiContainer.querySelectorAll(".multi").length < 20)
         multiContainer.appendChild(createMulti(true));
-    } 
     
     //Play music
     let music = document.getElementById("gameMusic");
     music.volume = 0.2;
     music.play();
 
-    //Debugging
-    if (window.location.protocol === "file:") {
-        //setTimeout(function() { sendKeyPress("`"); }, 1000);
-    }
+    lastFrameTimestamp = performance.now();
 }
 
 function gameLoop() {
-    let now = performance.now();
+    const now = performance.now();
+    frameTimeMs = now - lastFrameTimestamp; //This is reported in stats (~)
+    lastFrameTimestamp = now;
+    if (frameTimeMs > 1000 / idealCoreGameLoopFramesPerSec * 3) { //3X the ideal target (big slowdown)
+        //There is no mechanism to bump this back up to Normal besides reloading the page
+        selectedGraphicsMode = graphicsMode.LowGraphics; 
+        document.getElementById("gameContainer").classList.add("lowgraphics");
+    }
 
     let vaders = document.querySelectorAll("#gameContainer .vader");
     let incompleteVaders = Array.from(vaders).filter(v => !v.classList.contains("correct"));
@@ -293,7 +303,6 @@ function gameOver(vader) {
         if (selectedSetName !== "") {
             populateHighScoresUI();
             document.getElementById("noset").style.display = "none";
-            //gameOverScreen.querySelector("ol.highscorelist").style.display = "block";
         } else {
             gameOverScreen.querySelector("h2").style.display = "none";
             gameOverScreen.querySelector("h3").style.display = "none";
@@ -301,6 +310,7 @@ function gameOver(vader) {
             document.getElementById("btnPlayAgain").focus();
             gameOverScreen.querySelector("ol.highscorelist").style.display = "none";
             document.getElementById("gameOverButtons").style.display = "block";
+            document.getElementById("btnPlayAgain").focus();
         }
     }, 5000);
 }
@@ -583,7 +593,7 @@ class keyListenerHelper {
             music.volume = 0.1; //Lower volume when paused
             pausedStart = performance.now();
         } else {
-            gameLoopInterval = setInterval(gameLoop, 1000 / 33); //Resume the game loop
+            gameLoopInterval = setInterval(gameLoop, 1000 / idealCoreGameLoopFramesPerSec); //Resume the game loop
             document.getElementById("paused").style.display = "none";
             let music = document.getElementById("gameMusic");
             music.volume = 0.2;
@@ -703,11 +713,12 @@ function updateStats() {
     stats.Delay = (getDelay() / 1000).toFixed(1) + "s";
     stats.HitCeiling = hitCeiling;
     stats.Speed = (getSpeed(0) * 33).toFixed(0) + "px/s";
-    stats.Lifespan = (getEstimatedLifespan() / 33).toFixed(0) + "s";
+    stats.Lifespan = (getEstimatedLifespan() / idealCoreGameLoopFramesPerSec).toFixed(0) + "s";
     stats.Runner = "force=" + (forceNextRunner ? "on" : "off") + " : " 
         + document.querySelectorAll("#gameContainer .vader.runner").length;
     stats.Multishots = multishots + " : " + (multishotActive() ? "ACTIVE" : "off");
     stats.Time = min + ":" + (sec < 10 ? "0" : "") + sec;
+    stats.FPS = Math.round(1000 / frameTimeMs);
     stats.Chord = getChord();
     
     //Display stats
@@ -718,6 +729,8 @@ function updateStats() {
         dt.textContent = key;
         const dd = document.createElement("dd");
         dd.textContent = stats[key];
+        if (key === "FPS" && stats[key] < 20) { dd.style.color = "yellow"; }
+        if (key === "FPS" && stats[key] < 10) { dd.style.color = "red"; }
         dl.appendChild(dt);
         dl.appendChild(dd);
     }
@@ -731,13 +744,11 @@ function setDeadBackgroundStyle(o) {
         "linear-gradient(to bottom, rgba(0,0,0,0), rgba(255,0,0," + o + ")), linear-gradient(to bottom, #000, #459)";
 }
 
-function manageBackgroundMultis(isGameBg = true) {
+function manageBackgroundMultis() {
     //A multi is just a visual decoration, a large "×" character that floats up the screen
     const maxNumMultis = 20 + score / 5; //When score = 100, maxNumMultis = 40
     const multiWidth = 100;
-    const bgContainer = isGameBg 
-        ? document.querySelector("#gameContainer .background2")
-        : document.querySelector("#menuContainer .background2");
+    const bgContainer = document.querySelector("#menuContainer .background2");
         
     //Spawn
     let numMultis = bgContainer.querySelectorAll(".multi").length;
@@ -787,7 +798,8 @@ function zapLaser(targetVader, isFirst, numZapped) {
     svgl.setAttribute('y1', turretY);
     svgl.setAttribute('x2', targetX);
     svgl.setAttribute('y2', targetY);
-    createLaserParticles(g, turretX, turretY, targetX, targetY);
+    if (selectedGraphicsMode === graphicsMode.Normal)
+        createLaserParticles(g, turretX, turretY, targetX, targetY);
     g.append(svgl);
 
     //Schedule line removal

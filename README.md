@@ -50,18 +50,43 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
     - Game over "groan" or explosion
 - Move graphics code from game.js to separate graphics.js file
 - To prevent overlapping and legibility, darken problems that are behind the active problem; restore them when the active problem is solved
-- Add a performance mode for mobile
-    - Reduce particles
-    - Possibly detect frame rate issues
+- Possible difficulty recalibration to make scores over 100 really insane
+- The fewer the facts selected, the more powerful multishot becomes. Inversely, the more facts selected, the more useless multishot becomes. Find a way to even this out?
 
 ## Known Bugs
 
-- Select preset, click Delete Preset, preset is green not red.
-- Make preset, new preset is not auto-selected green
-- A tie in high scores should favor the new score (especially if other entry is "---")
+- Fullscreen feature does not work on iPhone or iPad
+- Play Again and Main Menu buttons sometimes are not visible on the Game Over screen
 
 ## Recent Updates
 
+- *November 2026:*
+    - Game enhancements:
+        - Default presets have been tweaked:
+            - If you have saved high scores, the old scores no longer reflect the new facts
+            - Addition facts have been tweaked:
+                - Set A: +0, +1, +2 (no change)
+                - Set B: Doubles & 10s
+                - Set C: Near-Doubles
+                - Set D: Make 10 or 12
+                - Set E: Everything Else
+            - Subtraction now has meaningful sets that mirror the addition sets:
+                - Set A: -0, -1, -2, make 0, make 1, make 2 (no change)
+                - Set B: subtract half, subtract 10, make 10
+                - set C: subtract near-half
+                - Set D: 10- or 12-
+                - Set E: Everything else
+            - Multiplication: no change
+            - Division: no change
+        - Default presets now have a description tooltip when you hover over them
+    - Quality-of-Life Enhancements:
+        - Now auto-detects when there is poor performance (low framerate) and turns off extra graphical stuff (helps with mobile)
+        - Ties in the high score list now favor the most recent entry
+    - Bug fixes:
+        - On-screen keyboard bug fix when checking high scores from the main menu
+        - Fixed runner orbiter ball orbit distance on mobile
+        - Minor UI bug fixes
+        - Death screen giant score zoom animation is improved
 - *October 2026:*
     - Quality-of-Life Enhancements:
         - Fullscreen button added

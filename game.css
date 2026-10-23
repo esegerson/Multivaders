@@ -145,7 +145,7 @@ button:active {
 }
 .format-preview.preview-bracket .result,
 .format-preview.preview-bracket .aboveRiser {
-    border-bottom: 0.08em solid currentColor;
+    border-bottom: 0.1rem solid currentColor;
 }
 .format-preview.preview-fraction .factA {
     border-bottom: 0.08em solid currentColor;
@@ -161,8 +161,8 @@ div[data-format="FRACTION"] .format-preview td.result { border-top: none; }
     text-transform: uppercase;
 }
 button.delete {
-    background-color: #800;
-    border-color: red;
+    background-color: #800 !important;
+    border-color: red !important;
     animation: jiggle 0.5s infinite;
 }
 button.delete:hover {
@@ -216,6 +216,8 @@ button.delete:hover {
     display: grid;
     grid-template-columns: repeat(13, 1fr);
     gap: 5px;
+    overflow-x: auto;
+    max-width: 120em;
 }
 @media (max-width: 400px) or (max-height: 600px) {
     #gameTitle { margin: 2px; }
@@ -274,7 +276,9 @@ button.delete:hover {
     position: absolute; 
     width: 100%; 
     text-align: center; 
-    font-size: 120vh; 
+    top: 50vh;
+    left: 50vw;
+    transform: translate(-50%, -50%) scale(50);
     font-weight: bold;
     text-shadow: 0 0 3vh white;
     line-height: 0.6em;
@@ -282,7 +286,7 @@ button.delete:hover {
 }
 #bigscore.hidden { visibility: hidden; }
 #bigscore.shrink { 
-    font-size: 10vh; 
+    transform: translate(-50%, -50%) scale(1);
     line-height: 10em;
     opacity: 0;
 }
@@ -375,9 +379,9 @@ button.fullscreen {
     animation: dance 2s infinite ease-in-out;
 }
 
-.vader.STACKED .result          { border-top: 0.08em solid var(--vaderColor); }
+.vader.STACKED .result { border-top: 0.1rem solid var(--vaderColor); }
 .vader.DIVISION.BRACKET .result,
-.vader.DIVISION.BRACKET .aboveRiser { border-bottom: 0.08em solid var(--vaderColor); }
+.vader.DIVISION.BRACKET .aboveRiser { border-bottom: 0.1em solid var(--vaderColor); }
 .vader.DIVISION.FRACTION .factA { border-bottom: 0.08em solid var(--vaderColor); padding-bottom: 0.16em; }
 .vader.DIVISION.FRACTION .factB { text-align: center; }
 .vader.DIVISION.BRACKET table { border-collapse: collapse; }
@@ -390,15 +394,18 @@ button.fullscreen {
     left: -0.34em;
     width: 0.6em;
     height: 100%;
-    border: 0.08em solid var(--vaderColor);
+    border: 0.1rem solid currentColor;
     border-radius: 50%;
     box-sizing: border-box;
     clip-path: inset(0 0 0 50%);
 }
+.vader.DIVISION.BRACKET .bracketRiser::before { border: 0.08em solid var(--vaderColor); }
 .vader.DIVISION.BRACKET .factA { padding-left: 0.4em; }
 .vader.DIVISION.BRACKET .factB { padding-right: 0.2em; }
-.vader.DIVISION.BRACKET.active .bracketRiser::before { border-color: var(--vaderActiveColor); }
-.vader.DIVISION.BRACKET.active .result { border-bottom-color: var(--vaderActiveColor); }
+.vader.DIVISION.BRACKET.active .bracketRiser::before,
+.vader.DIVISION.BRACKET.related .bracketRiser::before { border-color: var(--vaderActiveColor); }
+.vader.DIVISION.BRACKET.active .result,
+.vader.DIVISION.BRACKET.related .result { border-bottom-color: var(--vaderActiveColor); }
 
 .vader.active, .vader.related {
     color: var(--vaderActiveColor);
@@ -432,7 +439,8 @@ button.fullscreen {
 .vader.DIVISION.BRACKET.runner .bracketRiser::before { border-color: var(--vaderRunnerColor); animation: pulseColorPale 1s ease-in-out infinite; }
 .vader.active.runner { color: var(--vaderActiveRunnerColor); animation: dance 2s infinite ease-in-out, pulseColorActive 1s ease-in-out infinite; }
 .vader.active.runner .result { color: var(--vaderActiveRunnerColor); animation: pulseColorActive 1s ease-in-out infinite; }
-.vader.DIVISION.BRACKET.runner.active .bracketRiser::before { border-color: var(--vaderRunnerColor); animation: pulseColorActive 1s ease-in-out infinite; }
+.vader.DIVISION.BRACKET.runner.active .bracketRiser::before
+.vader.DIVISION.BRACKET.runner.related .bracketRiser::before { border-color: var(--vaderRunnerColor); animation: pulseColorActive 1s ease-in-out infinite; }
 
 @keyframes jiggle { /*death rattle*/
     0%   { transform: rotate(10deg) translate(0, 0); }
@@ -523,6 +531,8 @@ ul.tips span {
     filter: blur(6px);
     overflow: clip; 
 }
+
+#gameContainer.lowgraphics > .background2 { display: none; }
 
 #menuContainer > .background2 { position: fixed; }
 

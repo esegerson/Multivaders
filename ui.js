@@ -17,69 +17,81 @@ const Format = Object.freeze({
 const hardcodedPresets = [
     //ADDITION
     //These sets were constructed with a focus on conceptual understanding and strategies while keeping to four sets of similar sizes
-    { name: "Set A", operator: Operator.ADDITION, facts: [ //Basic Concepts: Identity (+0), Successor (+1), and Skip Count (+2) - 57 facts
-        [0,0], [1,0], [2,0], [3,0], [4,0], [5,0], [6,0], [7,0], [8,0], [9,0], [10,0], [11,0], [12,0],
-        [0,1], [0,2], [0,3], [0,4], [0,5], [0,6], [0,7], [0,8], [0,9], [0,10], [0,11], [0,12],
-        [1,1], [2,1], [3,1], [4,1], [5,1], [6,1], [7,1], [8,1], [9,1], [10,1], [11,1], [12,1],
-        [1,2], [1,3], [1,4], [1,5], [1,6], [1,7], [1,8], [1,9], [1,10], [1,11], [1,12],
-        [2,2], [3,2], [4,2], [5,2], [6,2], [7,2], [8,2], [9,2], [10,2], [11,2], [12,2],
-        [2,3], [2,4], [2,5], [2,6], [2,7], [2,8], [2,9], [2,10], [2,11], [2,12]]
+    { name: "Set A", operator: Operator.ADDITION, description: "Add 0 (identity); add 1 (count on); add 2 (count on two)", facts: [
+        [0,0], [1,0], [2,0], [3,0], [4,0], [5,0], [6,0], [7,0], [8,0], [9,0], [11,0],
+        [0,1], [0,2], [0,3], [0,4], [0,5], [0,6], [0,7], [0,8], [0,9], [0,11],
+        [3,1], [4,1], [5,1], [6,1], [7,1], [8,1], [12,1],
+        [1,3], [1,4], [1,5], [1,6], [1,7], [1,8], [1,12],
+        [4,2], [5,2], [6,2], [7,2], [9,2], [11,2], [12,2],
+        [2,4], [2,5], [2,6], [2,7], [2,9], [2,11], [2,12]]
     },
-    { name: "Set B", operator: Operator.ADDITION, facts: [ //Anchors & Relationships: Doubles, Near Doubles (+/- 1), and Friends of 10 - 32 facts
-        //Doubles (excluding 0, 1, 2)
-        [3,3], [4,4], [5,5], [6,6], [7,7], [8,8], [9,9], [10,10], [11,11], [12,12],
-        //Doubles Plus One (excluding pairs involving 0, 1, 2)
-        [3,4], [4,3], [4,5], [5,4], [5,6], [6,5], [6,7], [7,6], [7,8], [8,7],
-        [8,9], [9,8], [9,10], [10,9], [10,11], [11,10], [11,12], [12,11],
-        //Friends of 10 (excluding 5+5 which is already in doubles, and pairs with 1, 2)
-        [3,7], [7,3], [4,6], [6,4]]
+    { name: "Set B", operator: Operator.ADDITION, description: "Doubles and add ten", facts: [
+        //Doubles (excluding 0)
+        [1,1], [2,2], [3,3], [4,4], [5,5], [6,6], [7,7], [8,8], [9,9], [10,10], [11,11], [12,12],
+        //Tens (excluding 10+11 and 10+12)
+        [0,10], [1,10], [2,10], [3,10], [4,10], [5,10], [6,10], [7,10], [8,10],
+        [10,0], [10,1], [10,2], [10,3], [10,4], [10,5], [10,6], [10,7], [10,8]]
     },
-    { name: "Set C", operator: Operator.ADDITION, facts: [ //Base-10 Strategies: Make a 10 (+8, +9) and Place Value (+10, +11) - 42 facts
-        //Make 10 (+9 and +8 facts not covered above)
-        [9,3], [3,9], [9,4], [4,9], [9,5], [5,9], [9,6], [6,9], [9,7], [7,9],
-        [8,3], [3,8], [8,4], [4,8], [8,5], [5,8], [8,6], [6,8],
-        //Place Value Shifts (+10 and +11 facts not covered above)
-        [10,3], [3,10], [10,4], [4,10], [10,5], [5,10], [10,6], [6,10], [10,7], [7,10], [10,8], [8,10],
-        [11,3], [3,11], [11,4], [4,11], [11,5], [5,11], [11,6], [6,11], [11,7], [7,11], [11,8], [8,11], [11,9], [9,11]]
+    { name: "Set C", operator: Operator.ADDITION, description: "Near-doubles", facts: [
+        [1,2], [2,3], [3,4], [4,5], [5,6], [6,7], [7,8], [8,9], [9,10], [10,11], [11,12],
+        [2,1], [3,2], [4,3], [5,4], [6,5], [7,6], [8,7], [9,8], [10,9], [11,10], [12,11]]
     },
-    { name: "Set D", operator: Operator.ADDITION, facts: [ //Everything Else: Higher bridging & flexible decomposition strategies - 38 facts
-        [3,5], [5,3], [3,6], [6,3], [4,7], [7,4], [3,12], [12,3], [4,12], [12,4], [5,7], [7,5], [5,12], [12,5], [6,12], [12,6],
-        [7,8], [8,7], [7,12], [12,7], [8,9], [9,8], [8,12], [12,8], [9,12], [12,9], [10,12], [12,10], [11,12], [12,11]]
+    { name: "Set D", operator: Operator.ADDITION, description: "Make ten or twelve", facts: [
+        [10,0], [9,1], [8,2], [7,3], [6,4], [5,5], [4,6], [3,7], [2,8], [1,9], [0,10],
+        [12,0], [11,1], [10,2], [9,3], [8,4], [7,5], [6,6], [5,7], [4,8], [3,9], [2,10], [1,11], [0,12]]
+    },
+    { name: "Set E", operator: Operator.ADDITION, description: "Everything else", facts: [
+        [3,5], [3,6], [3,8], [3,11], [3,12], [4,7], [4,9], [4,11], [4,12], [5,8], [5,9], [5,11], [5,12],
+        [6,8], [6,9], [6,11], [6,12], [7,9], [7,11], [7,12], [8,11], [8,12], [9,11], [9,12], [10,12],
+        [5,3], [6,3], [8,3], [11,3], [12,3], [7,4], [9,4], [11,4], [12,4], [8,5], [9,5], [11,5], [12,5],
+        [8,6], [9,6], [11,6], [12,6], [9,7], [11,7], [12,7], [11,8], [12,8], [11,9], [12,9], [12,10]]
     },
     
     //SUBTRACTION
-    //Format [minuend, subtrahend] (e.g., 6 - 4 = 2 is [6,4])
-    { name: "Set A", operator: Operator.SUBTRACTION, facts: [ 
-        [2,1], [3,1], [4,2]]
+    //Mirrors the addition sets above. Format [minuend, subtrahend] (e.g., 6 - 4 = 2 is [6,4])
+    { name: "Set A", operator: Operator.SUBTRACTION, description: "Subtract 0, 1 or 2; difference 0, 1, or 2", facts: [
+        [0,0], [1,0], [2,0], [3,0], [4,0], [5,0], [6,0], [7,0], [8,0], [9,0], [10,0], [11,0], [12,0],
+        [1,1], [2,2], [3,3], [4,4], [5,5], [6,6], [7,7], [8,8], [9,9], [10,10], [11,11], [12,12],
+        [2,1], [3,1], [4,1], [5,1], [6,1], [7,1], [8,1], [9,1], [10,1], [11,1], [12,1], [13,1],
+        [3,2], [4,3], [5,4], [6,5], [7,6], [8,7], [9,8], [10,9], [11,10], [12,11], [13,12],
+        [4,2], [5,2], [6,2], [7,2], [8,2], [9,2], [10,2], [11,2], [12,2], [13,2], [14,2],
+        [5,3], [6,4], [7,5], [8,6], [9,7], [10,8], [11,9], [12,10], [13,11], [14,12]]
     },
-    { name: "Set B", operator: Operator.SUBTRACTION, facts: [
-        [4,2], [5,2], [6,3]]
+    { name: "Set B", operator: Operator.SUBTRACTION, description: "Subtract half; subtract 10; difference 10", facts: [
+        [2,1], [4,2], [6,3], [8,4], [10,5], [12,6], [14,7], [16,8], [18,9], [20,10], [22,11], [24,12],
+        [10,10], [11,10], [12,10], [13,10], [14,10], [15,10], [16,10], [17,10], [18,10], [19,10],
+        [10,0], [11,1], [12,2], [13,3], [14,4], [15,5], [16,6], [17,7], [18,8], [19,9]]
     },
-    { name: "Set C", operator: Operator.SUBTRACTION, facts: [
-        [6,4], [7,3], [8,2]]
+    { name: "Set C", operator: Operator.SUBTRACTION, description: "Subtract near-half", facts: [
+        [3,2], [5,3], [7,4], [9,5], [11,6], [13,7], [15,8], [17,9], [19,10], [21,11], [23,12],
+        [3,1], [5,2], [7,3], [9,4], [11,5], [13,6], [15,7], [17,8], [19,9], [21,10], [23,11]]
     },
-    { name: "Set D", operator: Operator.SUBTRACTION, facts: [
-        [8,4], [9,3], [10,2]]
+    { name: "Set D", operator: Operator.SUBTRACTION, description: "Ten-minus, twelve-minus", facts: [
+        [10,0], [10,1], [10,2], [10,3], [10,4], [10,5], [10,6], [10,7], [10,8], [10,9], [10,10],
+        [12,0], [12,1], [12,2], [12,3], [12,4], [12,5], [12,6], [12,7], [12,8], [12,9], [12,10], [12,11], [12,12]]
     },
-    { name: "Set E", operator: Operator.SUBTRACTION, facts: [
-        [10,5], [11,4], [12,3]]
+    { name: "Set E", operator: Operator.SUBTRACTION, description: "Everything else", facts: [
+        [8,5], [9,6], [11,8], [14,11], [15,12], [11,7], [13,9], [15,11], [16,12], [13,8], [14,9], [16,11], [17,12], 
+        [14,8], [15,9], [17,11], [18,12], [16,9], [18,11], [19,12], [19,11], [20,12], [20,11], [21,12], [22,12],
+        [8,3], [9,3], [11,3], [14,3], [15,3], [11,4], [13,4], [15,4], [16,4], [13,5], [14,5], [16,5], [17,5], 
+        [14,6], [15,6], [17,6], [18,6], [16,7], [18,7], [19,7], [19,8], [20,8], [20,9], [21,9], [22,10]]
     },
 
     //MULTIPLICATION
     //From "Simply Good and Beautiful Math 3" curriculum. Set E is "everything else"
-    { name: "Set A", operator: Operator.MULTIPLICATION, facts: [ 
+    { name: "Set A", operator: Operator.MULTIPLICATION, description: "Set A", facts: [ 
         [3,3], [6,6], [5,3], [8,4], [8,8], [3,4], [5,5], [9,9], [6,4], [3,5], [4,8], [4,3], [4,6]]
     },
-    { name: "Set B", operator: Operator.MULTIPLICATION, facts: [
+    { name: "Set B", operator: Operator.MULTIPLICATION, description: "Set B", facts: [
         [4,4], [4,5], [7,3], [7,4], [8,5], [8,7], [9,3], [9,4], [9,5], [5,4], [3,7], [4,7], [5,8], [7,8], [3,9], [4,9], [5,9]]
     },
-    { name: "Set C", operator: Operator.MULTIPLICATION, facts: [
+    { name: "Set C", operator: Operator.MULTIPLICATION, description: "Set C", facts: [
         [5,6], [5,7], [6,3], [6,8], [7,6], [7,7], [7,9], [8,3], [9,6], [9,8], [6,5], [7,5], [3,6], [8,6], [6,7], [9,7], [3,8], [6,9], [8,9]]
     },
-    { name: "Set D", operator: Operator.MULTIPLICATION, facts: [
+    { name: "Set D", operator: Operator.MULTIPLICATION, description: "Set D", facts: [
         [12,3], [12,4], [12,5], [12,6], [12,7], [12,8], [12,9], [12,11], [12,12], [3,12], [4,12], [5,12], [6,12], [7,12], [8,12], [9,12], [11,12]]
     },
-    { name: "Set E", operator: Operator.MULTIPLICATION, facts: [
+    { name: "Set E", operator: Operator.MULTIPLICATION, description: "Everything else", facts: [
         [1,1], [1,2], [1,3], [1,4], [1,5], [1,6], [1,7], [1,8], [1,9], [1,10], [1,11], [1,12], 
         [2,1], [3,1], [4,1], [5,1], [6,1], [7,1], [8,1], [9,1], [10,1], [11,1], [12,1], 
         [2,2], [2,3], [2,4], [2,5], [2,6], [2,7], [2,8], [2,9], [2,10], [2,11], [2,12], 
@@ -94,19 +106,19 @@ const hardcodedPresets = [
 
     //DIVISION
     //Transformed from the multiplication sets above. Format [dividend, divisor] (e.g., 6 / 3 = 2 is [6,3])
-    { name: "Set A", operator: Operator.DIVISION, facts: [ 
+    { name: "Set A", operator: Operator.DIVISION, description: "Set A", facts: [ 
         [9,3], [36,6], [15,3], [32,4], [64,8], [12,4], [25,5], [81,9], [24,4], [15,5], [32,8], [12,3], [24,6]]
     },
-    { name: "Set B", operator: Operator.DIVISION, facts: [
+    { name: "Set B", operator: Operator.DIVISION, description: "Set B", facts: [
         [16,4], [20,5], [21,3], [28,4], [40,5], [56,7], [27,3], [36,4], [45,5], [20,4], [21,7], [28,7], [40,8], [56,8], [27,9], [36,9], [45,9]]
     },
-    { name: "Set C", operator: Operator.DIVISION, facts: [
+    { name: "Set C", operator: Operator.DIVISION, description: "Set C", facts: [
         [30,6], [35,7], [18,3], [48,8], [42,6], [49,7], [63,9], [24,3], [54,6], [72,8], [30,5], [35,5], [18,6], [48,6], [42,7], [63,7], [24,8], [54,9], [72,9]]
     },
-    { name: "Set D", operator: Operator.DIVISION, facts: [
+    { name: "Set D", operator: Operator.DIVISION, description: "Set D", facts: [
         [36,3], [48,4], [60,5], [72,6], [84,7], [96,8], [108,9], [132,11], [144,12], [36,12], [48,12], [60,12], [72,12], [84,12], [96,12], [108,12], [132,12]]
     },
-    { name: "Set E", operator: Operator.DIVISION, facts: [
+    { name: "Set E", operator: Operator.DIVISION, description: "Everything else", facts: [
         [1,1], [2,2], [3,3], [4,4], [5,5], [6,6], [7,7], [8,8], [9,9], [10,10], [11,11], [12,12], 
         [2,1], [3,1], [4,1], [5,1], [6,1], [7,1], [8,1], [9,1], [10,1], [11,1], [12,1], 
         [4,2], [6,3], [8,4], [10,5], [12,6], [14,7], [16,8], [18,9], [20,10], [22,11], [24,12], 
@@ -355,6 +367,17 @@ function selectOperator(operator) {
         multiContainer.appendChild(createMulti(true));
     } 
     menuLoopInterval = setInterval(menuLoop, 33); //Start the menu loop 30fps
+
+    //Change tooltips on hardcoded presets
+    const presets = getHardcodedPresetDefinitions(selectedOperator);
+    document.querySelectorAll("#presetButtons button.hardcoded").forEach(b => {
+        b.classList.remove("selected"); //Deselect any residual selections from prior operator
+        const setName = b.textContent;
+        const setLetter = setName.split("Set ")[1];   //A, B, C, D, E
+        const ix = setLetter.charCodeAt(0) - 65;      //0, 1, 2, 3, 4
+        const desc = presets.filter(x => x.name === setName)[0].description ?? setName;
+        b.title = desc;
+    });
 }
 
 function menuLoop() {
@@ -571,6 +594,8 @@ function savePreset() {
     savePresetsToStorage(presetList);
     refreshCustomPresetButtons();
     closeNewPresetUi();
+    const newBtn = Array.from(document.getElementById("presetList").querySelectorAll("button")).filter(b => b.textContent === presetName)[0];
+    newBtn.classList.add("selected");
 }
 
 function deletePreset(deleteButton) {
@@ -654,6 +679,7 @@ function combinePresets() {
     for (const presetDefinition of getHardcodedPresetsForOperator(selectedOperator)) {
         combinedPresets.push({
             name: presetDefinition.name,
+            description: presetDefinition.description ?? presetDefinition.name,
             facts: presetDefinition.facts,
             operator: presetDefinition.operator,
             element: Array.from(document.querySelectorAll("#presetButtons > button.hardcoded"))
@@ -749,7 +775,6 @@ function saveHighScore() {
     //Get initials
     let initials = document.getElementById("initialsInput").value.trim().toUpperCase();
     if (initials.length === 0) initials = defaultInitials;
-    //else if (initials.length < 3) initials = initials.padEnd(3, " ");
     else if (initials.length > 3) initials = initials.substring(0, 3);
 
     //Get set name
@@ -819,7 +844,7 @@ function isHighScore(setName, score) {
     if (score < 2) return false;
     let highscoreList = getHighScoresForSet(setName);
     if (highscoreList.length < 10) return true;
-    return score > highscoreList[highscoreList.length - 1].score;
+    return score >= highscoreList[highscoreList.length - 1].score;
 }
 
 function populateHighScoresUI() {
@@ -839,16 +864,17 @@ function populateHighScoresUI() {
     let highscoreList = getHighScoresForSet(selectedSetName);
 
     //Get score, determine if it's a high score, and if so, what rank
-    const score = document.getElementById("score2").textContent;
+    const today = new Date().toLocaleDateString();
     const isHS = isHighScore(selectedSetName, score);
-    const newRank = isHS ? highscoreList.filter(entry => score < entry.score).length + 1 : 99;
+    const insertionIx = isHS ? highscoreList.findIndex(entry => entry.score <= score) : -1;
+    const newRank = isHS ? (insertionIx === -1 ? highscoreList.length + 1 : insertionIx + 1) : 99;
     if (newRank <= 10) {
         //Insert new score into list for display purposes
         highscoreList.splice(newRank - 1, 0, {
             rank: newRank,
             initials: "",
             score: score,
-            date: new Date().toLocaleDateString()
+            date: today
         });
         for (let i = newRank; i < highscoreList.length; i++)
             highscoreList[i].rank += 1;
@@ -894,7 +920,10 @@ function populateHighScoresUI() {
     h2GameOver.style.display = selectedSetName === "" ? "none" : "block";
     pNewHighScore.style.display = isHS ? "block" : "none";
     btns.style.display = isHS ? "none" : "inline-block";
-    if (!isHS) document.getElementById("btnPlayAgain").focus();
+    if (!isHS) {
+        document.getElementById("gameOverButtons").style.display = "block";
+        document.getElementById("btnPlayAgain").focus();
+    }
 
     //Add listeners for initials input if needed
     if (isHS && newMarked) document.addEventListener("keydown", initialsInputKeyDown);
@@ -1012,6 +1041,8 @@ function returnToMainMenuFromGameOver() {
     music.currentTime = 0;
     document.querySelectorAll("#gameContainer .vader").forEach(v => v.remove()); //Clear vaders
     tintBackground(); 
+    score = 0; //Resets background multis to a calm state
+    osk.setState(osk.isOn, true);
 }
 
 function toggleFullscreen() {
