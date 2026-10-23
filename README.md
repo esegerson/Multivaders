@@ -65,7 +65,7 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
         - Default presets have been tweaked:
             - If you have saved high scores, the old scores no longer reflect the new facts
             - Addition facts have been tweaked:
-                - Set A: +0, +1, +2 (no change)
+                - Set A: +0, +1, +2
                 - Set B: Doubles & 10s
                 - Set C: Near-Doubles
                 - Set D: Make 10 or 12
@@ -82,6 +82,7 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
     - Quality-of-Life Enhancements:
         - Now auto-detects when there is poor performance (low framerate) and turns off extra graphical stuff (helps with mobile)
         - Ties in the high score list now favor the most recent entry
+        - You can now bookmark this game with an operator pre-selected
     - Bug fixes:
         - On-screen keyboard bug fix when checking high scores from the main menu
         - Fixed runner orbiter ball orbit distance on mobile

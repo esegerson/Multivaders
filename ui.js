@@ -185,6 +185,12 @@ window.addEventListener("load", function() {
         window.addEventListener(e, resetHideCursorTimer, { passive: true })
     );
     resetHideCursorTimer();
+
+    //Redirect if operator in URL
+    if (window.location.search !== "" && window.location.search.indexOf("op=") > -1) {
+        const op = window.location.search.split("op=")[1]; //This only works if op is last query parameter; I'm lazy
+        selectOperator(op); //Auto-select operator for user-convenience
+    }
 });
 
 window.addEventListener("keydown", function(e) {
@@ -378,6 +384,10 @@ function selectOperator(operator) {
         const desc = presets.filter(x => x.name === setName)[0].description ?? setName;
         b.title = desc;
     });
+
+    //Tweak URL
+    var refresh = window.location.protocol + "//" + window.location.host + window.location.pathname + "?op=" + selectedOperator;
+    window.history.pushState({ path: refresh }, '', refresh); 
 }
 
 function menuLoop() {
@@ -395,6 +405,10 @@ function backToOperatorSelection() {
     document.getElementById("titleSelectOperator").style.display = "block";
     clearInterval(menuLoopInterval);
     document.querySelector("#menuContainer .background2").innerHTML = "";
+
+    //Remove operator from URL
+    var refresh = window.location.protocol + "//" + window.location.host + window.location.pathname;
+    window.history.pushState({ path: refresh }, '', refresh); 
 }
 
 function generateFactsGrid() {
