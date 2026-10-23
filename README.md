@@ -35,10 +35,12 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
 
 ## TODO / Wishlist
 
-- Operator Expansion:
-    - Format menu:
-        - Add "Surprise Me"
-        - Add "Random"
+- Operator Menu:
+    - Add Ultra Mode
+        - Skips next menu and jump straight into game
+        - Random mix of all 4 operators
+        - Pre-select only 20 random facts out of total set space so multishot remains effective
+        - Random formats (stacked and inline only?)
 - Display the high score in the top-left corner during gameplay (or what your current rank is)
 - Improve the inevitable game-over experience; the game-over screen is basic, and currently the problems on-screen turn black when I feel like they should continue to bombard the bottom of the screen for 5 seconds
 - Improve how left and right arrows choose different problems.  Currently it just looks at horizontal position, but I'd like to take into account the vertical position, too.  If there's a problem near the bottom of the screen to the right, I'd like the right-arrow to select that one over the one right next to the active problem that's at the top of the screen.
