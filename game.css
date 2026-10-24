@@ -178,6 +178,9 @@ button.delete:hover {
     max-width: 100%;
     justify-items: stretch;
 }
+#operatorSelect:has(button:nth-child(5).hidden) {
+    grid-template-columns: repeat(2, minmax(0, 9rem));
+}
 #operatorSelect button {
     width: 100%;
     aspect-ratio: 1;
@@ -195,6 +198,8 @@ button.delete:hover {
     text-transform: uppercase;
     font-size: 2em;
 }
+#operatorSelect button.hidden:last-child { display: none; }
+
 #operatorSelect button span {
   display: block;
   font-size: 4em;
@@ -207,16 +212,18 @@ button.delete:hover {
 #operatorSelect button:nth-child(3) span { animation-delay: -0.4s; }
 #operatorSelect button:nth-child(4) span { animation-delay: -0.8s; }
 @media (max-width: 40rem) {
-  #operatorSelect { grid-template-columns: repeat(2, 1fr); grid-template-rows: auto; }
+  #operatorSelect { grid-template-columns: repeat(2, 9rem); grid-template-rows: auto; }
   #operatorSelect button { max-width: 100%; }
   #operatorSelect button:last-child { grid-column: 1 / -1; grid-row: auto; width: 100%; }
 }
-#presetButtons BUTTON:disabled, #startGame:disabled, .grid button:disabled {
+#presetButtons BUTTON:disabled, #startGame:disabled, .grid button:disabled, 
+#operatorSelect button:disabled, #operatorSelect button.locked {
     background-color: #222;
     color: rgba(255, 255, 255, 0.3);
     border-color: #444;
     cursor: not-allowed;
 }
+#operatorSelect aside { font-size: 0.8rem; text-transform: none; padding-top: 1rem; }
 #btnDeletePreset.deleteMode {
     background: linear-gradient(to bottom, black, #800);
     border-color: red;

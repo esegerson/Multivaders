@@ -185,6 +185,7 @@ window.addEventListener("load", function() {
         window.addEventListener(e, resetHideCursorTimer, { passive: true })
     );
     resetHideCursorTimer();
+    updateUltraButton();
 });
 
 window.addEventListener("keydown", function(e) {
@@ -318,6 +319,12 @@ function updateFormatSelection() {
 }
 
 function selectOperator(operator) {
+    if (operator === "ULTRA") {
+        if (document.getElementById("btnUltra").disabled) return;
+        selectedOperator = operator; //Not in Operators enum
+        start();
+        return;
+    }
     selectedOperator = Operator[operator];
     document.getElementById("titleSelectOperator").style.display = "none";
     updateFormatOptionVisibility();
@@ -375,9 +382,152 @@ function selectOperator(operator) {
         const setName = b.textContent;
         const setLetter = setName.split("Set ")[1];   //A, B, C, D, E
         const ix = setLetter.charCodeAt(0) - 65;      //0, 1, 2, 3, 4
-        const desc = presets.filter(x => x.name === setName)[0].description ?? setName;
+        const desc = presets.find(x => x.name === setName)?.description ?? setName;
         b.title = desc;
     });
+}
+
+function updateUltraButton(makeVisible = false, unlock = false) {
+    const btn = document.getElementById("btnUltra");
+    let isLocked = true;
+    let isHidden = true;
+
+    /*  1. Tease ultra mode when player has gotten accustomed to the game.
+        2. Unlock when player has shown overall mastery
+
+        Details:
+            First:  make visible if:
+                a: there are at least 4 good scores for each operator, or
+                b: there are at least 25 good scores across all operators, or
+                c: the unlock condition (below) is met
+            Second:  unlock if there is a good score in sets A through E for all operators
+        
+            Score counts exclude default "---" initials.
+            Good scores beat the default 3rd place (30 points).
+            Condition A playstyle:  doesn't mater the preset. 
+                Shows overall interest or proficiency in all operators.
+            Condition B playstyle:  doesn't matter the operator.
+                Shows exceeding interest in the game as a whole. 
+                Many high scores in custom presets for only Addition will satisfy this.
+    */
+
+    const filterScores = (minValidScore) => {
+        const scores = getHighscoresFromStorage();
+        const scoresFiltered = [];
+        scores.forEach(set => {
+            const setEntries = set.scores.filter(x => x.initials !== defaultInitials && x.score >= minValidScore);
+            setEntries.forEach(x => {
+                scoresFiltered.push({
+                    operator:   set.operator,
+                    set:        set.name,
+                    score:      x.score,
+                    initials:   x.initials
+                });
+            });
+        });
+        return scoresFiltered;
+    };
+
+    const meetsConditionA = (scores, minNum) => {
+        //Return true if at least minNum scores for each operator
+        //scores is prefiltered to exclude too-low scores
+        //Custom sets are allowed (not excluded)
+        for (const op of Object.keys(Operator))
+            if (scores.filter(x => x.operator === op).length < minNum) 
+                return false;
+        return true;
+    }
+
+    const meetsConditionB = (scores, minNum) => {
+        //Returns true if at least minNum scores across all operators
+        //scores is prefiltered to exclude too-low scores
+        //Custom sets are allowed (not excluded)
+        return scores.length >= minNum;
+    }
+
+    const meetsConditionC = (scores) => {
+        //Return true if there is a score in every default set for every operator
+        //scores is prefiltered to exclude too-low scores
+        const defaultSetNames = new Set(hardcodedPresets.map(x => x.name));
+        for (const op of Object.keys(Operator))
+            for (const setName of defaultSetNames)
+                if (scores.filter(x => x.operator === op && x.set === setName).length === 0)
+                    return false;
+        return true;
+    };
+
+    const getNextGoalForC = (scores) => {
+        //This code based on meetsConditionC()
+        const defaultSetNames = new Set(hardcodedPresets.map(x => x.name));
+        for (const op of Object.keys(Operator))
+            for (const setName of defaultSetNames)
+                if (scores.filter(x => x.operator === op && x.set === setName).length === 0)
+                    return titleCase(op.toLowerCase()) + " " + setName;
+        return "None";
+    };
+
+    const titleCase = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+    const cheat = (e) => {
+        const isVisible = !document.getElementById("btnUltra").classList.contains("hidden");
+        if (e.key === "Pause" && !isVisible) updateUltraButton(true, false);
+        if (e.key === "`" && isVisible) updateUltraButton(true, true);
+    };
+
+    const minValidScore = defaultHighScores().find(x => x.rank === 3).score;
+    const scoresFiltered = filterScores(minValidScore);
+    const numScoresNeededPerOp = 4;
+    const minTotalValidScoresAllOps = 25;
+    const asides = [
+        "Can you beat 100?",
+        "Let's do this!",
+        "The ultimate challenge!",
+        "Your path to beat the game!",
+        "The final wave.",
+        "Are you ready?",
+        "How good are you?",
+        "Meet the boss.",
+        "Are you faster than a calculator?",
+        
+        //Quotes
+        "“The only way to learn mathematics is to do mathematics.” – Paul Halmos",
+        "“What we learn with pleasure, we never forget.” – Alfred Mercier",
+        "“You never fail until you stop trying.” – Albert Einstein",
+        "“Mathematics is not a spectator sport.” – John Wesley Young",
+        "“Mathematics is the door and key to the sciences.” – Roger Bacon",
+        "“Mathematical knowledge adds vigor to the mind.” – John Locke",
+        "“Mathematics is the music of reason.” – James Joseph Sylvester"
+    ];
+
+    //Calculate
+    const conditionA = meetsConditionA(scoresFiltered, numScoresNeededPerOp);
+    const conditionB = meetsConditionB(scoresFiltered, minTotalValidScoresAllOps);
+    const conditionC = meetsConditionC(scoresFiltered);
+
+    //Apply tests
+    if (conditionA || conditionB || conditionC || makeVisible) isHidden = false;
+    if (conditionC || unlock) isLocked = false;
+    
+    //Cheat
+    if (!makeVisible && isLocked) document.addEventListener("keydown", cheat);
+    
+    //Change DOM
+    if (!isHidden) {
+        btn.classList.remove("hidden");
+        const goal = getNextGoalForC(scoresFiltered);
+        const msg = "To unlock, get a score of " 
+            + minValidScore + " or better on \"Set A\" through \"Set E\" "
+            + "for all operators.\n\nNext goal: " + goal;
+        btn.title = msg;
+        btn.querySelector("aside").innerHTML = msg.replaceAll("\n", "<br>");
+    }
+    if (!isLocked) {
+        btn.classList.remove("locked");
+        btn.disabled = false;
+        const msg = asides[Math.floor(Math.random() * asides.length)]
+        btn.title = msg;
+        btn.querySelector("aside").textContent = msg;
+    }
 }
 
 function menuLoop() {
@@ -594,7 +744,7 @@ function savePreset() {
     savePresetsToStorage(presetList);
     refreshCustomPresetButtons();
     closeNewPresetUi();
-    const newBtn = Array.from(document.getElementById("presetList").querySelectorAll("button")).filter(b => b.textContent === presetName)[0];
+    const newBtn = Array.from(document.getElementById("presetList").querySelectorAll("button")).find(b => b.textContent === presetName);
     newBtn.classList.add("selected");
 }
 

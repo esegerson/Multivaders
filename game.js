@@ -49,19 +49,65 @@ function gameDomLoaded() {
 }
 
 function start() {
-    const selectedButtons = document.querySelectorAll('.grid button.selected');
-    if (selectedButtons.length === 0) {
-        alert("Please select at least one multiplication fact.");
-        return;
+    if (selectedOperator === "ULTRA") {
+        document.getElementById("titleSelectOperator").style.display = "none";
+        //Randomly select some facts for each of the four operators
+        const numFactsPerOp = 8;
+        const randomFactGrid = () => {
+            return {
+                factA: Math.floor(Math.random() * 13),
+                factB: Math.floor(Math.random() * 13)
+            };
+        };
+        selectedProblems = [];
+        for (const op of Object.keys(Operator)) {
+            for (let i = 0; i < numFactsPerOp; i++) {
+                let f = { factA: -1, factB: -1 };
+                if (op === Operator.ADDITION || op === Operator.MULTIPLICATION)
+                    f = randomFactGrid();
+                else if (op === Operator.SUBTRACTION) {
+                    const t = randomFactGrid();
+                    f.factA = t.factA + t.factB;
+                    f.factB = t.factB;
+                } else if (op === Operator.DIVISION) {
+                    const t = randomFactGrid();
+                    f.factA = t.factA * t.factB;
+                    f.factB = t.factB;
+                }
+                selectedProblems.push({
+                    factA: f.factA,
+                    factB: f.factB,
+                    operator: op
+                });
+            }
+        }
+        console.log("Starting game with selected facts:", selectedProblems.map(p => {
+            switch (p.operator) {
+                case Operator.ADDITION:
+                    return p.factA + "+" + p.factB;
+                case Operator.SUBTRACTION:
+                    return p.factA + "-" + p.factB;
+                case Operator.MULTIPLICATION:
+                    return p.factA + "x" + p.factB;
+                case Operator.DIVISION:
+                    return p.factA + "/" + p.factB;
+            }
+        }));
+    } else {
+        const selectedButtons = document.querySelectorAll('.grid button.selected');
+        if (selectedButtons.length === 0) {
+            alert("Please select at least one " + selectedOperator.toLowerCase() + " fact.");
+            return;
+        }
+        console.log("Starting game with selected facts:", Array.from(selectedButtons).map(btn => btn.textContent));
+        selectedProblems = Array.from(selectedButtons).map(btn => ({
+            factA: btn.getAttribute("data-fact-a"),
+            factB: btn.getAttribute("data-fact-b")
+        }));
     }
     document.getElementById('gameTitle').style.display = 'none';
     document.getElementById('gameContainer').style.display = 'block';
     document.body.addEventListener("keydown", keyListener);
-    console.log("Starting game with selected facts:", Array.from(selectedButtons).map(btn => btn.textContent));
-    selectedProblems = Array.from(selectedButtons).map(btn => ({
-        factA: btn.getAttribute("data-fact-a"),
-        factB: btn.getAttribute("data-fact-b")
-    }));
 
     //Init
     window.scrollTo({ top: 0 }); //Fixes some weirdness when scrolled on menu
@@ -340,7 +386,7 @@ function spawnVader(id, init = false) {
         return false;
     };
     let problem = getProblem();
-    let vader = createVader(id, problem.factA, problem.factB);
+    let vader = createVader(id, problem.factA, problem.factB, problem.operator ?? selectedOperator);
     let container = document.getElementById("vaderContainer");
     if (container.querySelectorAll("#gameContainer .active").length === 0)
         vader.classList.add("active");
@@ -358,19 +404,26 @@ function spawnVader(id, init = false) {
 
 function getProblem() {
     if (selectedProblems.length === 0) {
-        alert("No multiplication facts selected.");
+        alert("No " + selectedOperator.toLowerCase() + " facts selected.");
         return null;
     }
     const randomIndex = Math.floor(Math.random() * selectedProblems.length);
     return selectedProblems[randomIndex];
 }
 
-function createVader(id, factA, factB) {
+function createVader(id, factA, factB, op) {
+    const randomFormat = () => {
+        const ixMax = op === Operator.DIVISION ? 4 : 2;
+        const randomIx = Math.floor(Math.random() * ixMax);
+        return Object.keys(Format)[randomIx];
+    };
+    let format = selectedOperator === "ULTRA" ? randomFormat() : selectedFormat;
+    if (op === undefined || op === null) throw new Error("Operator not set");
     let sampleVader = document.querySelector("#gameContainer .vader");
     let sampleVaderWidth = sampleVader ? sampleVader.offsetWidth : 200;
-    let vaderTemplate = document.querySelector("#templates > .vaderTemplate." + selectedOperator + "." + selectedFormat);
+    let vaderTemplate = document.querySelector("#templates > .vaderTemplate." + op + "." + format);
     if (vaderTemplate === null) //TODO: remove after development
-        throw new Error("No vader template found for operator " + selectedOperator + " and format " + selectedFormat);
+        throw new Error("No vader template found for operator " + op + " and format " + format);
     let vaderClone = vaderTemplate.cloneNode(true);
     vaderClone.querySelector(".factA").textContent = factA;
     vaderClone.querySelector(".factB").textContent = factB;
