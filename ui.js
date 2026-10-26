@@ -319,13 +319,14 @@ function updateFormatSelection() {
 }
 
 function selectOperator(operator) {
+    selectedOperator = Operator[operator]; //"ULTRA" is not in the Operators enum
     if (operator === "ULTRA") {
-        if (document.getElementById("btnUltra").disabled) return;
-        selectedOperator = operator; //Not in Operators enum
+        var btn = document.getElementById("btnUltra");
+        if (btn.disabled || btn.classList.contains("hidden") || btn.classList.contains("locked")) return; //Failsafe
+        document.getElementById("titleSelectOperator").style.display = "none";
         start();
         return;
     }
-    selectedOperator = Operator[operator];
     document.getElementById("titleSelectOperator").style.display = "none";
     updateFormatOptionVisibility();
     document.getElementById("gameTitle").style.display = "block";
@@ -474,6 +475,18 @@ function updateUltraButton(makeVisible = false, unlock = false) {
         if (e.key === "`" && isVisible) updateUltraButton(true, true);
     };
 
+    const seededRandom = (seed) => {
+        let x = Math.sin(seed * 12.9898 + 78.233) * 43758.5453;
+        return x - Math.floor(x);
+    };
+
+    const getDailyAside = () => {
+        var d = new Date();
+        var r = seededRandom(new Date(d.getFullYear(), d.getMonth(), d.getDate()));
+        var ix = Math.floor(r * asides.length);
+        return asides[ix];
+    };
+
     const minValidScore = defaultHighScores().find(x => x.rank === 3).score;
     const scoresFiltered = filterScores(minValidScore);
     const numScoresNeededPerOp = 4;
@@ -489,14 +502,14 @@ function updateUltraButton(makeVisible = false, unlock = false) {
         "Meet the boss.",
         "Are you faster than a calculator?",
         
-        //Quotes
-        "“The only way to learn mathematics is to do mathematics.” – Paul Halmos",
-        "“What we learn with pleasure, we never forget.” – Alfred Mercier",
-        "“You never fail until you stop trying.” – Albert Einstein",
-        "“Mathematics is not a spectator sport.” – John Wesley Young",
-        "“Mathematics is the door and key to the sciences.” – Roger Bacon",
-        "“Mathematical knowledge adds vigor to the mind.” – John Locke",
-        "“Mathematics is the music of reason.” – James Joseph Sylvester"
+        //Quotes (\u2013 is en-dash, displays well in tooltip and DOM)
+        "“The only way to learn mathematics is to do mathematics.” \u2013 Paul Halmos",
+        "“What we learn with pleasure, we never forget.” \u2013 Alfred Mercier",
+        "“You never fail until you stop trying.” \u2013 Albert Einstein",
+        "“Mathematics is not a spectator sport.” \u2013 John Wesley Young",
+        "“Mathematics is the door and key to the sciences.” \u2013 Roger Bacon",
+        "“Mathematical knowledge adds vigor to the mind.” \u2013 John Locke",
+        "“Mathematics is the music of reason.” \u2013 James Joseph Sylvester"
     ];
 
     //Calculate
@@ -521,12 +534,19 @@ function updateUltraButton(makeVisible = false, unlock = false) {
         btn.title = msg;
         btn.querySelector("aside").innerHTML = msg.replaceAll("\n", "<br>");
     }
+    
     if (!isLocked) {
+        //Ultra Mode is not yet complete. Hard lockout.
+        btn.setAttribute("onclick", "");
+        const msg = "You have unlocked this mode but this feature is not yet complete. "
+            + "It should be ready next month.";
+        /*
         btn.classList.remove("locked");
         btn.disabled = false;
-        const msg = asides[Math.floor(Math.random() * asides.length)]
+        const msg = getDailyAside();
+        */
         btn.title = msg;
-        btn.querySelector("aside").textContent = msg;
+        btn.querySelector("aside").innerHTML = msg;
     }
 }
 
