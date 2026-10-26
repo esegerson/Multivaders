@@ -50,7 +50,6 @@ function gameDomLoaded() {
 
 function start() {
     if (selectedOperator === "ULTRA") {
-        document.getElementById("titleSelectOperator").style.display = "none";
         //Randomly select some facts for each of the four operators
         const numFactsPerOp = 8;
         const randomFactGrid = () => {
@@ -224,7 +223,9 @@ function gameLoop() {
     //Move all vaders down
     for (const vader of vaders) {
         let speed = parseFloat(vader.getAttribute("data-speed") || 1);
-        let speedNominal = speed / 2160 * window.innerHeight; //Original design was calibrated to a 4K monitor
+        let speedNominal = vader.classList.contains("runner") //Original design was calibrated to a fullscreen 4K monitor
+            ? speed / 3840 * window.innerWidth
+            : speed / 2160 * window.innerHeight; 
         if (overrideSpeed) speedNominal = 0;
         if (vader.classList.contains("runner")) {
             let left = parseFloat(vader.style.left);
@@ -242,6 +243,21 @@ function gameLoop() {
                 if (speedNominal < 0.2) speedNominal = 0.2; //Ensure a minimum speed
             }
             vader.style.top = (top + speedNominal) + "px";
+        }
+
+        //Adjust horizontal shift for regular vaders (from an incorrect value)
+        let hs = parseFloat(vader.getAttribute("data-horiz-speed")) || 0;
+        if (hs !== 0) {
+            hs *= 0.9; //Taper speed off each iteration
+            if (Math.abs(hs) < 0.001) hs = 0;
+            if (hs === 0)
+                vader.removeAttribute("data-horiz-speed");
+            else
+                vader.setAttribute("data-horiz-speed", hs);
+            hs *= window.innerWidth / 3840; //Scale against screen width
+            let left = parseFloat(vader.style.left);
+            left += hs;
+            vader.style.left = left + "px";
         }
     }
 
@@ -396,7 +412,8 @@ function spawnVader(id, init = false) {
         vader.style.left = direction < 0 ? "-200px" : window.innerWidth + 100 + "px";
         vader.style.top = (Math.random() * window.innerHeight * .7) + "px";
         vader.setAttribute("data-dir", direction);
-        vader.setAttribute("data-speed", parseFloat(vader.getAttribute("data-speed")) * 8);
+        let s = parseFloat(vader.getAttribute("data-speed")) * 8; //Much faster than reg vader
+        vader.setAttribute("data-speed", s); //8X speed
     }
     container.appendChild(vader);
     lastVaderSpawned = performance.now();
@@ -631,6 +648,17 @@ class keyListenerHelper {
                 v.classList.add("incorrect");
                 let speed = parseFloat(v.getAttribute("data-speed"));
                 v.setAttribute("data-speed", speed * 3); //Increase speed on incorrect answer
+
+                //Add "dodge" horizontal shift
+                if (!v.classList.contains("runner")) {
+                    let dodgeDir = Math.floor(Math.random() * 2) || -1;
+                    const left = parseInt(v.style.left);
+                    const screenW = window.innerWidth;
+                    if ((left < 400 && dodgeDir < 0) || (left > (screenW - 400) && dodgeDir > 0))
+                        dodgeDir *= -1; //Protect against dodging outside of window
+                    const hs = Math.random() * 20 + 20; //20-40
+                    v.setAttribute("data-horiz-speed", hs * dodgeDir);
+                }
             }
         }
     }

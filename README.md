@@ -62,8 +62,6 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
 
 - Fullscreen feature does not work on iPhone or iPad
 - Play Again and Main Menu buttons sometimes are not visible on the Game Over screen
-- An incorrect runner does not turn red
-- Runner speed should scale to width of screen so it crosses in the same amount of time on skinny or wide screens. Current behavior punishes players with skinny screens
 - Mouse sometimes does not hide during gameplay
 
 ## Recent Updates
@@ -79,7 +77,7 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
                 - Set D: Make 10 or 12
                 - Set E: Everything Else
             - Subtraction now has meaningful sets that mirror the addition sets:
-                - Set A: -0, -1, -2, make 0, make 1, make 2 (no change)
+                - Set A: -0, -1, -2, make 0, make 1, make 2
                 - Set B: subtract half, subtract 10, make 10
                 - set C: subtract near-half
                 - Set D: 10- or 12-
@@ -87,6 +85,7 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
             - Multiplication: no change
             - Division: no change
         - Default presets now have a description tooltip when you hover over them
+        - Answering a problem incorrectly now visually shifts to the side as if dodging
         - ULTRA MODE added
             - Button in menu is hidden until player shows interest in the game
             - Button in menu is locked until player shows proficiency in all operators
@@ -104,6 +103,8 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
         - Fixed runner orbiter ball orbit distance on mobile
         - Minor UI bug fixes
         - Death screen giant score zoom animation is improved
+        - Answering a runner incorrectly now marks it red
+        - Runner speed now scales with screen width instead of screen height
 - *October 2026:*
     - Quality-of-Life Enhancements:
         - Fullscreen button added
