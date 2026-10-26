@@ -54,11 +54,17 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
 - To prevent overlapping and legibility, darken problems that are behind the active problem; restore them when the active problem is solved
 - Possible difficulty recalibration to make scores over 100 really insane
 - The fewer the facts selected, the more powerful multishot becomes. Inversely, the more facts selected, the more useless multishot becomes. Find a way to even this out?
+- Runners take too long to appear
+- If player selects random facts and clicks Start Game, should display a pop-up to create a new set right there (textbox entry), with option to skip that and just play (current function).
+- Wrong answers should shimmy to the side as if dodging
 
 ## Known Bugs
 
 - Fullscreen feature does not work on iPhone or iPad
 - Play Again and Main Menu buttons sometimes are not visible on the Game Over screen
+- An incorrect runner does not turn red
+- Runner speed should scale to width of screen so it crosses in the same amount of time on skinny or wide screens. Current behavior punishes players with skinny screens
+- Mouse sometimes does not hide during gameplay
 
 ## Recent Updates
 
@@ -81,6 +87,14 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
             - Multiplication: no change
             - Division: no change
         - Default presets now have a description tooltip when you hover over them
+        - ULTRA MODE added
+            - Button in menu is hidden until player shows interest in the game
+            - Button in menu is locked until player shows proficiency in all operators
+            - Is currently hard-locked as functionality is not coded yet. Teaser:
+                - Will skip the main menu and jump right into the game
+                - Will mix all four operators together
+                - Will use a mix of all facts on the 12x12 grid
+                - Will have its own high score list
     - Quality-of-Life Enhancements:
         - Now auto-detects when there is poor performance (low framerate) and turns off extra graphical stuff (helps with mobile)
         - Ties in the high score list now favor the most recent entry
