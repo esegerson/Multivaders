@@ -842,6 +842,7 @@ function presetCustom(btn) {
         //Update UI
         deletePreset(document.getElementById("btnDeletePreset"));
         refreshCustomPresetButtons();
+        clearHoverPreset();
         return;
     } else {
         //Load this preset
@@ -893,7 +894,7 @@ function updateClearButton() {
     document.getElementById("btnMakePreset").disabled = noFactsSelected || !presetSelected;
     document.getElementById("btnMakePreset").title = noFactsSelected 
         ? "Select at least one multiplication fact to create a preset." 
-        : "Create a custom preset from the selected multiplication facts.";
+        : "Create a custom preset from the selected " + selectedOperator.toLowerCase() + " facts.";
     if (noFactsSelected) document.querySelectorAll("#presetButtons button.hover").forEach(b => b.classList.remove("hover"));
     closeNewPresetUi();
 }
