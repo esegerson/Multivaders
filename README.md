@@ -62,6 +62,16 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
 
 ## Recent Updates
 
+- *December 2026:*
+    - Game enhancements:
+        - ULTRA MODE added
+            - Button in operator menu is hidden until player shows *interest* in the game
+                - If you don't see it, play more
+            - Button is locked until player shows *proficiency* in all operators
+            - Skips the main menu and jumps right into the game
+            - Mixes all four operators together
+            - Uses a random subset of all facts on the 12x12 grid
+            - Has its own high score list
 - *November 2026:*
     - Game enhancements:
         - Default presets have been tweaked:
