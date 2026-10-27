@@ -1163,11 +1163,11 @@ function saveHighScore() {
         highscoreList.push(setEntry);
     }
 
-    //Add new score    
-    setEntry.scores.push(entry);
-
-    //Sort and trim
-    setEntry.scores.sort((a, b) => b.score - a.score);
+    //Insert new score at proper position
+    let insertAt = setEntry.scores.length;
+    for (let i = 0; i < insertAt; i++)
+        if (setEntry.scores[i].score <= entry.score) { insertAt = i; break; }
+    setEntry.scores.splice(insertAt, 0, entry);
     if (setEntry.scores.length > maxEntriesPerSet)
         setEntry.scores = setEntry.scores.slice(0, maxEntriesPerSet);
     
@@ -1373,6 +1373,7 @@ function viewHighScoresMainMenu() {
     if (selectedSetName === "") return; //Should not be possible; populate() requires this
     document.getElementById("highScoresMainMenu").style.display = "block";
     document.getElementById("gameTitle").style.display = "none";
+    score = 0; //Without this, function below will allow insertion of a new (dup) high score
     populateHighScoresUI();
 }
 

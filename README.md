@@ -35,12 +35,6 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
 
 ## TODO / Wishlist
 
-- Operator Menu:
-    - Add Ultra Mode
-        - Skips next menu and jump straight into game
-        - Random mix of all 4 operators
-        - Pre-select only 20 random facts out of total set space so multishot remains effective
-        - Random formats (stacked and inline only?)
 - Display the high score in the top-left corner during gameplay (or what your current rank is)
 - Improve the inevitable game-over experience; the game-over screen is basic, and currently the problems on-screen turn black when I feel like they should continue to bombard the bottom of the screen for 5 seconds
 - Improve how left and right arrows choose different problems.  Currently it just looks at horizontal position, but I'd like to take into account the vertical position, too.  If there's a problem near the bottom of the screen to the right, I'd like the right-arrow to select that one over the one right next to the active problem that's at the top of the screen.
@@ -87,15 +81,16 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
         - Default presets now have a description tooltip when you hover over them
         - Answering a problem incorrectly now visually shifts to the side as if dodging
         - ULTRA MODE added
-            - Button in menu is hidden until player shows interest in the game
-            - Button in menu is locked until player shows proficiency in all operators
-            - Is currently hard-locked as functionality is not coded yet. Teaser:
+            - Button in operator menu is hidden until player shows *interest* in the game
+            - Button is locked until player shows *proficiency* in all operators
+            - *Is currently hard-locked* as functionality is not yet coded. Teaser:
                 - Will skip the main menu and jump right into the game
                 - Will mix all four operators together
-                - Will use a mix of all facts on the 12x12 grid
+                - Will use a random subset of all facts on the 12x12 grid
                 - Will have its own high score list
     - Quality-of-Life Enhancements:
         - Now auto-detects when there is poor performance (low framerate) and turns off extra graphical stuff (helps with mobile)
+        - Your current score now shows your current rank, who you just beat and what score you need to beat next
         - Ties in the high score list now favor the most recent entry
         - You can now bookmark this game with an operator pre-selected
     - Bug fixes:

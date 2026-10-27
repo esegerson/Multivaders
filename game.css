@@ -287,6 +287,7 @@ button.delete:hover {
 }
 
 .score, #score2, #bigscore { color: yellow; font-size: 1.5rem; }
+.score { width: min-content; }
 #bigscore { 
     display: block; 
     position: absolute; 
@@ -706,23 +707,19 @@ ol.highscorelist {
     background-size: 1000%;
     font-weight: bold;
 }
-
 ol.highscorelist li {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 2fr;
     align-items: start;
 }
-
 ol.highscorelist li.new {
     -webkit-text-fill-color: initial;
     text-shadow: 0 0 1rem;
     transition: transform 2s ease-out;
 }
-
 ol.highscorelist li.new dd:nth-child(2) {
     text-transform: uppercase;
 }
-
 ol.highscorelist li.new:not(.full) dd:nth-child(2)::after {
     content: "_";
     animation: blink 1s steps(1) infinite;
@@ -751,19 +748,11 @@ ol.highscorelist li.kicked {
     z-index: 1;
     transition: opacity 5s ease-out, top 5s ease-out;
 }
-
 ol.highscorelist li.kicked.hidden { opacity: 0; top: 3rem; pointer-events: none; }
-
 ol.highscorelist li dl { display: contents; }
-
-ol.highscorelist li dt, ol.highscorelist li dd {
-    margin: 0;
-}
-
+ol.highscorelist li dt, ol.highscorelist li dd { text-align: center; margin: 0; }
 ol.highscorelist li dt { font-size: 1rem; position: relative; top: 0.4rem;}
-
 ol.highscorelist li *:nth-child(2) { letter-spacing: 0.1em; }
-
 ol.highscorelist li dd:last-child { text-align: right; }
 
 @keyframes rainbowShift {
