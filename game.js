@@ -30,6 +30,7 @@ let priorScreenWidth = window.innerWidth;
 let justExitedFullscreen = false;
 const graphicsMode = { Normal: 1, LowGraphics: 2 }
 let selectedGraphicsMode = graphicsMode.Normal;
+let scoreRankManager = null;
 
 let keybuffer = [];
 
@@ -112,8 +113,12 @@ function start() {
     window.scrollTo({ top: 0 }); //Fixes some weirdness when scrolled on menu
     document.body.classList.toggle("noscroll");
     document.querySelectorAll("#gameContainer .vader").forEach(v => v.remove()); //Clear previous vaders
+    scoreRankManager = new ScoreShiftManager(
+        document.getElementById("liveOldScores"), 
+        document.getElementById("liveCurScore"),
+        getHighScoresForSet(selectedSetName))
     score = -1;
-    incrementScore(); //Start score at 0
+    incrementScore(score, true); //Start score at 0
     resetBigScore();
     resetOrbiters();
     multishots = 0;
@@ -759,6 +764,7 @@ function incrementScore() {
     document.getElementById("score2").textContent = score;
     document.getElementById("pauseScore").textContent = score;
     document.getElementById("bigscore").textContent = score;
+    scoreRankManager.updateScore(score);
 }
 
 function tintBackground() {

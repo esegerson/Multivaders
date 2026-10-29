@@ -35,7 +35,6 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
 
 ## TODO / Wishlist
 
-- Display the high score in the top-left corner during gameplay (or what your current rank is)
 - Improve the inevitable game-over experience; the game-over screen is basic, and currently the problems on-screen turn black when I feel like they should continue to bombard the bottom of the screen for 5 seconds
 - Improve how left and right arrows choose different problems.  Currently it just looks at horizontal position, but I'd like to take into account the vertical position, too.  If there's a problem near the bottom of the screen to the right, I'd like the right-arrow to select that one over the one right next to the active problem that's at the top of the screen.
     - Maybe use the mouse like a left-right paddle to select?
@@ -48,15 +47,16 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
 - To prevent overlapping and legibility, darken problems that are behind the active problem; restore them when the active problem is solved
 - Possible difficulty recalibration to make scores over 100 really insane
 - The fewer the facts selected, the more powerful multishot becomes. Inversely, the more facts selected, the more useless multishot becomes. Find a way to even this out?
-- Runners take too long to appear
+- Runners take too long to appear (particularly when score < 20)
 - If player selects random facts and clicks Start Game, should display a pop-up to create a new set right there (textbox entry), with option to skip that and just play (current function).
-- Wrong answers should shimmy to the side as if dodging
+- Add favicon.ico
 
 ## Known Bugs
 
 - Fullscreen feature does not work on iPhone or iPad
 - Play Again and Main Menu buttons sometimes are not visible on the Game Over screen
 - Mouse sometimes does not hide during gameplay
+- If a set is selected and you switch operators, the set button is still selected
 
 ## Recent Updates
 
@@ -72,8 +72,8 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
                 - Set E: Everything Else
             - Subtraction now has meaningful sets that mirror the addition sets:
                 - Set A: -0, -1, -2, make 0, make 1, make 2
-                - Set B: subtract half, subtract 10, make 10
-                - set C: subtract near-half
+                - Set B: Subtract half, subtract 10, make 10
+                - Set C: Subtract near-half
                 - Set D: 10- or 12-
                 - Set E: Everything else
             - Multiplication: no change

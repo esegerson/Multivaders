@@ -1454,3 +1454,158 @@ function onScreenKeyboardAlphaClick(event) {
             break;
     }
 }
+
+//This class manages the score animation in the top-left
+class ScoreShiftManager {
+    constructor(rankElement, scoreElement, highscores, initialScore = 0) {
+        this.rankEl = rankElement;       //DOM element for the animation/display, #liveOldScore
+        this.scoreEl = scoreElement;     //Static element that just displays the score
+        this.highscores = highscores;    //From LocalStorage
+        this.queue = [];                 //Queue holding score checkpoints for sequential shifting
+        this.isProcessing = false;       //Lock during the 2-second window
+        this.lastScore = initialScore;   //Tracks the player's score before the latest update
+        this.currentScoreIndex = this.findCurrentScoreIndex(initialScore);
+
+        //Track current display state
+        this.currentBeaten = null;
+        this.currentGoal = null;
+        this.currentNextGoal = null;
+
+        //Initialize the DOM
+        this.rankEl.classList.add("primed");
+        this.updateDisplayValues(this.calculateRelativePositions(this.lastScore));
+        this.updateCurScore();
+    }
+
+    findCurrentScoreIndex(score) {
+        //Walk from the front of the descending leaderboard until we hit the first score at or below
+        //the current score. That gives the exact insertion point and keeps the queue anchored to the
+        //next threshold to be crossed, including repeated values like three 9s.
+        let index = 0;
+        while (index < this.highscores.length && this.highscores[index].score > score)
+            index += 1;
+        return index;
+    }
+
+    /**
+     * Call this whenever the player's score changes. 
+     * It calculates all high score thresholds crossed and queues shifts accordingly.
+     * @param {number} newScore - The player's updated score
+     */
+    updateScore(newScore) {
+        if (newScore <= this.lastScore) {
+            this.lastScore = newScore;
+            this.currentScoreIndex = this.findCurrentScoreIndex(newScore);
+            this.updateCurScore();
+            return;
+        }
+
+        //Queue every threshold the player crossed. Because the leaderboard is descending, the index
+        //moves toward the front of the array as the score increases, which preserves each duplicate
+        //threshold separately (for example, each 9 in [16, 9, 9, 9, 6, 3]).
+        while (this.currentScoreIndex > 0 && this.highscores[this.currentScoreIndex - 1].score <= newScore) {
+            const targetIndex = this.currentScoreIndex - 1;
+            this.queue.push({
+                targetScore: newScore,
+                targetIndex
+            });
+            this.currentScoreIndex = targetIndex;
+        }
+
+        this.lastScore = newScore;
+        this.updateCurScore();
+
+        if (!this.isProcessing) this.processQueue();
+    }
+
+    async processQueue() {
+        if (this.queue.length === 0) {
+            this.isProcessing = false;
+            return;
+        }
+
+        this.isProcessing = true;
+        const shiftTask = this.queue.shift();
+
+        //TRIGGER SHIFT: Remove "primed" class to start exit/shift animation
+        this.rankEl.classList.remove("primed");
+
+        //Calculate relative positions based on the exact threshold crossed so duplicate values
+        //can advance sequentially instead of collapsing into a single "same score" result.
+        const newPositions = this.calculateRelativePositions(
+            shiftTask.targetScore,
+            shiftTask.targetIndex
+        );
+
+        //WAIT UNTIL SHIFT ANIMATION COMPLETES: Block updates and shifts during this window
+        await new Promise(resolve => setTimeout(resolve, 1500));
+
+        //UPDATE VALUES: Update display data after the delay
+        this.updateDisplayValues(newPositions);
+
+        //RESET PRIMED: Add "primed" class back for resting/active state
+        this.rankEl.classList.add("primed");
+
+        //WAIT A BIT MORE: for screen to redraw the class added back in
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        //CONTINUE QUEUE: Process next shift if any remain
+        this.processQueue();
+    }
+
+    calculateRelativePositions(score, targetIndex = null) {
+        //When we know the exact threshold index being crossed, use it. This preserves the distinct
+        //duplicate entries (three 9s all count as separate steps in the queue).
+        if (targetIndex != null && targetIndex >= 0 && targetIndex < this.highscores.length) {
+            const beaten = this.highscores[targetIndex] ?? null;
+            const goal = targetIndex > 0 ? this.highscores[targetIndex - 1] : null;
+            const nextGoal = targetIndex > 1 ? this.highscores[targetIndex - 2] : null;
+            return { beaten, goal, nextGoal };
+        }
+
+        // Fallback for a generic call without a queued target index.
+        let beaten = null;
+        let goal = null;
+        let nextGoal = null;
+
+        if (score > 0) {
+            const beatenCandidates = this.highscores
+                .filter(entry => entry.score <= score)
+                .sort((a, b) => b.score - a.score);
+            beaten = beatenCandidates[0] ?? null;
+        }
+
+        const higherScores = this.highscores
+            .filter(entry => entry.score > score)
+            .sort((a, b) => a.score - b.score);
+
+        if (higherScores.length > 0) {
+            goal = higherScores[0];
+            if (higherScores.length > 1) nextGoal = higherScores[1];
+        }
+
+        return { beaten, goal, nextGoal };
+    }
+
+    updateCurScore() {
+        this.scoreEl.children[0].children[0].children[2].textContent = this.lastScore;
+    }
+
+    updateDisplayValues({ beaten, goal, nextGoal }) {
+        this.currentBeaten = beaten;
+        this.currentGoal = goal;
+        this.currentNextGoal = nextGoal;
+
+        const populateDl = function(el, scoreObj) {
+            el.children[0].innerHTML = scoreObj === null ? "&nbsp;" : ordinal(scoreObj.rank);
+            el.children[1].innerHTML = scoreObj?.initials ?? "&nbsp;";
+            el.children[2].innerHTML = scoreObj?.score ?? "&nbsp;";
+            el.children[3].innerHTML = scoreObj?.date ?? "&nbsp;";
+        };
+
+        this.updateCurScore();
+        populateDl(this.rankEl.children[0].children[0], nextGoal);
+        populateDl(this.rankEl.children[1].children[0], goal);
+        populateDl(this.rankEl.children[2].children[0], beaten);
+    }
+}
