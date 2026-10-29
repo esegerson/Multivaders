@@ -56,7 +56,6 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
 - Fullscreen feature does not work on iPhone or iPad
 - Play Again and Main Menu buttons sometimes are not visible on the Game Over screen
 - Mouse sometimes does not hide during gameplay
-- If a set is selected and you switch operators, the set button is still selected
 
 ## Recent Updates
 
