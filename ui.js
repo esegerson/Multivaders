@@ -944,6 +944,7 @@ function savePreset() {
     closeNewPresetUi();
     const newBtn = Array.from(document.getElementById("presetList").querySelectorAll("button")).find(b => b.textContent === presetName);
     newBtn.classList.add("selected");
+    selectedSetName = presetName;
 }
 
 function deletePreset(deleteButton) {
