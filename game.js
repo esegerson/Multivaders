@@ -118,7 +118,7 @@ function start() {
         document.getElementById("liveCurScore"),
         getHighScoresForSet(selectedSetName))
     score = -1;
-    incrementScore(score, true); //Start score at 0
+    incrementScore(); //Start score at 0
     resetBigScore();
     resetOrbiters();
     multishots = 0;
