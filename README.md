@@ -44,6 +44,7 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
     - Backspace "click"
     - Game over "groan" or explosion
 - Move graphics code from game.js to separate graphics.js file
+    - Refactor and clean up global space
 - To prevent overlapping and legibility, darken problems that are behind the active problem; restore them when the active problem is solved
 - Possible difficulty recalibration to make scores over 100 really insane
 - The fewer the facts selected, the more powerful multishot becomes. Inversely, the more facts selected, the more useless multishot becomes. Find a way to even this out?
