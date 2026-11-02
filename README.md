@@ -64,15 +64,17 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
     - Game enhancements:
         - ULTRA MODE added
             - Button in operator menu is hidden until player shows *interest* in the game
-                - If you don't see it, play more
             - Button is locked until player shows *proficiency* in all operators
             - Skips the main menu and jumps right into the game
             - Mixes all four operators together
             - Uses a random subset of all facts on the 12x12 grid
+            - Mixes all formats together
             - Has its own high score list
+        - Game is much harder with scores over 100 - the way it was intended to be
     - Bug fixes:
-        - TODO: Problems no longer shift off the screen
-        - TODO: Runners no longer take forever to appear when the score is less than 20
+        - Problems no longer shift off the screen
+        - Runners no longer take forever to appear when the score is less than 20
+        - Scrolling rank next to score removed for non-preset games
 - *November 2026:*
     - Game enhancements:
         - Default presets have been tweaked:

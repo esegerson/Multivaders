@@ -257,7 +257,7 @@ function gameLoop() {
         let hs = parseFloat(vader.getAttribute("data-horiz-speed")) || 0;
         if (hs !== 0) {
             hs *= 0.9; //Taper speed off each iteration
-            if (Math.abs(hs) < 0.001) hs = 0;
+            if (Math.abs(hs) < 0.01) hs = 0;
             if (hs === 0)
                 vader.removeAttribute("data-horiz-speed");
             else
@@ -424,6 +424,18 @@ function spawnVader(id, init = false) {
         vader.setAttribute("data-speed", s); //8X speed
     }
     container.appendChild(vader);
+    
+    //Adjust initial position now that size can be calculated
+    const size = vader.getBoundingClientRect();
+    if (vader.classList.contains("runner")) {
+        if (parseInt(vader.getAttribute("data-dir")) === -1)
+            vader.style.left = "-" + (size.width * 1.3) + "px"; //Multiplier ensure orbiters are off-screen
+        else
+            vader.style.left = window.innerWidth + (size.width * 1.2) + "px";
+    } else {
+        vader.style.top = "-" + size.height + "px"; //Start just above the viewport
+    }
+
     lastVaderSpawned = performance.now();
 }
 
@@ -668,7 +680,7 @@ class keyListenerHelper {
                     let dodgeDir = Math.floor(Math.random() * 2) || -1;
                     const left = parseInt(v.style.left);
                     const screenW = window.innerWidth;
-                    if ((left < 400 && dodgeDir < 0) || (left > (screenW - 400) && dodgeDir > 0))
+                    if ((left < screenW * 0.1 && dodgeDir < 0) || (left > (screenW * 0.8) && dodgeDir > 0))
                         dodgeDir *= -1; //Protect against dodging outside of window
                     const hs = Math.random() * 20 + 20; //20-40
                     v.setAttribute("data-horiz-speed", hs * dodgeDir);
