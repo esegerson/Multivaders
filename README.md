@@ -70,6 +70,9 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
             - Mixes all four operators together
             - Uses a random subset of all facts on the 12x12 grid
             - Has its own high score list
+    - Bug fixes:
+        - TODO: Problems no longer shift off the screen
+        - TODO: Runners no longer take forever to appear when the score is less than 20
 - *November 2026:*
     - Game enhancements:
         - Default presets have been tweaked:
@@ -90,14 +93,7 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
             - Division: no change
         - Default presets now have a description tooltip when you hover over them
         - Answering a problem incorrectly now visually shifts to the side as if dodging
-        - ULTRA MODE added
-            - Button in operator menu is hidden until player shows *interest* in the game
-            - Button is locked until player shows *proficiency* in all operators
-            - *Is currently hard-locked* as functionality is not yet coded. Teaser:
-                - Will skip the main menu and jump right into the game
-                - Will mix all four operators together
-                - Will use a random subset of all facts on the 12x12 grid
-                - Will have its own high score list
+        - ULTRA MODE teaser button added
     - Quality-of-Life Enhancements:
         - Now auto-detects when there is poor performance (low framerate) and turns off extra graphical stuff (helps with mobile)
         - Your current score now shows your current rank, who you just beat and what score you need to beat next

@@ -295,8 +295,8 @@ function gameLoop() {
 
     //Autosolve (secret mode)
     if (autoSolve) {
-        let getSolution = (factA, factB) => {
-            switch (selectedOperator) {
+        let getSolution = (factA, factB, op) => {
+            switch (op) {
                 case Operator.ADDITION:         return factA + factB;
                 case Operator.SUBTRACTION:      return factA - factB;
                 case Operator.MULTIPLICATION:   return factA * factB;
@@ -317,7 +317,7 @@ function gameLoop() {
             autoSolveInProgress = true;
             let activeVader = document.querySelector("#gameContainer .vader.active");
             let facts = getFactsFromVader(activeVader);
-            let result = getSolution(facts.factA, facts.factB);
+            let result = getSolution(facts.factA, facts.factB, facts.op);
             let delay = 0;
             for (let c of result.toString()) {
                 setTimeout(() => { sendKeyPress(c); }, delay);
@@ -607,8 +607,8 @@ function keyListener(e) {
 
 class keyListenerHelper {
     static doEnter(activeVader, result) {
-        const getExpectedResult = (factA, factB) => {
-            switch (selectedOperator) {
+        const getExpectedResult = (factA, factB, op) => {
+            switch (op) {
                 case Operator.ADDITION:         return factA + factB;
                 case Operator.SUBTRACTION:      return factA - factB;
                 case Operator.MULTIPLICATION:   return factA * factB;
@@ -616,7 +616,7 @@ class keyListenerHelper {
             }
         };
         const facts = getFactsFromVader(activeVader);
-        const expectedResult = getExpectedResult(facts.factA, facts.factB);
+        const expectedResult = getExpectedResult(facts.factA, facts.factB, facts.op);
         const relatedVaders = multishotActive()
                 ? [activeVader, ...getRelatedVaders(activeVader)]
                 : [activeVader];
@@ -981,8 +981,8 @@ function vaderIsSame(vader1, vader2) {
     let facts1 = getFactsFromVader(vader1);
     let facts2 = getFactsFromVader(vader2);
     return facts1.id !== facts2.id 
-        && ((facts1.factA === facts2.factA && facts1.factB === facts2.factB)
-        || (facts1.factA === facts2.factB && facts1.factB === facts2.factA));
+        && ((facts1.factA === facts2.factA && facts1.factB === facts2.factB && facts1.op === facts2.op)
+        ||  (facts1.factA === facts2.factB && facts1.factB === facts2.factA && facts1.op === facts2.op));
 }
 
 function initMultishot() {
@@ -1019,7 +1019,8 @@ function getFactsFromVader(vader) {
     const id = vader.getAttribute("id");
     const factA = parseInt(vader.querySelector(".factA").textContent);
     const factB = parseInt(vader.querySelector(".factB").textContent);
-    return { id, factA, factB };
+    const op = Object.values(Operator).find(o => vader.classList.contains(o)) ?? null;
+    return { id, factA, factB, op };
 }
 
 function networkFor(vader) {

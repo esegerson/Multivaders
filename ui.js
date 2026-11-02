@@ -331,6 +331,7 @@ function selectOperator(operator) {
         var btn = document.getElementById("btnUltra");
         if (btn.disabled || btn.classList.contains("hidden") || btn.classList.contains("locked")) return; //Failsafe
         document.getElementById("titleSelectOperator").style.display = "none";
+        selectedOperator = operator;
         start();
         return;
     }
@@ -709,15 +710,9 @@ function updateUltraButton(makeVisible = false, unlock = false) {
     }
     
     if (!isLocked) {
-        //Ultra Mode is not yet complete. Hard lockout.
-        btn.setAttribute("onclick", "");
-        const msg = "You have unlocked this mode but this feature is not yet complete. "
-            + "It should be ready next month.";
-        /*
         btn.classList.remove("locked");
         btn.disabled = false;
         const msg = getDailyAside();
-        */
         btn.title = msg;
         btn.querySelector("aside").innerHTML = msg;
     }
