@@ -53,10 +53,12 @@ function start() {
     if (selectedOperator === "ULTRA") {
         //Randomly select some facts for each of the four operators
         const numFactsPerOp = 8;
-        const randomFactGrid = () => {
+        const randomFactGrid = (isDivision = false) => {
             return {
                 factA: Math.floor(Math.random() * 13),
-                factB: Math.floor(Math.random() * 13)
+                factB: isDivision 
+                    ? Math.floor(Math.random() * 12) + 1 //Do not allow division by zero
+                    : Math.floor(Math.random() * 13)
             };
         };
         selectedProblems = [];
@@ -70,7 +72,7 @@ function start() {
                     f.factA = t.factA + t.factB;
                     f.factB = t.factB;
                 } else if (op === Operator.DIVISION) {
-                    const t = randomFactGrid();
+                    const t = randomFactGrid(true);
                     f.factA = t.factA * t.factB;
                     f.factB = t.factB;
                 }
