@@ -119,6 +119,7 @@ function start() {
         document.getElementById("liveOldScores"), 
         document.getElementById("liveCurScore"),
         getHighScoresForSet(selectedSetName))
+    if (selectedSetName === "") scoreRankManager.hideRank(); else scoreRankManager.showRank();
     score = -1;
     incrementScore(); //Start score at 0
     resetBigScore();

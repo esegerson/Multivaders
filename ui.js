@@ -1604,4 +1604,8 @@ class ScoreShiftManager {
         populateDl(this.rankEl.children[1].children[0], goal);
         populateDl(this.rankEl.children[2].children[0], beaten);
     }
+
+    showRank() { this.rankEl.style.display = ""; }
+
+    hideRank() { this.rankEl.style.display = "none"; }
 }
