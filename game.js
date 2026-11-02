@@ -467,7 +467,13 @@ function createVader(id, factA, factB, op) {
 function getSpeed(variance = 1) {
     //Variance = 1 allows some randomness to the speed,
     //but that's annoying when displaying a speed stat, so variance = 0 kills that
-    const difficulty = score / 3;
+    const calcDifficulty = function(s) {
+        if (s < 80) return s / 3; //Classic linear progression
+        const baseMilestone = 80 / 3;
+        const scaleFactor = 1.03; //Roughly 1.4X the old speed at 100, 2X at 120, 3X at 140, and 9X at 200
+        return baseMilestone * Math.pow(scaleFactor, (s - 80)); //Exponential
+    };
+    const difficulty = calcDifficulty(score);
     let rv = Math.round((Math.random() * variance * difficulty / 2 + difficulty) * 10) / 200;
     if (rv < 0.2) rv = 0.2; //Ensure a minimum speed
 
@@ -502,8 +508,8 @@ function getDelay() {
         and by 100 points, the delay is down to 1 second, which is insanely difficult.
     */
     let seconds = 460 / (score + 20) - 2.87 - hitCeiling;
-    if (seconds < 0.4 && hitCeiling > 0) seconds = 0.4; //If the user is hitting the ceiling, allow a faster rate
-    if (seconds < 0.7 && hitCeiling == 0) seconds = 0.7; //Ensure a minimum delay
+    if (seconds < 0.3 && hitCeiling > 0) seconds = 0.3; //If the user is hitting the ceiling, allow a faster rate
+    if (seconds < 0.5 && hitCeiling == 0) seconds = 0.5; //Ensure a minimum delay
     return seconds * 1000;
 }
 
