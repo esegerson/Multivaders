@@ -22,6 +22,9 @@
                 <button onclick="selectOperator('SUBTRACTION')"><span>&minus;</span>Subtraction</button>
                 <button onclick="selectOperator('MULTIPLICATION')"><span>&times;</span>Multiplication</button>
                 <button onclick="selectOperator('DIVISION')"><span>&divide;</span>Division</button>
+                <button onclick="selectOperator('ULTRA')" disabled class="hidden locked" 
+                    id="btnUltra"><span>&#8252;</span>Ultra Mode<aside>Play more to 
+                    unlock!</aside></button>
             </p>
         </div>
         <div id="gameTitle" style="display: none;">
@@ -143,12 +146,19 @@
                 <li><span>4</span> extra points if you clear the screen</li>
                 <li><span>8</span> extra points if you clear the screen soon after the last clear</li>
                 <li>The game gets harder the more points you score!  Can you beat <span>100</span>?</span></li>
-4            </ul>
+            </ul>
 
-            <!--<p>Coming Soon:</p>
+            <p>Coming Soon:</p>
             <ul class="tips">
-                <li></li>
-            </ul>-->
+                <li><b>Ultra Mode!</b> For when division isn't hard enough.</li>
+            </ul>
+
+            <p>Disclaimers:</p>
+            <ul class="tips">
+                <li>High scores are stored locally on your browser.</li>
+                <li>No third-party resources are used.</li>
+                <li>You are not being spied on or tracked.</li>
+            </ul>
 
             <p><a href="https://github.com/esegerson/Multivaders" target="code">View the code</a> that makes this game.</p>
         </div>
@@ -163,7 +173,17 @@
             </button>
             <button class="fullscreen" onclick="toggleFullscreen()" title="Toggle Fullscreen">&#x26F6;</button>
         </div>
-        <div class="score">Score: <span id="score">0</span><span id="bigscore" class="hidden"></span></div>
+        <div class="score">
+            <div id="scoreLabel">Score:</div> <span id="score">0</span><span id="bigscore" class="hidden"></span>
+            <ol id="liveOldScores" class="highscorelist primed">
+                <li><dl><dt></dt><dd></dd><dd></dd><dd></dd></dl></li>
+                <li><dl><dt></dt><dd></dd><dd></dd><dd></dd></dl></li>
+                <li><dl><dt></dt><dd></dd><dd></dd><dd></dd></dl></li>
+            </ol>
+            <ol id="liveCurScore" class="highscorelist">
+                <li><dl><dt></dt><dd></dd><dd>10</dd><dd></dd></dl></li>
+            </ol>
+        </div>
         <div id="tipContainer"></div>
         <div class="decoration">
             <div id="svgContainer">
@@ -233,7 +253,6 @@
             </div>
         </div>
         <div class="background"></div>
-        <div class="background2"></div>
         <div id="statsContainer"></div>
         <div id="vaderContainer"></div>
         <div id="svgContainerBehind">

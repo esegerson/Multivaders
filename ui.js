@@ -17,69 +17,81 @@ const Format = Object.freeze({
 const hardcodedPresets = [
     //ADDITION
     //These sets were constructed with a focus on conceptual understanding and strategies while keeping to four sets of similar sizes
-    { name: "Set A", operator: Operator.ADDITION, facts: [ //Basic Concepts: Identity (+0), Successor (+1), and Skip Count (+2) - 57 facts
-        [0,0], [1,0], [2,0], [3,0], [4,0], [5,0], [6,0], [7,0], [8,0], [9,0], [10,0], [11,0], [12,0],
-        [0,1], [0,2], [0,3], [0,4], [0,5], [0,6], [0,7], [0,8], [0,9], [0,10], [0,11], [0,12],
-        [1,1], [2,1], [3,1], [4,1], [5,1], [6,1], [7,1], [8,1], [9,1], [10,1], [11,1], [12,1],
-        [1,2], [1,3], [1,4], [1,5], [1,6], [1,7], [1,8], [1,9], [1,10], [1,11], [1,12],
-        [2,2], [3,2], [4,2], [5,2], [6,2], [7,2], [8,2], [9,2], [10,2], [11,2], [12,2],
-        [2,3], [2,4], [2,5], [2,6], [2,7], [2,8], [2,9], [2,10], [2,11], [2,12]]
+    { name: "Set A", operator: Operator.ADDITION, description: "Add 0 (identity); add 1 (count on); add 2 (count on two)", facts: [
+        [0,0], [1,0], [2,0], [3,0], [4,0], [5,0], [6,0], [7,0], [8,0], [9,0], [11,0],
+        [0,1], [0,2], [0,3], [0,4], [0,5], [0,6], [0,7], [0,8], [0,9], [0,11],
+        [3,1], [4,1], [5,1], [6,1], [7,1], [8,1], [12,1],
+        [1,3], [1,4], [1,5], [1,6], [1,7], [1,8], [1,12],
+        [4,2], [5,2], [6,2], [7,2], [9,2], [11,2], [12,2],
+        [2,4], [2,5], [2,6], [2,7], [2,9], [2,11], [2,12]]
     },
-    { name: "Set B", operator: Operator.ADDITION, facts: [ //Anchors & Relationships: Doubles, Near Doubles (+/- 1), and Friends of 10 - 32 facts
-        //Doubles (excluding 0, 1, 2)
-        [3,3], [4,4], [5,5], [6,6], [7,7], [8,8], [9,9], [10,10], [11,11], [12,12],
-        //Doubles Plus One (excluding pairs involving 0, 1, 2)
-        [3,4], [4,3], [4,5], [5,4], [5,6], [6,5], [6,7], [7,6], [7,8], [8,7],
-        [8,9], [9,8], [9,10], [10,9], [10,11], [11,10], [11,12], [12,11],
-        //Friends of 10 (excluding 5+5 which is already in doubles, and pairs with 1, 2)
-        [3,7], [7,3], [4,6], [6,4]]
+    { name: "Set B", operator: Operator.ADDITION, description: "Doubles and add ten", facts: [
+        //Doubles (excluding 0)
+        [1,1], [2,2], [3,3], [4,4], [5,5], [6,6], [7,7], [8,8], [9,9], [10,10], [11,11], [12,12],
+        //Tens (excluding 10+11 and 10+12)
+        [0,10], [1,10], [2,10], [3,10], [4,10], [5,10], [6,10], [7,10], [8,10],
+        [10,0], [10,1], [10,2], [10,3], [10,4], [10,5], [10,6], [10,7], [10,8]]
     },
-    { name: "Set C", operator: Operator.ADDITION, facts: [ //Base-10 Strategies: Make a 10 (+8, +9) and Place Value (+10, +11) - 42 facts
-        //Make 10 (+9 and +8 facts not covered above)
-        [9,3], [3,9], [9,4], [4,9], [9,5], [5,9], [9,6], [6,9], [9,7], [7,9],
-        [8,3], [3,8], [8,4], [4,8], [8,5], [5,8], [8,6], [6,8],
-        //Place Value Shifts (+10 and +11 facts not covered above)
-        [10,3], [3,10], [10,4], [4,10], [10,5], [5,10], [10,6], [6,10], [10,7], [7,10], [10,8], [8,10],
-        [11,3], [3,11], [11,4], [4,11], [11,5], [5,11], [11,6], [6,11], [11,7], [7,11], [11,8], [8,11], [11,9], [9,11]]
+    { name: "Set C", operator: Operator.ADDITION, description: "Near-doubles", facts: [
+        [1,2], [2,3], [3,4], [4,5], [5,6], [6,7], [7,8], [8,9], [9,10], [10,11], [11,12],
+        [2,1], [3,2], [4,3], [5,4], [6,5], [7,6], [8,7], [9,8], [10,9], [11,10], [12,11]]
     },
-    { name: "Set D", operator: Operator.ADDITION, facts: [ //Everything Else: Higher bridging & flexible decomposition strategies - 38 facts
-        [3,5], [5,3], [3,6], [6,3], [4,7], [7,4], [3,12], [12,3], [4,12], [12,4], [5,7], [7,5], [5,12], [12,5], [6,12], [12,6],
-        [7,8], [8,7], [7,12], [12,7], [8,9], [9,8], [8,12], [12,8], [9,12], [12,9], [10,12], [12,10], [11,12], [12,11]]
+    { name: "Set D", operator: Operator.ADDITION, description: "Make ten or twelve", facts: [
+        [10,0], [9,1], [8,2], [7,3], [6,4], [5,5], [4,6], [3,7], [2,8], [1,9], [0,10],
+        [12,0], [11,1], [10,2], [9,3], [8,4], [7,5], [6,6], [5,7], [4,8], [3,9], [2,10], [1,11], [0,12]]
+    },
+    { name: "Set E", operator: Operator.ADDITION, description: "Everything else", facts: [
+        [3,5], [3,6], [3,8], [3,11], [3,12], [4,7], [4,9], [4,11], [4,12], [5,8], [5,9], [5,11], [5,12],
+        [6,8], [6,9], [6,11], [6,12], [7,9], [7,11], [7,12], [8,11], [8,12], [9,11], [9,12], [10,12],
+        [5,3], [6,3], [8,3], [11,3], [12,3], [7,4], [9,4], [11,4], [12,4], [8,5], [9,5], [11,5], [12,5],
+        [8,6], [9,6], [11,6], [12,6], [9,7], [11,7], [12,7], [11,8], [12,8], [11,9], [12,9], [12,10]]
     },
     
     //SUBTRACTION
-    //Format [minuend, subtrahend] (e.g., 6 - 4 = 2 is [6,4])
-    { name: "Set A", operator: Operator.SUBTRACTION, facts: [ 
-        [2,1], [3,1], [4,2]]
+    //Mirrors the addition sets above. Format [minuend, subtrahend] (e.g., 6 - 4 = 2 is [6,4])
+    { name: "Set A", operator: Operator.SUBTRACTION, description: "Subtract 0, 1 or 2; difference 0, 1, or 2", facts: [
+        [0,0], [1,0], [2,0], [3,0], [4,0], [5,0], [6,0], [7,0], [8,0], [9,0], [11,0],
+        [1,1], [2,2], [3,3], [4,4], [5,5], [6,6], [7,7], [8,8], [9,9], [11,11],
+        [4,1], [5,1], [6,1], [7,1], [8,1], [9,1], [13,1],
+        [4,3], [5,4], [6,5], [7,6], [8,7], [9,8], [13,12],
+        [6,2], [7,2], [8,2], [9,2], [11,2], [13,2], [14,2],
+        [6,4], [7,5], [8,6], [9,7], [11,9], [13,11], [14,12]]
     },
-    { name: "Set B", operator: Operator.SUBTRACTION, facts: [
-        [4,2], [5,2], [6,3]]
+    { name: "Set B", operator: Operator.SUBTRACTION, description: "Subtract half; subtract 10; difference 10", facts: [
+        [2,1], [4,2], [6,3], [8,4], [10,5], [12,6], [14,7], [16,8], [18,9], [20,10], [22,11], [24,12],
+        [10,10], [11,10], [12,10], [13,10], [14,10], [15,10], [16,10], [17,10], [18,10],
+        [10,0], [11,1], [12,2], [13,3], [14,4], [15,5], [16,6], [17,7], [18,8]]
     },
-    { name: "Set C", operator: Operator.SUBTRACTION, facts: [
-        [6,4], [7,3], [8,2]]
+    { name: "Set C", operator: Operator.SUBTRACTION, description: "Subtract near-half", facts: [
+        [3,2], [5,3], [7,4], [9,5], [11,6], [13,7], [15,8], [17,9], [19,10], [21,11], [23,12],
+        [3,1], [5,2], [7,3], [9,4], [11,5], [13,6], [15,7], [17,8], [19,9], [21,10], [23,11]]
     },
-    { name: "Set D", operator: Operator.SUBTRACTION, facts: [
-        [8,4], [9,3], [10,2]]
+    { name: "Set D", operator: Operator.SUBTRACTION, description: "Ten-minus, twelve-minus", facts: [
+        [10,0], [10,1], [10,2], [10,3], [10,4], [10,5], [10,6], [10,7], [10,8], [10,9], [10,10],
+        [12,0], [12,1], [12,2], [12,3], [12,4], [12,5], [12,6], [12,7], [12,8], [12,9], [12,10], [12,11], [12,12]]
     },
-    { name: "Set E", operator: Operator.SUBTRACTION, facts: [
-        [10,5], [11,4], [12,3]]
+    { name: "Set E", operator: Operator.SUBTRACTION, description: "Everything else", facts: [
+        [8,5], [9,6], [11,8], [14,11], [15,12], [11,7], [13,9], [15,11], [16,12], [13,8], [14,9], [16,11], [17,12], 
+        [14,8], [15,9], [17,11], [18,12], [16,9], [18,11], [19,12], [19,11], [20,12], [20,11], [21,12], [22,12],
+        [8,3], [9,3], [11,3], [14,3], [15,3], [11,4], [13,4], [15,4], [16,4], [13,5], [14,5], [16,5], [17,5], 
+        [14,6], [15,6], [17,6], [18,6], [16,7], [18,7], [19,7], [19,8], [20,8], [20,9], [21,9], [22,10]]
     },
 
     //MULTIPLICATION
     //From "Simply Good and Beautiful Math 3" curriculum. Set E is "everything else"
-    { name: "Set A", operator: Operator.MULTIPLICATION, facts: [ 
+    { name: "Set A", operator: Operator.MULTIPLICATION, description: "Set A", facts: [ 
         [3,3], [6,6], [5,3], [8,4], [8,8], [3,4], [5,5], [9,9], [6,4], [3,5], [4,8], [4,3], [4,6]]
     },
-    { name: "Set B", operator: Operator.MULTIPLICATION, facts: [
+    { name: "Set B", operator: Operator.MULTIPLICATION, description: "Set B", facts: [
         [4,4], [4,5], [7,3], [7,4], [8,5], [8,7], [9,3], [9,4], [9,5], [5,4], [3,7], [4,7], [5,8], [7,8], [3,9], [4,9], [5,9]]
     },
-    { name: "Set C", operator: Operator.MULTIPLICATION, facts: [
+    { name: "Set C", operator: Operator.MULTIPLICATION, description: "Set C", facts: [
         [5,6], [5,7], [6,3], [6,8], [7,6], [7,7], [7,9], [8,3], [9,6], [9,8], [6,5], [7,5], [3,6], [8,6], [6,7], [9,7], [3,8], [6,9], [8,9]]
     },
-    { name: "Set D", operator: Operator.MULTIPLICATION, facts: [
+    { name: "Set D", operator: Operator.MULTIPLICATION, description: "Set D", facts: [
         [12,3], [12,4], [12,5], [12,6], [12,7], [12,8], [12,9], [12,11], [12,12], [3,12], [4,12], [5,12], [6,12], [7,12], [8,12], [9,12], [11,12]]
     },
-    { name: "Set E", operator: Operator.MULTIPLICATION, facts: [
+    { name: "Set E", operator: Operator.MULTIPLICATION, description: "Everything else", facts: [
         [1,1], [1,2], [1,3], [1,4], [1,5], [1,6], [1,7], [1,8], [1,9], [1,10], [1,11], [1,12], 
         [2,1], [3,1], [4,1], [5,1], [6,1], [7,1], [8,1], [9,1], [10,1], [11,1], [12,1], 
         [2,2], [2,3], [2,4], [2,5], [2,6], [2,7], [2,8], [2,9], [2,10], [2,11], [2,12], 
@@ -94,19 +106,19 @@ const hardcodedPresets = [
 
     //DIVISION
     //Transformed from the multiplication sets above. Format [dividend, divisor] (e.g., 6 / 3 = 2 is [6,3])
-    { name: "Set A", operator: Operator.DIVISION, facts: [ 
+    { name: "Set A", operator: Operator.DIVISION, description: "Set A", facts: [ 
         [9,3], [36,6], [15,3], [32,4], [64,8], [12,4], [25,5], [81,9], [24,4], [15,5], [32,8], [12,3], [24,6]]
     },
-    { name: "Set B", operator: Operator.DIVISION, facts: [
+    { name: "Set B", operator: Operator.DIVISION, description: "Set B", facts: [
         [16,4], [20,5], [21,3], [28,4], [40,5], [56,7], [27,3], [36,4], [45,5], [20,4], [21,7], [28,7], [40,8], [56,8], [27,9], [36,9], [45,9]]
     },
-    { name: "Set C", operator: Operator.DIVISION, facts: [
+    { name: "Set C", operator: Operator.DIVISION, description: "Set C", facts: [
         [30,6], [35,7], [18,3], [48,8], [42,6], [49,7], [63,9], [24,3], [54,6], [72,8], [30,5], [35,5], [18,6], [48,6], [42,7], [63,7], [24,8], [54,9], [72,9]]
     },
-    { name: "Set D", operator: Operator.DIVISION, facts: [
+    { name: "Set D", operator: Operator.DIVISION, description: "Set D", facts: [
         [36,3], [48,4], [60,5], [72,6], [84,7], [96,8], [108,9], [132,11], [144,12], [36,12], [48,12], [60,12], [72,12], [84,12], [96,12], [108,12], [132,12]]
     },
-    { name: "Set E", operator: Operator.DIVISION, facts: [
+    { name: "Set E", operator: Operator.DIVISION, description: "Everything else", facts: [
         [1,1], [2,2], [3,3], [4,4], [5,5], [6,6], [7,7], [8,8], [9,9], [10,10], [11,11], [12,12], 
         [2,1], [3,1], [4,1], [5,1], [6,1], [7,1], [8,1], [9,1], [10,1], [11,1], [12,1], 
         [4,2], [6,3], [8,4], [10,5], [12,6], [14,7], [16,8], [18,9], [20,10], [22,11], [24,12], 
@@ -173,6 +185,14 @@ window.addEventListener("load", function() {
         window.addEventListener(e, resetHideCursorTimer, { passive: true })
     );
     resetHideCursorTimer();
+
+    //Redirect if operator in URL
+    if (window.location.search !== "" && window.location.search.indexOf("op=") > -1) {
+        const op = window.location.search.split("op=")[1]; //This only works if op is last query parameter; I'm lazy
+        selectOperator(op); //Auto-select operator for user-convenience
+    }
+
+    updateUltraButton();
 });
 
 window.addEventListener("keydown", function(e) {
@@ -306,7 +326,14 @@ function updateFormatSelection() {
 }
 
 function selectOperator(operator) {
-    selectedOperator = Operator[operator];
+    selectedOperator = Operator[operator]; //"ULTRA" is not in the Operators enum
+    if (operator === "ULTRA") {
+        var btn = document.getElementById("btnUltra");
+        if (btn.disabled || btn.classList.contains("hidden") || btn.classList.contains("locked")) return; //Failsafe
+        document.getElementById("titleSelectOperator").style.display = "none";
+        start();
+        return;
+    }
     document.getElementById("titleSelectOperator").style.display = "none";
     updateFormatOptionVisibility();
     document.getElementById("gameTitle").style.display = "block";
@@ -355,6 +382,345 @@ function selectOperator(operator) {
         multiContainer.appendChild(createMulti(true));
     } 
     menuLoopInterval = setInterval(menuLoop, 33); //Start the menu loop 30fps
+
+    //Change tooltips on hardcoded presets
+    const presets = getHardcodedPresetDefinitions(selectedOperator);
+    document.querySelectorAll("#presetButtons button.hardcoded").forEach(b => {
+        b.classList.remove("selected"); //Deselect any residual selections from prior operator
+        const setName = b.textContent;
+        const setLetter = setName.split("Set ")[1];   //A, B, C, D, E
+        const ix = setLetter.charCodeAt(0) - 65;      //0, 1, 2, 3, 4
+        const desc = presets.find(x => x.name === setName)?.description ?? setName;
+        b.title = desc;
+    });
+
+    //Tweak URL
+    var refresh = window.location.protocol + "//" + window.location.host + window.location.pathname + "?op=" + selectedOperator;
+    window.history.pushState({ path: refresh }, '', refresh); 
+}
+
+function updateUltraButton(makeVisible = false, unlock = false) {
+    const btn = document.getElementById("btnUltra");
+    let isLocked = true;
+    let isHidden = true;
+
+    /*  1. Tease ultra mode when player has gotten accustomed to the game.
+        2. Unlock when player has shown overall mastery
+
+        Details:
+            First:  make visible if:
+                a: there are at least 4 good scores for each operator, or
+                b: there are at least 25 good scores across all operators, or
+                c: the unlock condition (below) is met
+            Second:  unlock if there is a good score in sets A through E for all operators
+        
+            Score counts exclude default "---" initials.
+            Good scores beat the default 3rd place (30 points).
+            Condition A playstyle:  doesn't mater the preset. 
+                Shows overall interest or proficiency in all operators.
+            Condition B playstyle:  doesn't matter the operator.
+                Shows exceeding interest in the game as a whole. 
+                Many high scores in custom presets for only Addition will satisfy this.
+    */
+
+    const filterScores = (minValidScore) => {
+        const scores = getHighscoresFromStorage();
+        const scoresFiltered = [];
+        scores.forEach(set => {
+            const setEntries = set.scores.filter(x => x.initials !== defaultInitials && x.score >= minValidScore);
+            setEntries.forEach(x => {
+                scoresFiltered.push({
+                    operator:   set.operator,
+                    set:        set.name,
+                    score:      x.score,
+                    initials:   x.initials
+                });
+            });
+        });
+        return scoresFiltered;
+    };
+
+    const meetsConditionA = (scores, minNum) => {
+        //Return true if at least minNum scores for each operator
+        //scores is prefiltered to exclude too-low scores
+        //Custom sets are allowed (not excluded)
+        for (const op of Object.keys(Operator))
+            if (scores.filter(x => x.operator === op).length < minNum) 
+                return false;
+        return true;
+    }
+
+    const meetsConditionB = (scores, minNum) => {
+        //Returns true if at least minNum scores across all operators
+        //scores is prefiltered to exclude too-low scores
+        //Custom sets are allowed (not excluded)
+        return scores.length >= minNum;
+    }
+
+    const meetsConditionC = (scores) => {
+        //Return true if there is a score in every default set for every operator
+        //scores is prefiltered to exclude too-low scores
+        const defaultSetNames = new Set(hardcodedPresets.map(x => x.name));
+        for (const op of Object.keys(Operator))
+            for (const setName of defaultSetNames)
+                if (scores.filter(x => x.operator === op && x.set === setName).length === 0)
+                    return false;
+        return true;
+    };
+
+    const getNextGoalForC = (scores) => {
+        //This code based on meetsConditionC()
+        const defaultSetNames = new Set(hardcodedPresets.map(x => x.name));
+        for (const op of Object.keys(Operator))
+            for (const setName of defaultSetNames)
+                if (scores.filter(x => x.operator === op && x.set === setName).length === 0)
+                    return titleCase(op.toLowerCase()) + " " + setName;
+        return "None";
+    };
+
+    const titleCase = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+    const cheat = (e) => {
+        const isVisible = !document.getElementById("btnUltra").classList.contains("hidden");
+        if (e.key === "Pause" && !isVisible) updateUltraButton(true, false);
+        if (e.key === "`" && isVisible) updateUltraButton(true, true);
+    };
+
+    const seededRandom = (seed) => {
+        let x = Math.sin(seed * 12.9898 + 78.233) * 43758.5453;
+        return x - Math.floor(x);
+    };
+
+    const getDailyAside = () => {
+        var d = new Date();
+        var r = seededRandom(new Date(d.getFullYear(), d.getMonth(), d.getDate()));
+        var ix = Math.floor(r * asides.length);
+        return asides[ix];
+    };
+
+    const minValidScore = defaultHighScores().find(x => x.rank === 3).score;
+    const scoresFiltered = filterScores(minValidScore);
+    const numScoresNeededPerOp = 4;
+    const minTotalValidScoresAllOps = 25;
+    const asides = [
+        "Can you beat 100?",
+        "Let's do this!",
+        "The ultimate challenge!",
+        "Your path to beat the game!",
+        "The final wave.",
+        "Are you ready?",
+        "How good are you?",
+        "Meet the boss.",
+        "Are you faster than a calculator?",
+        
+        //Quotes (\u2013 is en-dash, displays well in tooltip and DOM)
+        "“The only way to learn mathematics is to do mathematics.” \u2013 Paul Halmos",
+        "“What we learn with pleasure, we never forget.” \u2013 Alfred Mercier",
+        "“You never fail until you stop trying.” \u2013 Albert Einstein",
+        "“Mathematics is not a spectator sport.” \u2013 John Wesley Young",
+        "“Mathematics is the door and key to the sciences.” \u2013 Roger Bacon",
+        "“Mathematical knowledge adds vigor to the mind.” \u2013 John Locke",
+        "“Mathematics is the music of reason.” \u2013 James Joseph Sylvester"
+    ];
+
+    //Calculate
+    const conditionA = meetsConditionA(scoresFiltered, numScoresNeededPerOp);
+    const conditionB = meetsConditionB(scoresFiltered, minTotalValidScoresAllOps);
+    const conditionC = meetsConditionC(scoresFiltered);
+
+    //Apply tests
+    if (conditionA || conditionB || conditionC || makeVisible) isHidden = false;
+    if (conditionC || unlock) isLocked = false;
+    
+    //Cheat
+    if (!makeVisible && isLocked) document.addEventListener("keydown", cheat);
+    
+    //Change DOM
+    if (!isHidden) {
+        btn.classList.remove("hidden");
+        const goal = getNextGoalForC(scoresFiltered);
+        const msg = "To unlock, get a score of " 
+            + minValidScore + " or better on \"Set A\" through \"Set E\" "
+            + "for all operators.\n\nNext goal: " + goal;
+        btn.title = msg;
+        btn.querySelector("aside").innerHTML = msg.replaceAll("\n", "<br>");
+    }
+    
+    if (!isLocked) {
+        //Ultra Mode is not yet complete. Hard lockout.
+        btn.setAttribute("onclick", "");
+        const msg = "You have unlocked this mode but this feature is not yet complete. "
+            + "It should be ready next month.";
+        /*
+        btn.classList.remove("locked");
+        btn.disabled = false;
+        const msg = getDailyAside();
+        */
+        btn.title = msg;
+        btn.querySelector("aside").innerHTML = msg;
+    }
+}
+
+function updateUltraButton(makeVisible = false, unlock = false) {
+    const btn = document.getElementById("btnUltra");
+    let isLocked = true;
+    let isHidden = true;
+
+    /*  1. Tease ultra mode when player has gotten accustomed to the game.
+        2. Unlock when player has shown overall mastery
+
+        Details:
+            First:  make visible if:
+                a: there are at least 4 good scores for each operator, or
+                b: there are at least 25 good scores across all operators, or
+                c: the unlock condition (below) is met
+            Second:  unlock if there is a good score in sets A through E for all operators
+        
+            Score counts exclude default "---" initials.
+            Good scores beat the default 3rd place (30 points).
+            Condition A playstyle:  doesn't mater the preset. 
+                Shows overall interest or proficiency in all operators.
+            Condition B playstyle:  doesn't matter the operator.
+                Shows exceeding interest in the game as a whole. 
+                Many high scores in custom presets for only Addition will satisfy this.
+    */
+
+    const filterScores = (minValidScore) => {
+        const scores = getHighscoresFromStorage();
+        const scoresFiltered = [];
+        scores.forEach(set => {
+            const setEntries = set.scores.filter(x => x.initials !== defaultInitials && x.score >= minValidScore);
+            setEntries.forEach(x => {
+                scoresFiltered.push({
+                    operator:   set.operator,
+                    set:        set.name,
+                    score:      x.score,
+                    initials:   x.initials
+                });
+            });
+        });
+        return scoresFiltered;
+    };
+
+    const meetsConditionA = (scores, minNum) => {
+        //Return true if at least minNum scores for each operator
+        //scores is prefiltered to exclude too-low scores
+        //Custom sets are allowed (not excluded)
+        for (const op of Object.keys(Operator))
+            if (scores.filter(x => x.operator === op).length < minNum) 
+                return false;
+        return true;
+    }
+
+    const meetsConditionB = (scores, minNum) => {
+        //Returns true if at least minNum scores across all operators
+        //scores is prefiltered to exclude too-low scores
+        //Custom sets are allowed (not excluded)
+        return scores.length >= minNum;
+    }
+
+    const meetsConditionC = (scores) => {
+        //Return true if there is a score in every default set for every operator
+        //scores is prefiltered to exclude too-low scores
+        const defaultSetNames = new Set(hardcodedPresets.map(x => x.name));
+        for (const op of Object.keys(Operator))
+            for (const setName of defaultSetNames)
+                if (scores.filter(x => x.operator === op && x.set === setName).length === 0)
+                    return false;
+        return true;
+    };
+
+    const getNextGoalForC = (scores) => {
+        //This code based on meetsConditionC()
+        const defaultSetNames = new Set(hardcodedPresets.map(x => x.name));
+        for (const op of Object.keys(Operator))
+            for (const setName of defaultSetNames)
+                if (scores.filter(x => x.operator === op && x.set === setName).length === 0)
+                    return titleCase(op.toLowerCase()) + " " + setName;
+        return "None";
+    };
+
+    const titleCase = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+    const cheat = (e) => {
+        const isVisible = !document.getElementById("btnUltra").classList.contains("hidden");
+        if (e.key === "Pause" && !isVisible) updateUltraButton(true, false);
+        if (e.key === "`" && isVisible) updateUltraButton(true, true);
+    };
+
+    const seededRandom = (seed) => {
+        let x = Math.sin(seed * 12.9898 + 78.233) * 43758.5453;
+        return x - Math.floor(x);
+    };
+
+    const getDailyAside = () => {
+        var d = new Date();
+        var r = seededRandom(new Date(d.getFullYear(), d.getMonth(), d.getDate()));
+        var ix = Math.floor(r * asides.length);
+        return asides[ix];
+    };
+
+    const minValidScore = defaultHighScores().find(x => x.rank === 3).score;
+    const scoresFiltered = filterScores(minValidScore);
+    const numScoresNeededPerOp = 4;
+    const minTotalValidScoresAllOps = 25;
+    const asides = [
+        "Can you beat 100?",
+        "Let's do this!",
+        "The ultimate challenge!",
+        "Your path to beat the game!",
+        "The final wave.",
+        "Are you ready?",
+        "How good are you?",
+        "Meet the boss.",
+        "Are you faster than a calculator?",
+        
+        //Quotes (\u2013 is en-dash, displays well in tooltip and DOM)
+        "“The only way to learn mathematics is to do mathematics.” \u2013 Paul Halmos",
+        "“What we learn with pleasure, we never forget.” \u2013 Alfred Mercier",
+        "“You never fail until you stop trying.” \u2013 Albert Einstein",
+        "“Mathematics is not a spectator sport.” \u2013 John Wesley Young",
+        "“Mathematics is the door and key to the sciences.” \u2013 Roger Bacon",
+        "“Mathematical knowledge adds vigor to the mind.” \u2013 John Locke",
+        "“Mathematics is the music of reason.” \u2013 James Joseph Sylvester"
+    ];
+
+    //Calculate
+    const conditionA = meetsConditionA(scoresFiltered, numScoresNeededPerOp);
+    const conditionB = meetsConditionB(scoresFiltered, minTotalValidScoresAllOps);
+    const conditionC = meetsConditionC(scoresFiltered);
+
+    //Apply tests
+    if (conditionA || conditionB || conditionC || makeVisible) isHidden = false;
+    if (conditionC || unlock) isLocked = false;
+    
+    //Cheat
+    if (!makeVisible && isLocked) document.addEventListener("keydown", cheat);
+    
+    //Change DOM
+    if (!isHidden) {
+        btn.classList.remove("hidden");
+        const goal = getNextGoalForC(scoresFiltered);
+        const msg = "To unlock, get a score of " 
+            + minValidScore + " or better on \"Set A\" through \"Set E\" "
+            + "for all operators.\n\nNext goal: " + goal;
+        btn.title = msg;
+        btn.querySelector("aside").innerHTML = msg.replaceAll("\n", "<br>");
+    }
+    
+    if (!isLocked) {
+        //Ultra Mode is not yet complete. Hard lockout.
+        btn.setAttribute("onclick", "");
+        const msg = "You have unlocked this mode but this feature is not yet complete. "
+            + "It should be ready next month.";
+        /*
+        btn.classList.remove("locked");
+        btn.disabled = false;
+        const msg = getDailyAside();
+        */
+        btn.title = msg;
+        btn.querySelector("aside").innerHTML = msg;
+    }
 }
 
 function menuLoop() {
@@ -372,6 +738,10 @@ function backToOperatorSelection() {
     document.getElementById("titleSelectOperator").style.display = "block";
     clearInterval(menuLoopInterval);
     document.querySelector("#menuContainer .background2").innerHTML = "";
+
+    //Remove operator from URL
+    var refresh = window.location.protocol + "//" + window.location.host + window.location.pathname;
+    window.history.pushState({ path: refresh }, '', refresh); 
 }
 
 function generateFactsGrid() {
@@ -472,6 +842,7 @@ function presetCustom(btn) {
         //Update UI
         deletePreset(document.getElementById("btnDeletePreset"));
         refreshCustomPresetButtons();
+        clearHoverPreset();
         return;
     } else {
         //Load this preset
@@ -523,7 +894,7 @@ function updateClearButton() {
     document.getElementById("btnMakePreset").disabled = noFactsSelected || !presetSelected;
     document.getElementById("btnMakePreset").title = noFactsSelected 
         ? "Select at least one multiplication fact to create a preset." 
-        : "Create a custom preset from the selected multiplication facts.";
+        : "Create a custom preset from the selected " + selectedOperator.toLowerCase() + " facts.";
     if (noFactsSelected) document.querySelectorAll("#presetButtons button.hover").forEach(b => b.classList.remove("hover"));
     closeNewPresetUi();
 }
@@ -571,6 +942,9 @@ function savePreset() {
     savePresetsToStorage(presetList);
     refreshCustomPresetButtons();
     closeNewPresetUi();
+    const newBtn = Array.from(document.getElementById("presetList").querySelectorAll("button")).find(b => b.textContent === presetName);
+    newBtn.classList.add("selected");
+    selectedSetName = presetName;
 }
 
 function deletePreset(deleteButton) {
@@ -654,6 +1028,7 @@ function combinePresets() {
     for (const presetDefinition of getHardcodedPresetsForOperator(selectedOperator)) {
         combinedPresets.push({
             name: presetDefinition.name,
+            description: presetDefinition.description ?? presetDefinition.name,
             facts: presetDefinition.facts,
             operator: presetDefinition.operator,
             element: Array.from(document.querySelectorAll("#presetButtons > button.hardcoded"))
@@ -749,7 +1124,6 @@ function saveHighScore() {
     //Get initials
     let initials = document.getElementById("initialsInput").value.trim().toUpperCase();
     if (initials.length === 0) initials = defaultInitials;
-    //else if (initials.length < 3) initials = initials.padEnd(3, " ");
     else if (initials.length > 3) initials = initials.substring(0, 3);
 
     //Get set name
@@ -790,11 +1164,11 @@ function saveHighScore() {
         highscoreList.push(setEntry);
     }
 
-    //Add new score    
-    setEntry.scores.push(entry);
-
-    //Sort and trim
-    setEntry.scores.sort((a, b) => b.score - a.score);
+    //Insert new score at proper position
+    let insertAt = setEntry.scores.length;
+    for (let i = 0; i < insertAt; i++)
+        if (setEntry.scores[i].score <= entry.score) { insertAt = i; break; }
+    setEntry.scores.splice(insertAt, 0, entry);
     if (setEntry.scores.length > maxEntriesPerSet)
         setEntry.scores = setEntry.scores.slice(0, maxEntriesPerSet);
     
@@ -819,7 +1193,7 @@ function isHighScore(setName, score) {
     if (score < 2) return false;
     let highscoreList = getHighScoresForSet(setName);
     if (highscoreList.length < 10) return true;
-    return score > highscoreList[highscoreList.length - 1].score;
+    return score >= highscoreList[highscoreList.length - 1].score;
 }
 
 function populateHighScoresUI() {
@@ -839,16 +1213,17 @@ function populateHighScoresUI() {
     let highscoreList = getHighScoresForSet(selectedSetName);
 
     //Get score, determine if it's a high score, and if so, what rank
-    const score = document.getElementById("score2").textContent;
+    const today = new Date().toLocaleDateString();
     const isHS = isHighScore(selectedSetName, score);
-    const newRank = isHS ? highscoreList.filter(entry => score < entry.score).length + 1 : 99;
+    const insertionIx = isHS ? highscoreList.findIndex(entry => entry.score <= score) : -1;
+    const newRank = isHS ? (insertionIx === -1 ? highscoreList.length + 1 : insertionIx + 1) : 99;
     if (newRank <= 10) {
         //Insert new score into list for display purposes
         highscoreList.splice(newRank - 1, 0, {
             rank: newRank,
             initials: "",
             score: score,
-            date: new Date().toLocaleDateString()
+            date: today
         });
         for (let i = newRank; i < highscoreList.length; i++)
             highscoreList[i].rank += 1;
@@ -894,7 +1269,10 @@ function populateHighScoresUI() {
     h2GameOver.style.display = selectedSetName === "" ? "none" : "block";
     pNewHighScore.style.display = isHS ? "block" : "none";
     btns.style.display = isHS ? "none" : "inline-block";
-    if (!isHS) document.getElementById("btnPlayAgain").focus();
+    if (!isHS) {
+        document.getElementById("gameOverButtons").style.display = "block";
+        document.getElementById("btnPlayAgain").focus();
+    }
 
     //Add listeners for initials input if needed
     if (isHS && newMarked) document.addEventListener("keydown", initialsInputKeyDown);
@@ -996,6 +1374,7 @@ function viewHighScoresMainMenu() {
     if (selectedSetName === "") return; //Should not be possible; populate() requires this
     document.getElementById("highScoresMainMenu").style.display = "block";
     document.getElementById("gameTitle").style.display = "none";
+    score = 0; //Without this, function below will allow insertion of a new (dup) high score
     populateHighScoresUI();
 }
 
@@ -1012,6 +1391,8 @@ function returnToMainMenuFromGameOver() {
     music.currentTime = 0;
     document.querySelectorAll("#gameContainer .vader").forEach(v => v.remove()); //Clear vaders
     tintBackground(); 
+    score = 0; //Resets background multis to a calm state
+    osk.setState(osk.isOn, true);
 }
 
 function toggleFullscreen() {
@@ -1072,5 +1453,160 @@ function onScreenKeyboardAlphaClick(event) {
         default: //Letters
             sendKeyPress(key, false);
             break;
+    }
+}
+
+//This class manages the score animation in the top-left
+class ScoreShiftManager {
+    constructor(rankElement, scoreElement, highscores, initialScore = 0) {
+        this.rankEl = rankElement;       //DOM element for the animation/display, #liveOldScore
+        this.scoreEl = scoreElement;     //Static element that just displays the score
+        this.highscores = highscores;    //From LocalStorage
+        this.queue = [];                 //Queue holding score checkpoints for sequential shifting
+        this.isProcessing = false;       //Lock during the 2-second window
+        this.lastScore = initialScore;   //Tracks the player's score before the latest update
+        this.currentScoreIndex = this.findCurrentScoreIndex(initialScore);
+
+        //Track current display state
+        this.currentBeaten = null;
+        this.currentGoal = null;
+        this.currentNextGoal = null;
+
+        //Initialize the DOM
+        this.rankEl.classList.add("primed");
+        this.updateDisplayValues(this.calculateRelativePositions(this.lastScore));
+        this.updateCurScore();
+    }
+
+    findCurrentScoreIndex(score) {
+        //Walk from the front of the descending leaderboard until we hit the first score at or below
+        //the current score. That gives the exact insertion point and keeps the queue anchored to the
+        //next threshold to be crossed, including repeated values like three 9s.
+        let index = 0;
+        while (index < this.highscores.length && this.highscores[index].score > score)
+            index += 1;
+        return index;
+    }
+
+    /**
+     * Call this whenever the player's score changes. 
+     * It calculates all high score thresholds crossed and queues shifts accordingly.
+     * @param {number} newScore - The player's updated score
+     */
+    updateScore(newScore) {
+        if (newScore <= this.lastScore) {
+            this.lastScore = newScore;
+            this.currentScoreIndex = this.findCurrentScoreIndex(newScore);
+            this.updateCurScore();
+            return;
+        }
+
+        //Queue every threshold the player crossed. Because the leaderboard is descending, the index
+        //moves toward the front of the array as the score increases, which preserves each duplicate
+        //threshold separately (for example, each 9 in [16, 9, 9, 9, 6, 3]).
+        while (this.currentScoreIndex > 0 && this.highscores[this.currentScoreIndex - 1].score <= newScore) {
+            const targetIndex = this.currentScoreIndex - 1;
+            this.queue.push({
+                targetScore: newScore,
+                targetIndex
+            });
+            this.currentScoreIndex = targetIndex;
+        }
+
+        this.lastScore = newScore;
+        this.updateCurScore();
+
+        if (!this.isProcessing) this.processQueue();
+    }
+
+    async processQueue() {
+        if (this.queue.length === 0) {
+            this.isProcessing = false;
+            return;
+        }
+
+        this.isProcessing = true;
+        const shiftTask = this.queue.shift();
+
+        //TRIGGER SHIFT: Remove "primed" class to start exit/shift animation
+        this.rankEl.classList.remove("primed");
+
+        //Calculate relative positions based on the exact threshold crossed so duplicate values
+        //can advance sequentially instead of collapsing into a single "same score" result.
+        const newPositions = this.calculateRelativePositions(
+            shiftTask.targetScore,
+            shiftTask.targetIndex
+        );
+
+        //WAIT UNTIL SHIFT ANIMATION COMPLETES: Block updates and shifts during this window
+        await new Promise(resolve => setTimeout(resolve, 1500));
+
+        //UPDATE VALUES: Update display data after the delay
+        this.updateDisplayValues(newPositions);
+
+        //RESET PRIMED: Add "primed" class back for resting/active state
+        this.rankEl.classList.add("primed");
+
+        //WAIT A BIT MORE: for screen to redraw the class added back in
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        //CONTINUE QUEUE: Process next shift if any remain
+        this.processQueue();
+    }
+
+    calculateRelativePositions(score, targetIndex = null) {
+        //When we know the exact threshold index being crossed, use it. This preserves the distinct
+        //duplicate entries (three 9s all count as separate steps in the queue).
+        if (targetIndex != null && targetIndex >= 0 && targetIndex < this.highscores.length) {
+            const beaten = this.highscores[targetIndex] ?? null;
+            const goal = targetIndex > 0 ? this.highscores[targetIndex - 1] : null;
+            const nextGoal = targetIndex > 1 ? this.highscores[targetIndex - 2] : null;
+            return { beaten, goal, nextGoal };
+        }
+
+        // Fallback for a generic call without a queued target index.
+        let beaten = null;
+        let goal = null;
+        let nextGoal = null;
+
+        if (score > 0) {
+            const beatenCandidates = this.highscores
+                .filter(entry => entry.score <= score)
+                .sort((a, b) => b.score - a.score);
+            beaten = beatenCandidates[0] ?? null;
+        }
+
+        const higherScores = this.highscores
+            .filter(entry => entry.score > score)
+            .sort((a, b) => a.score - b.score);
+
+        if (higherScores.length > 0) {
+            goal = higherScores[0];
+            if (higherScores.length > 1) nextGoal = higherScores[1];
+        }
+
+        return { beaten, goal, nextGoal };
+    }
+
+    updateCurScore() {
+        this.scoreEl.children[0].children[0].children[2].textContent = this.lastScore;
+    }
+
+    updateDisplayValues({ beaten, goal, nextGoal }) {
+        this.currentBeaten = beaten;
+        this.currentGoal = goal;
+        this.currentNextGoal = nextGoal;
+
+        const populateDl = function(el, scoreObj) {
+            el.children[0].innerHTML = scoreObj === null ? "&nbsp;" : ordinal(scoreObj.rank);
+            el.children[1].innerHTML = scoreObj?.initials ?? "&nbsp;";
+            el.children[2].innerHTML = scoreObj?.score ?? "&nbsp;";
+            el.children[3].innerHTML = scoreObj?.date ?? "&nbsp;";
+        };
+
+        this.updateCurScore();
+        populateDl(this.rankEl.children[0].children[0], nextGoal);
+        populateDl(this.rankEl.children[1].children[0], goal);
+        populateDl(this.rankEl.children[2].children[0], beaten);
     }
 }

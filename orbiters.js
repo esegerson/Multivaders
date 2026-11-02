@@ -73,16 +73,20 @@ function updateOrbiters() {
         const gFront = document.getElementById("orbitersFront");
         const gBehind = document.getElementById("orbitersBehind");
 
+        //Adapt to screen size. Original design targeted a 4K fullscreen.
+        const wh = window.innerHeight;
+        const screenScale = orbitDetails.movementMode === "turret" ? 1 : wh / 2160;
+
         orbitDetails.orbiters.forEach(o => {
             o.angle += orbitDetails.orbitSpeed;
 
             //Eliptical parametric equations with rotation
-            const xRaw = o.radiusX * Math.cos(o.angle);
-            const yRaw = o.radiusY * Math.sin(o.angle);
+            const xRaw = o.radiusX * Math.cos(o.angle) * screenScale;
+            const yRaw = o.radiusY * Math.sin(o.angle) * screenScale;
             const x = center.x + xRaw * Math.cos(o.rotation) - yRaw * Math.sin(o.rotation);
             const y = center.y + xRaw * Math.sin(o.rotation) + yRaw * Math.cos(o.rotation);
             const z = (Math.sin(o.angle) + 1) / 2; //0 to 1
-            const r = 4 + z * 6;
+            const r = (4 + z * 6) * screenScale;
             o.circle.setAttribute("cx", x);
             o.circle.setAttribute("cy", y);
             o.circle.setAttribute("r", r);

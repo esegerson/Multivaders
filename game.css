@@ -145,7 +145,7 @@ button:active {
 }
 .format-preview.preview-bracket .result,
 .format-preview.preview-bracket .aboveRiser {
-    border-bottom: 0.08em solid currentColor;
+    border-bottom: 0.1rem solid currentColor;
 }
 .format-preview.preview-fraction .factA {
     border-bottom: 0.08em solid currentColor;
@@ -161,8 +161,8 @@ div[data-format="FRACTION"] .format-preview td.result { border-top: none; }
     text-transform: uppercase;
 }
 button.delete {
-    background-color: #800;
-    border-color: red;
+    background-color: #800 !important;
+    border-color: red !important;
     animation: jiggle 0.5s infinite;
 }
 button.delete:hover {
@@ -170,23 +170,36 @@ button.delete:hover {
 }
 #pregameTitle p.center { margin-top: 3em; text-align: center;}
 #operatorSelect {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.5rem;
-  max-width: 18rem;
-  justify-items: stretch;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 9rem)) minmax(0, calc(9rem * 2 + 0.5rem));
+    grid-template-rows: repeat(2, minmax(0, 9rem));
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 100%;
+    justify-items: stretch;
+}
+#operatorSelect:has(button:nth-child(5).hidden) {
+    grid-template-columns: repeat(2, minmax(0, 9rem));
 }
 #operatorSelect button {
-  aspect-ratio: 1 / 1;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem;
-  box-sizing: border-box;
-  font-size: 1rem;
+    width: 100%;
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    box-sizing: border-box;
+    font-size: 1rem;
 }
+#operatorSelect button:last-child {
+    grid-column: 3;
+    grid-row: 1;
+    text-transform: uppercase;
+    font-size: 2em;
+}
+#operatorSelect button.hidden:last-child { display: none; }
+
 #operatorSelect button span {
   display: block;
   font-size: 4em;
@@ -198,16 +211,19 @@ button.delete:hover {
 #operatorSelect button:nth-child(2) span { animation-delay: -0.6s; }
 #operatorSelect button:nth-child(3) span { animation-delay: -0.4s; }
 #operatorSelect button:nth-child(4) span { animation-delay: -0.8s; }
-@media (max-width: 480px) {
-  #operatorSelect { max-width: 90vw; gap: 0.25rem; }
-  #operatorSelect button { padding: 0.25rem; }
+@media (max-width: 40rem) {
+  #operatorSelect { grid-template-columns: repeat(2, 9rem); grid-template-rows: auto; }
+  #operatorSelect button { max-width: 100%; }
+  #operatorSelect button:last-child { grid-column: 1 / -1; grid-row: auto; width: 100%; }
 }
-#presetButtons BUTTON:disabled, #startGame:disabled, .grid button:disabled {
+#presetButtons BUTTON:disabled, #startGame:disabled, .grid button:disabled, 
+#operatorSelect button:disabled, #operatorSelect button.locked {
     background-color: #222;
     color: rgba(255, 255, 255, 0.3);
     border-color: #444;
     cursor: not-allowed;
 }
+#operatorSelect aside { font-size: 0.8rem; text-transform: none; padding-top: 1rem; }
 #btnDeletePreset.deleteMode {
     background: linear-gradient(to bottom, black, #800);
     border-color: red;
@@ -216,6 +232,8 @@ button.delete:hover {
     display: grid;
     grid-template-columns: repeat(13, 1fr);
     gap: 5px;
+    overflow-x: auto;
+    max-width: 120em;
 }
 @media (max-width: 400px) or (max-height: 600px) {
     #gameTitle { margin: 2px; }
@@ -269,12 +287,15 @@ button.delete:hover {
 }
 
 .score, #score2, #bigscore { color: yellow; font-size: 1.5rem; }
+.score { width: min-content; }
 #bigscore { 
     display: block; 
     position: absolute; 
     width: 100%; 
     text-align: center; 
-    font-size: 120vh; 
+    top: 50vh;
+    left: 50vw;
+    transform: translate(-50%, -50%) scale(50);
     font-weight: bold;
     text-shadow: 0 0 3vh white;
     line-height: 0.6em;
@@ -282,7 +303,7 @@ button.delete:hover {
 }
 #bigscore.hidden { visibility: hidden; }
 #bigscore.shrink { 
-    font-size: 10vh; 
+    transform: translate(-50%, -50%) scale(1);
     line-height: 10em;
     opacity: 0;
 }
@@ -375,9 +396,9 @@ button.fullscreen {
     animation: dance 2s infinite ease-in-out;
 }
 
-.vader.STACKED .result          { border-top: 0.08em solid var(--vaderColor); }
+.vader.STACKED .result { border-top: 0.1rem solid var(--vaderColor); }
 .vader.DIVISION.BRACKET .result,
-.vader.DIVISION.BRACKET .aboveRiser { border-bottom: 0.08em solid var(--vaderColor); }
+.vader.DIVISION.BRACKET .aboveRiser { border-bottom: 0.1em solid var(--vaderColor); }
 .vader.DIVISION.FRACTION .factA { border-bottom: 0.08em solid var(--vaderColor); padding-bottom: 0.16em; }
 .vader.DIVISION.FRACTION .factB { text-align: center; }
 .vader.DIVISION.BRACKET table { border-collapse: collapse; }
@@ -390,15 +411,18 @@ button.fullscreen {
     left: -0.34em;
     width: 0.6em;
     height: 100%;
-    border: 0.08em solid var(--vaderColor);
+    border: 0.1rem solid currentColor;
     border-radius: 50%;
     box-sizing: border-box;
     clip-path: inset(0 0 0 50%);
 }
+.vader.DIVISION.BRACKET .bracketRiser::before { border: 0.08em solid var(--vaderColor); }
 .vader.DIVISION.BRACKET .factA { padding-left: 0.4em; }
 .vader.DIVISION.BRACKET .factB { padding-right: 0.2em; }
-.vader.DIVISION.BRACKET.active .bracketRiser::before { border-color: var(--vaderActiveColor); }
-.vader.DIVISION.BRACKET.active .result { border-bottom-color: var(--vaderActiveColor); }
+.vader.DIVISION.BRACKET.active .bracketRiser::before,
+.vader.DIVISION.BRACKET.related .bracketRiser::before { border-color: var(--vaderActiveColor); }
+.vader.DIVISION.BRACKET.active .result,
+.vader.DIVISION.BRACKET.related .result { border-bottom-color: var(--vaderActiveColor); }
 
 .vader.active, .vader.related {
     color: var(--vaderActiveColor);
@@ -432,7 +456,9 @@ button.fullscreen {
 .vader.DIVISION.BRACKET.runner .bracketRiser::before { border-color: var(--vaderRunnerColor); animation: pulseColorPale 1s ease-in-out infinite; }
 .vader.active.runner { color: var(--vaderActiveRunnerColor); animation: dance 2s infinite ease-in-out, pulseColorActive 1s ease-in-out infinite; }
 .vader.active.runner .result { color: var(--vaderActiveRunnerColor); animation: pulseColorActive 1s ease-in-out infinite; }
-.vader.DIVISION.BRACKET.runner.active .bracketRiser::before { border-color: var(--vaderRunnerColor); animation: pulseColorActive 1s ease-in-out infinite; }
+.vader.DIVISION.BRACKET.runner.active .bracketRiser::before
+.vader.DIVISION.BRACKET.runner.related .bracketRiser::before { border-color: var(--vaderRunnerColor); animation: pulseColorActive 1s ease-in-out infinite; }
+.vader.runner.incorrect { filter: brightness(0.4) saturate(0) sepia(1) hue-rotate(-45deg) saturate(5); } /*Tint red*/
 
 @keyframes jiggle { /*death rattle*/
     0%   { transform: rotate(10deg) translate(0, 0); }
@@ -523,6 +549,8 @@ ul.tips span {
     filter: blur(6px);
     overflow: clip; 
 }
+
+#gameContainer.lowgraphics > .background2 { display: none; }
 
 #menuContainer > .background2 { position: fixed; }
 
@@ -679,23 +707,19 @@ ol.highscorelist {
     background-size: 1000%;
     font-weight: bold;
 }
-
 ol.highscorelist li {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 2fr;
     align-items: start;
 }
-
 ol.highscorelist li.new {
     -webkit-text-fill-color: initial;
     text-shadow: 0 0 1rem;
     transition: transform 2s ease-out;
 }
-
 ol.highscorelist li.new dd:nth-child(2) {
     text-transform: uppercase;
 }
-
 ol.highscorelist li.new:not(.full) dd:nth-child(2)::after {
     content: "_";
     animation: blink 1s steps(1) infinite;
@@ -724,20 +748,38 @@ ol.highscorelist li.kicked {
     z-index: 1;
     transition: opacity 5s ease-out, top 5s ease-out;
 }
-
 ol.highscorelist li.kicked.hidden { opacity: 0; top: 3rem; pointer-events: none; }
-
 ol.highscorelist li dl { display: contents; }
-
-ol.highscorelist li dt, ol.highscorelist li dd {
-    margin: 0;
-}
-
+ol.highscorelist li dt, ol.highscorelist li dd { text-align: center; margin: 0; }
 ol.highscorelist li dt { font-size: 1rem; position: relative; top: 0.4rem;}
-
 ol.highscorelist li *:nth-child(2) { letter-spacing: 0.1em; }
-
 ol.highscorelist li dd:last-child { text-align: right; }
+
+/*Live ranking preview in-game*/
+#score { display: none; }
+#gameContainer ol.highscorelist {
+    background: initial; 
+    background-clip: initial; 
+    -webkit-text-fill-color: initial;
+    animation: initial;
+    scale: 0.8;
+    position: relative;
+    left: -2em;
+    font-weight: normal;
+}
+#gameContainer #scoreLabel { position: absolute; top: 2.6rem; }
+#gameContainer #liveOldScores { position: absolute; left: -1rem; top: -0.5rem; filter: saturate(0.2); transition: all 1s ease-out; }
+#gameContainer #liveCurScore { position: absolute; left: -1rem; top: 2.7rem; }
+#gameContainer #liveOldScores li > dl > * { opacity: 0.4; }
+#gameContainer #liveCurScore li > dl > *:nth-child(2) { text-align: right; }
+#gameContainer #liveCurScore li > dl > *:last-child { text-align: left; }
+#gameContainer #liveOldScores li { margin-top: 2rem; line-height: 1rem; transition: all 1s ease-out; }
+#gameContainer #liveOldScores.primed { top: -2.9rem; }
+#gameContainer #liveOldScores.primed li:first-child { opacity: 0; }
+#gameContainer #liveOldScores:not(.primed) li:last-child { opacity: 0; }
+#gameContainer #liveOldScores.primed,
+#gameContainer #liveOldScores.primed li { transition: none; }
+#gameContainer #liveOldScores li dt { top: initial; }
 
 @keyframes rainbowShift {
     0%   { background-position: 0%; }

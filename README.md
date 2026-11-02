@@ -35,11 +35,6 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
 
 ## TODO / Wishlist
 
-- Operator Expansion:
-    - Format menu:
-        - Add "Surprise Me"
-        - Add "Random"
-- Display the high score in the top-left corner during gameplay (or what your current rank is)
 - Improve the inevitable game-over experience; the game-over screen is basic, and currently the problems on-screen turn black when I feel like they should continue to bombard the bottom of the screen for 5 seconds
 - Improve how left and right arrows choose different problems.  Currently it just looks at horizontal position, but I'd like to take into account the vertical position, too.  If there's a problem near the bottom of the screen to the right, I'd like the right-arrow to select that one over the one right next to the active problem that's at the top of the screen.
     - Maybe use the mouse like a left-right paddle to select?
@@ -49,19 +44,62 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
     - Backspace "click"
     - Game over "groan" or explosion
 - Move graphics code from game.js to separate graphics.js file
+    - Refactor and clean up global space
 - To prevent overlapping and legibility, darken problems that are behind the active problem; restore them when the active problem is solved
-- Add a performance mode for mobile
-    - Reduce particles
-    - Possibly detect frame rate issues
+- Possible difficulty recalibration to make scores over 100 really insane
+- The fewer the facts selected, the more powerful multishot becomes. Inversely, the more facts selected, the more useless multishot becomes. Find a way to even this out?
+- Runners take too long to appear (particularly when score < 20)
+- If player selects random facts and clicks Start Game, should display a pop-up to create a new set right there (textbox entry), with option to skip that and just play (current function).
+- Add favicon.ico
 
 ## Known Bugs
 
-- Select preset, click Delete Preset, preset is green not red.
-- Make preset, new preset is not auto-selected green
-- A tie in high scores should favor the new score (especially if other entry is "---")
+- Fullscreen feature does not work on iPhone or iPad
+- Play Again and Main Menu buttons sometimes are not visible on the Game Over screen
+- Mouse sometimes does not hide during gameplay
 
 ## Recent Updates
 
+- *November 2026:*
+    - Game enhancements:
+        - Default presets have been tweaked:
+            - If you have saved high scores, the old scores no longer reflect the new facts
+            - Addition facts have been tweaked:
+                - Set A: +0, +1, +2
+                - Set B: Doubles & 10s
+                - Set C: Near-Doubles
+                - Set D: Make 10 or 12
+                - Set E: Everything Else
+            - Subtraction now has meaningful sets that mirror the addition sets:
+                - Set A: -0, -1, -2, make 0, make 1, make 2
+                - Set B: Subtract half, subtract 10, make 10
+                - Set C: Subtract near-half
+                - Set D: 10- or 12-
+                - Set E: Everything else
+            - Multiplication: no change
+            - Division: no change
+        - Default presets now have a description tooltip when you hover over them
+        - Answering a problem incorrectly now visually shifts to the side as if dodging
+        - ULTRA MODE added
+            - Button in operator menu is hidden until player shows *interest* in the game
+            - Button is locked until player shows *proficiency* in all operators
+            - *Is currently hard-locked* as functionality is not yet coded. Teaser:
+                - Will skip the main menu and jump right into the game
+                - Will mix all four operators together
+                - Will use a random subset of all facts on the 12x12 grid
+                - Will have its own high score list
+    - Quality-of-Life Enhancements:
+        - Now auto-detects when there is poor performance (low framerate) and turns off extra graphical stuff (helps with mobile)
+        - Your current score now shows your current rank, who you just beat and what score you need to beat next
+        - Ties in the high score list now favor the most recent entry
+        - You can now bookmark this game with an operator pre-selected
+    - Bug fixes:
+        - On-screen keyboard bug fix when checking high scores from the main menu
+        - Fixed runner orbiter ball orbit distance on mobile
+        - Minor UI bug fixes
+        - Death screen giant score zoom animation is improved
+        - Answering a runner incorrectly now marks it red
+        - Runner speed now scales with screen width instead of screen height
 - *October 2026:*
     - Quality-of-Life Enhancements:
         - Fullscreen button added

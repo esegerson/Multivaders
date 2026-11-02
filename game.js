@@ -9,6 +9,9 @@ let turretInterval = null;
 let startingVaders = 10;
 let autoSolve = false;
 let autoSolveInProgress = false;
+let lastFrameTimestamp = 0;
+let frameTimeMs = 0;
+const idealCoreGameLoopFramesPerSec = 30;
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 let stats = [];
 let showStats = false;
@@ -25,6 +28,9 @@ let multishotActive = function() { return multishots > 0; };
 let priorScreenHeight = window.innerHeight;
 let priorScreenWidth = window.innerWidth;
 let justExitedFullscreen = false;
+const graphicsMode = { Normal: 1, LowGraphics: 2 }
+let selectedGraphicsMode = graphicsMode.Normal;
+let scoreRankManager = null;
 
 let keybuffer = [];
 
@@ -44,24 +50,73 @@ function gameDomLoaded() {
 }
 
 function start() {
-    const selectedButtons = document.querySelectorAll('.grid button.selected');
-    if (selectedButtons.length === 0) {
-        alert("Please select at least one multiplication fact.");
-        return;
+    if (selectedOperator === "ULTRA") {
+        //Randomly select some facts for each of the four operators
+        const numFactsPerOp = 8;
+        const randomFactGrid = () => {
+            return {
+                factA: Math.floor(Math.random() * 13),
+                factB: Math.floor(Math.random() * 13)
+            };
+        };
+        selectedProblems = [];
+        for (const op of Object.keys(Operator)) {
+            for (let i = 0; i < numFactsPerOp; i++) {
+                let f = { factA: -1, factB: -1 };
+                if (op === Operator.ADDITION || op === Operator.MULTIPLICATION)
+                    f = randomFactGrid();
+                else if (op === Operator.SUBTRACTION) {
+                    const t = randomFactGrid();
+                    f.factA = t.factA + t.factB;
+                    f.factB = t.factB;
+                } else if (op === Operator.DIVISION) {
+                    const t = randomFactGrid();
+                    f.factA = t.factA * t.factB;
+                    f.factB = t.factB;
+                }
+                selectedProblems.push({
+                    factA: f.factA,
+                    factB: f.factB,
+                    operator: op
+                });
+            }
+        }
+        console.log("Starting game with selected facts:", selectedProblems.map(p => {
+            switch (p.operator) {
+                case Operator.ADDITION:
+                    return p.factA + "+" + p.factB;
+                case Operator.SUBTRACTION:
+                    return p.factA + "-" + p.factB;
+                case Operator.MULTIPLICATION:
+                    return p.factA + "x" + p.factB;
+                case Operator.DIVISION:
+                    return p.factA + "/" + p.factB;
+            }
+        }));
+    } else {
+        const selectedButtons = document.querySelectorAll('.grid button.selected');
+        if (selectedButtons.length === 0) {
+            alert("Please select at least one " + selectedOperator.toLowerCase() + " fact.");
+            return;
+        }
+        console.log("Starting game with selected facts:", Array.from(selectedButtons).map(btn => btn.textContent));
+        selectedProblems = Array.from(selectedButtons).map(btn => ({
+            factA: btn.getAttribute("data-fact-a"),
+            factB: btn.getAttribute("data-fact-b")
+        }));
     }
     document.getElementById('gameTitle').style.display = 'none';
     document.getElementById('gameContainer').style.display = 'block';
-    document.getElementsByTagName("body")[0].addEventListener("keydown", keyListener);
-    console.log("Starting game with selected facts:", Array.from(selectedButtons).map(btn => btn.textContent));
-    selectedProblems = Array.from(selectedButtons).map(btn => ({
-        factA: btn.getAttribute("data-fact-a"),
-        factB: btn.getAttribute("data-fact-b")
-    }));
+    document.body.addEventListener("keydown", keyListener);
 
     //Init
     window.scrollTo({ top: 0 }); //Fixes some weirdness when scrolled on menu
     document.body.classList.toggle("noscroll");
     document.querySelectorAll("#gameContainer .vader").forEach(v => v.remove()); //Clear previous vaders
+    scoreRankManager = new ScoreShiftManager(
+        document.getElementById("liveOldScores"), 
+        document.getElementById("liveCurScore"),
+        getHighScoresForSet(selectedSetName))
     score = -1;
     incrementScore(); //Start score at 0
     resetBigScore();
@@ -71,6 +126,7 @@ function start() {
     lastId = 0;
     priorScreenHeight = window.innerHeight;
     priorScreenWidth = window.innerWidth;
+    lastGraphicsModeAutoSwitch = performance.now();
 
     //Construct turret
     setTurretOperatorSign(selectedOperator);
@@ -92,30 +148,34 @@ function start() {
     timer = performance.now(); //Start the timer
     totalSeconds = 0; //This gets set in gameOver(), used for high score display
     spawnVader(lastId++); //Spawn the first vader
-    gameLoopInterval = setInterval(gameLoop, 1000 / 30); //Start the game loop 30fps
+    gameLoopInterval = setInterval(gameLoop, 1000 / idealCoreGameLoopFramesPerSec); //Start the game loop
     statLoopInterval = setInterval(updateStats, 1000 / 10); //10fps
     orbiterInterval = setInterval(updateOrbiters, 1000 / 60); //60fps
     turretInterval = setInterval(moveTurret, 1000 / 60); //60fps
 
     //Pre-populate multis (decorative background elements)
-    const multiContainer = document.querySelector("#gameContainer .background2");
-    for (let i = 0; i < 20; i++) {
+    const multiContainer = document.querySelector("#menuContainer .background2");
+    const multis = multiContainer.querySelectorAll(".multi");
+    while (multiContainer.querySelectorAll(".multi").length < 20)
         multiContainer.appendChild(createMulti(true));
-    } 
     
     //Play music
     let music = document.getElementById("gameMusic");
     music.volume = 0.2;
     music.play();
 
-    //Debugging
-    if (window.location.protocol === "file:") {
-        //setTimeout(function() { sendKeyPress("`"); }, 1000);
-    }
+    lastFrameTimestamp = performance.now();
 }
 
 function gameLoop() {
-    let now = performance.now();
+    const now = performance.now();
+    frameTimeMs = now - lastFrameTimestamp; //This is reported in stats (~)
+    lastFrameTimestamp = now;
+    if (frameTimeMs > 1000 / idealCoreGameLoopFramesPerSec * 3) { //3X the ideal target (big slowdown)
+        //There is no mechanism to bump this back up to Normal besides reloading the page
+        selectedGraphicsMode = graphicsMode.LowGraphics; 
+        document.getElementById("gameContainer").classList.add("lowgraphics");
+    }
 
     let vaders = document.querySelectorAll("#gameContainer .vader");
     let incompleteVaders = Array.from(vaders).filter(v => !v.classList.contains("correct"));
@@ -168,7 +228,9 @@ function gameLoop() {
     //Move all vaders down
     for (const vader of vaders) {
         let speed = parseFloat(vader.getAttribute("data-speed") || 1);
-        let speedNominal = speed / 2160 * window.innerHeight; //Original design was calibrated to a 4K monitor
+        let speedNominal = vader.classList.contains("runner") //Original design was calibrated to a fullscreen 4K monitor
+            ? speed / 3840 * window.innerWidth
+            : speed / 2160 * window.innerHeight; 
         if (overrideSpeed) speedNominal = 0;
         if (vader.classList.contains("runner")) {
             let left = parseFloat(vader.style.left);
@@ -186,6 +248,21 @@ function gameLoop() {
                 if (speedNominal < 0.2) speedNominal = 0.2; //Ensure a minimum speed
             }
             vader.style.top = (top + speedNominal) + "px";
+        }
+
+        //Adjust horizontal shift for regular vaders (from an incorrect value)
+        let hs = parseFloat(vader.getAttribute("data-horiz-speed")) || 0;
+        if (hs !== 0) {
+            hs *= 0.9; //Taper speed off each iteration
+            if (Math.abs(hs) < 0.001) hs = 0;
+            if (hs === 0)
+                vader.removeAttribute("data-horiz-speed");
+            else
+                vader.setAttribute("data-horiz-speed", hs);
+            hs *= window.innerWidth / 3840; //Scale against screen width
+            let left = parseFloat(vader.style.left);
+            left += hs;
+            vader.style.left = left + "px";
         }
     }
 
@@ -293,7 +370,6 @@ function gameOver(vader) {
         if (selectedSetName !== "") {
             populateHighScoresUI();
             document.getElementById("noset").style.display = "none";
-            //gameOverScreen.querySelector("ol.highscorelist").style.display = "block";
         } else {
             gameOverScreen.querySelector("h2").style.display = "none";
             gameOverScreen.querySelector("h3").style.display = "none";
@@ -301,6 +377,7 @@ function gameOver(vader) {
             document.getElementById("btnPlayAgain").focus();
             gameOverScreen.querySelector("ol.highscorelist").style.display = "none";
             document.getElementById("gameOverButtons").style.display = "block";
+            document.getElementById("btnPlayAgain").focus();
         }
     }, 5000);
 }
@@ -330,7 +407,7 @@ function spawnVader(id, init = false) {
         return false;
     };
     let problem = getProblem();
-    let vader = createVader(id, problem.factA, problem.factB);
+    let vader = createVader(id, problem.factA, problem.factB, problem.operator ?? selectedOperator);
     let container = document.getElementById("vaderContainer");
     if (container.querySelectorAll("#gameContainer .active").length === 0)
         vader.classList.add("active");
@@ -340,7 +417,8 @@ function spawnVader(id, init = false) {
         vader.style.left = direction < 0 ? "-200px" : window.innerWidth + 100 + "px";
         vader.style.top = (Math.random() * window.innerHeight * .7) + "px";
         vader.setAttribute("data-dir", direction);
-        vader.setAttribute("data-speed", parseFloat(vader.getAttribute("data-speed")) * 8);
+        let s = parseFloat(vader.getAttribute("data-speed")) * 8; //Much faster than reg vader
+        vader.setAttribute("data-speed", s); //8X speed
     }
     container.appendChild(vader);
     lastVaderSpawned = performance.now();
@@ -348,19 +426,26 @@ function spawnVader(id, init = false) {
 
 function getProblem() {
     if (selectedProblems.length === 0) {
-        alert("No multiplication facts selected.");
+        alert("No " + selectedOperator.toLowerCase() + " facts selected.");
         return null;
     }
     const randomIndex = Math.floor(Math.random() * selectedProblems.length);
     return selectedProblems[randomIndex];
 }
 
-function createVader(id, factA, factB) {
+function createVader(id, factA, factB, op) {
+    const randomFormat = () => {
+        const ixMax = op === Operator.DIVISION ? 4 : 2;
+        const randomIx = Math.floor(Math.random() * ixMax);
+        return Object.keys(Format)[randomIx];
+    };
+    let format = selectedOperator === "ULTRA" ? randomFormat() : selectedFormat;
+    if (op === undefined || op === null) throw new Error("Operator not set");
     let sampleVader = document.querySelector("#gameContainer .vader");
     let sampleVaderWidth = sampleVader ? sampleVader.offsetWidth : 200;
-    let vaderTemplate = document.querySelector("#templates > .vaderTemplate." + selectedOperator + "." + selectedFormat);
+    let vaderTemplate = document.querySelector("#templates > .vaderTemplate." + op + "." + format);
     if (vaderTemplate === null) //TODO: remove after development
-        throw new Error("No vader template found for operator " + selectedOperator + " and format " + selectedFormat);
+        throw new Error("No vader template found for operator " + op + " and format " + format);
     let vaderClone = vaderTemplate.cloneNode(true);
     vaderClone.querySelector(".factA").textContent = factA;
     vaderClone.querySelector(".factB").textContent = factB;
@@ -568,6 +653,17 @@ class keyListenerHelper {
                 v.classList.add("incorrect");
                 let speed = parseFloat(v.getAttribute("data-speed"));
                 v.setAttribute("data-speed", speed * 3); //Increase speed on incorrect answer
+
+                //Add "dodge" horizontal shift
+                if (!v.classList.contains("runner")) {
+                    let dodgeDir = Math.floor(Math.random() * 2) || -1;
+                    const left = parseInt(v.style.left);
+                    const screenW = window.innerWidth;
+                    if ((left < 400 && dodgeDir < 0) || (left > (screenW - 400) && dodgeDir > 0))
+                        dodgeDir *= -1; //Protect against dodging outside of window
+                    const hs = Math.random() * 20 + 20; //20-40
+                    v.setAttribute("data-horiz-speed", hs * dodgeDir);
+                }
             }
         }
     }
@@ -583,7 +679,7 @@ class keyListenerHelper {
             music.volume = 0.1; //Lower volume when paused
             pausedStart = performance.now();
         } else {
-            gameLoopInterval = setInterval(gameLoop, 1000 / 33); //Resume the game loop
+            gameLoopInterval = setInterval(gameLoop, 1000 / idealCoreGameLoopFramesPerSec); //Resume the game loop
             document.getElementById("paused").style.display = "none";
             let music = document.getElementById("gameMusic");
             music.volume = 0.2;
@@ -668,6 +764,7 @@ function incrementScore() {
     document.getElementById("score2").textContent = score;
     document.getElementById("pauseScore").textContent = score;
     document.getElementById("bigscore").textContent = score;
+    scoreRankManager.updateScore(score);
 }
 
 function tintBackground() {
@@ -703,11 +800,12 @@ function updateStats() {
     stats.Delay = (getDelay() / 1000).toFixed(1) + "s";
     stats.HitCeiling = hitCeiling;
     stats.Speed = (getSpeed(0) * 33).toFixed(0) + "px/s";
-    stats.Lifespan = (getEstimatedLifespan() / 33).toFixed(0) + "s";
+    stats.Lifespan = (getEstimatedLifespan() / idealCoreGameLoopFramesPerSec).toFixed(0) + "s";
     stats.Runner = "force=" + (forceNextRunner ? "on" : "off") + " : " 
         + document.querySelectorAll("#gameContainer .vader.runner").length;
     stats.Multishots = multishots + " : " + (multishotActive() ? "ACTIVE" : "off");
     stats.Time = min + ":" + (sec < 10 ? "0" : "") + sec;
+    stats.FPS = Math.round(1000 / frameTimeMs);
     stats.Chord = getChord();
     
     //Display stats
@@ -718,6 +816,8 @@ function updateStats() {
         dt.textContent = key;
         const dd = document.createElement("dd");
         dd.textContent = stats[key];
+        if (key === "FPS" && stats[key] < 20) { dd.style.color = "yellow"; }
+        if (key === "FPS" && stats[key] < 10) { dd.style.color = "red"; }
         dl.appendChild(dt);
         dl.appendChild(dd);
     }
@@ -731,13 +831,11 @@ function setDeadBackgroundStyle(o) {
         "linear-gradient(to bottom, rgba(0,0,0,0), rgba(255,0,0," + o + ")), linear-gradient(to bottom, #000, #459)";
 }
 
-function manageBackgroundMultis(isGameBg = true) {
+function manageBackgroundMultis() {
     //A multi is just a visual decoration, a large "×" character that floats up the screen
     const maxNumMultis = 20 + score / 5; //When score = 100, maxNumMultis = 40
     const multiWidth = 100;
-    const bgContainer = isGameBg 
-        ? document.querySelector("#gameContainer .background2")
-        : document.querySelector("#menuContainer .background2");
+    const bgContainer = document.querySelector("#menuContainer .background2");
         
     //Spawn
     let numMultis = bgContainer.querySelectorAll(".multi").length;
@@ -787,7 +885,8 @@ function zapLaser(targetVader, isFirst, numZapped) {
     svgl.setAttribute('y1', turretY);
     svgl.setAttribute('x2', targetX);
     svgl.setAttribute('y2', targetY);
-    createLaserParticles(g, turretX, turretY, targetX, targetY);
+    if (selectedGraphicsMode === graphicsMode.Normal)
+        createLaserParticles(g, turretX, turretY, targetX, targetY);
     g.append(svgl);
 
     //Schedule line removal
