@@ -1088,7 +1088,8 @@ function setTurretOperatorSign(operator) {
         ADDITION: ["turretHoriz", "turretVert"],
         SUBTRACTION: ["turretHoriz"],
         MULTIPLICATION: ["turretMultFwdSlash", "turretMultBckSlash"],
-        DIVISION: ["turretHoriz","turretDivDotUpper", "turretDivDotLower"]
+        DIVISION: ["turretHoriz","turretDivDotUpper", "turretDivDotLower"],
+        ULTRA: ["turretUltra"]
     };
 
     const allIds = [
@@ -1097,7 +1098,8 @@ function setTurretOperatorSign(operator) {
         "turretHoriz",
         "turretVert",
         "turretDivDotUpper",
-        "turretDivDotLower"
+        "turretDivDotLower",
+        "turretUltra"
     ];
 
     //Hide everything first
