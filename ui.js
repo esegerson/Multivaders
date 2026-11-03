@@ -326,12 +326,24 @@ function updateFormatSelection() {
 }
 
 function selectOperator(operator) {
+    const bgSymbol = function() {
+        switch (selectedOperator) {
+            case Operator.ADDITION: return "+";
+            case Operator.SUBTRACTION: return "-";
+            case Operator.MULTIPLICATION: return "&#215;";
+            case Operator.DIVISION: return "&#247";
+            case "ULTRA": return "&#8252;"; //!! symbol
+            default: return "?";
+        }
+    };
+
     selectedOperator = Operator[operator]; //"ULTRA" is not in the Operators enum
     if (operator === "ULTRA") {
         var btn = document.getElementById("btnUltra");
         if (btn.disabled || btn.classList.contains("hidden") || btn.classList.contains("locked")) return; //Failsafe
         document.getElementById("titleSelectOperator").style.display = "none";
         selectedOperator = operator;
+        document.querySelector("#gameContainer > .background").innerHTML = bgSymbol();
         start();
         return;
     }
@@ -340,17 +352,6 @@ function selectOperator(operator) {
     document.getElementById("gameTitle").style.display = "block";
     generateFactsGrid();
     document.getElementById("opDisplay").textContent = operator.toLowerCase();
-
-    //Draw the background for game
-    const bgSymbol = function() {
-        switch (selectedOperator) {
-            case Operator.ADDITION: return "+";
-            case Operator.SUBTRACTION: return "-";
-            case Operator.MULTIPLICATION: return "&#215;";
-            case Operator.DIVISION: return "&#247";
-            default: return "?";
-        }
-    };
 
     const exampleNum = function(part) {
         let parts = [0, 0, 0];
@@ -363,6 +364,7 @@ function selectOperator(operator) {
         return parts[part];
     }
 
+    //Draw the background for game
     document.querySelector("#gameContainer > .background").innerHTML = bgSymbol();
 
     //Fix format preview operator

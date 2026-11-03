@@ -69,12 +69,28 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
             - Mixes all four operators together
             - Uses a random subset of all facts on the 12x12 grid
             - Mixes all formats together
-            - Has its own high score list
+            - TODO: draw turret
+            - TODO: Has its own high score list
+            - Bonuses:
+                - TODO: Two extra multishots are awarded if a runner is solved
+                - TODO: Higher chance of the same problem appearing in a row
+                    - 33% chance of repeating the same vader (but use different format)
+                    - Test this to see if it's fun
+            - Hazards:
+                - TODO: when score > 40, active vaders will sometimes "warp" to 
+                    somewhere else (higher) on the screen after 2 seconds, 
+                    losing the active lock (retaining any typed values)
+                - TODO: when score > 50, add 5% chance of dive-bombers
+                    - Descend fast but decelerate so full lifespan is about the same as a normal vader
+                - TODO: when score > 60, rotate vaders 90 or -90 degrees
+                - TODO: when score > 80, occasionally change facts on non-active vaders
         - Game is much harder with scores over 100 - the way it was intended to be
     - Bug fixes:
         - Problems no longer shift off the screen
         - Runners no longer take forever to appear when the score is less than 20
         - Scrolling rank next to score removed for non-preset games
+    - Quality-of-Life Enhancements:
+        - TODO: Hovering over a preset button now displays the high score
 - *November 2026:*
     - Game enhancements:
         - Default presets have been tweaked:

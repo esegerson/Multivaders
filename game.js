@@ -875,12 +875,17 @@ function manageBackgroundMultis() {
 }
 
 function createMulti(init) {
+    const addOperator = () => {
+        if (selectedOperator === "ULTRA")
+            return Object.values(Operator)[Math.floor(Math.random() * Object.values(Operator).length)];
+        return selectedOperator;
+    }
     const multiWidth = 20;
     const left = Math.round(Math.random() * (window.innerWidth - multiWidth));
     const top = init ? Math.round(Math.random() * window.innerHeight) : window.innerHeight;
     let multi = document.createElement("div");
     multi.classList.add("multi");
-    multi.classList.add(selectedOperator);
+    multi.classList.add(addOperator());
     multi.style.left = left + "px";
     multi.style.top = top + "px";
     multi.style.fontSize = (Math.random() * 5 + 10) + "rem";
