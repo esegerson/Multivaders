@@ -226,6 +226,19 @@ function gameLoop() {
     priorScreenWidth = window.innerWidth;
 
     //Move all vaders down
+    const runnerSpeedBoost = () => {
+        const r = document.querySelector(".runner");
+        if (r === null) return 0;
+        let left = parseFloat(r.style.left);
+        let dir = parseInt(r.getAttribute("data-dir"));
+        if (dir < 0 && left < 0) return left * -1;
+        if (dir < 0) return 0;
+        const width = r.offsetWidth;
+        const margin = window.innerWidth - width - left;
+        if (margin < 0) return margin * -1;
+        return 0;
+    };
+
     for (const vader of vaders) {
         let speed = parseFloat(vader.getAttribute("data-speed") || 1);
         let speedNominal = vader.classList.contains("runner") //Original design was calibrated to a fullscreen 4K monitor
@@ -235,7 +248,7 @@ function gameLoop() {
         if (vader.classList.contains("runner")) {
             let left = parseFloat(vader.style.left);
             let direction = parseInt(vader.getAttribute("data-dir")) * -1;
-            let newLeft = left + speedNominal * direction;
+            let newLeft = left + speedNominal * direction + runnerSpeedBoost() / 50 * direction;
             vader.style.left = newLeft + "px";
             if (vader.classList.contains("active") && !runnerOutOfBounds(vader).canBeActive) {
                 vader.classList.remove("active");
@@ -408,16 +421,16 @@ function spawnVader(id, init = false) {
     };
     let problem = getProblem();
     let vader = createVader(id, problem.factA, problem.factB, problem.operator ?? selectedOperator);
-    let container = document.getElementById("vaderContainer");
+    const container = document.getElementById("vaderContainer");
     if (container.querySelectorAll("#gameContainer .active").length === 0)
         vader.classList.add("active");
     if (isRunner()) {
         vader.classList.add("runner");
-        let direction = Math.random() * 2 < 1 ? -1 : 1;
+        const direction = Math.random() * 2 < 1 ? -1 : 1;
         vader.style.left = direction < 0 ? "-200px" : window.innerWidth + 100 + "px";
         vader.style.top = (Math.random() * window.innerHeight * .7) + "px";
         vader.setAttribute("data-dir", direction);
-        let s = parseFloat(vader.getAttribute("data-speed")) * 8; //Much faster than reg vader
+        const s = parseFloat(vader.getAttribute("data-speed")) * 8; //Much faster than reg vader
         vader.setAttribute("data-speed", s); //8X speed
     }
     container.appendChild(vader);
@@ -785,7 +798,7 @@ function tintBackground() {
 }
 
 function updateStats() {
-    let container = document.getElementById("statsContainer");
+    const container = document.getElementById("statsContainer");
     if (!showStats) {
         container.style.display = "none";
         return;
