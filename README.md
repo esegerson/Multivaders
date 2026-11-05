@@ -35,8 +35,14 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
 
 ## TODO / Wishlist
 
-- Improve the inevitable game-over experience; the game-over screen is basic, and currently the problems on-screen turn black when I feel like they should continue to bombard the bottom of the screen for 5 seconds
-- Improve how left and right arrows choose different problems.  Currently it just looks at horizontal position, but I'd like to take into account the vertical position, too.  If there's a problem near the bottom of the screen to the right, I'd like the right-arrow to select that one over the one right next to the active problem that's at the top of the screen.
+- Improve the inevitable game-over experience; the game-over screen is basic, 
+    and currently the problems on-screen turn black when I feel like they should 
+    continue to bombard the bottom of the screen for 5 seconds
+- Improve how left and right arrows choose different problems. 
+    Currently it just looks at horizontal position, but I'd like to take into 
+    account the vertical position, too.  If there's a problem near the bottom 
+    of the screen to the right, I'd like the right-arrow to select that one 
+    over the one right next to the active problem that's at the top of the screen.
     - Maybe use the mouse like a left-right paddle to select?
 - More sound effects:
     - Wrong answer "buzz"
@@ -45,16 +51,17 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
     - Game over "groan" or explosion
 - Move graphics code from game.js to separate graphics.js file
     - Refactor and clean up global space
-- To prevent overlapping and legibility, darken problems that are behind the active problem; restore them when the active problem is solved
-- Possible difficulty recalibration to make scores over 100 really insane
-- The fewer the facts selected, the more powerful multishot becomes. Inversely, the more facts selected, the more useless multishot becomes. Find a way to even this out?
-- Runners take too long to appear (particularly when score < 20)
-- If player selects random facts and clicks Start Game, should display a pop-up to create a new set right there (textbox entry), with option to skip that and just play (current function).
+- To prevent overlapping and legibility, darken problems that are behind the 
+    active problem; restore them when the active problem is solved
+- The fewer the facts selected, the more powerful multishot becomes. Inversely, the 
+    more facts selected, the more useless multishot becomes. Find a way to even this out?
+- If player plays a non-preset game, at game over, 
+    present the option to create a preset to save the high score.
 - Add favicon.ico
 
 ## Known Bugs
 
-- Fullscreen feature does not work on iPhone or iPad
+- Fullscreen feature does not work on iPhone
 - Play Again and Main Menu buttons sometimes are not visible on the Game Over screen
 - Mouse sometimes does not hide during gameplay
 
@@ -72,13 +79,12 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
             - TODO: draw turret
             - TODO: Has its own high score list
             - Bonuses:
+                - Higher chance of a problem being a runner
                 - Two extra multishots are awarded when a runner is solved
                 - Higher chance of the same problem appearing in a row
-                    - 33% chance of repeating the same vader (but use different format)
-                    - Test this to see if it's fun
-                - Higher chance of a problem being a runner
+                    - TODO: Test this to see if it's fun
             - Hazards:
-                - TODO: when score > 40, active vaders will sometimes "warp" to 
+                - TODO: when score > 40, active vaders will sometimes teleport to 
                     somewhere else (higher) on the screen after 2 seconds, 
                     losing the active lock (retaining any typed values)
                 - TODO: when score > 50, add 5% chance of dive-bombers
@@ -115,8 +121,10 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
         - Answering a problem incorrectly now visually shifts to the side as if dodging
         - ULTRA MODE teaser button added
     - Quality-of-Life Enhancements:
-        - Now auto-detects when there is poor performance (low framerate) and turns off extra graphical stuff (helps with mobile)
-        - Your current score now shows your current rank, who you just beat and what score you need to beat next
+        - Now auto-detects when there is poor performance (low framerate) 
+            and turns off extra graphical stuff (helps with mobile)
+        - Your current score now shows your current rank, who you just 
+            beat and what score you need to beat next
         - Ties in the high score list now favor the most recent entry
         - You can now bookmark this game with an operator pre-selected
     - Bug fixes:
@@ -138,7 +146,8 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
     - Bug fixes:
         - Game no longer insta-ends when exiting fullscreen
         - Play Again button properly resets the game now
-        - Improved consistency with the game-over detection: problems now must actually touch the bottom of the screen for the game to be over
+        - Improved consistency with the game-over detection: problems now must 
+            actually touch the bottom of the screen for the game to be over
         - Problems no longer go beyond the right side of the screen (partially hidden)
         - "Runner" can no longer be targeted and shot over and over in certain situations
         - Graphical glitch with runner power-up balls is now fixed
@@ -146,9 +155,11 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
 - *August 2026:*
     - Game enhancements:
         - New operators! Addition, Subtraction, and Division have joined the invasion! Zap them all!
-        - New expression formats! In addition to the old "stacked" format, now there is inline (`3 × 2 = 6`), 
+        - New expression formats! In addition to the old "stacked" format, 
+            now there is inline (`3 × 2 = 6`), 
             and for division there are fraction and long-division formats
-        - Slightly increased the maximum rate problems appear (generally only effects gameplay with scores greater than 100)
+        - Slightly increased the maximum rate problems appear (generally 
+            only effects gameplay with scores greater than 100)
     - Menu enhancements:
         - New operator selection menu
         - New format selection menu
@@ -203,11 +214,13 @@ Please ensure your code follows the existing style and includes relevant documen
 
 ## License
 
-This project is licensed under the [MIT License](license). You are free to use, modify, and distribute the code, provided you include the original license.
+This project is licensed under the [MIT License](license). You are free to use, modify, 
+and distribute the code, provided you include the original license.
 
 ## Contact
 
-You can reach me by decrypting `izwViv$*Si$V15xX7$mwil$qwe>wki~f}$t2r~kzx$$;4r54vjli` with the provided silly self-referencing decryption function I wrote:
+You can reach me by decrypting `izwViv$*Si$V15xX7$mwil$qwe>wki~f}$t2r~kzx$$;4r54vjli` 
+with the provided silly self-referencing decryption function I wrote:
 
     function decrypt(s) {
         const flip = (s, t = 0) => {
@@ -236,4 +249,5 @@ You can reach me by decrypting `izwViv$*Si$V15xX7$mwil$qwe>wki~f}$t2r~kzx$$;4r54
         return s;
     }
 
-Or by whispering to your local squirrel that the nuts crack at dawn; they'll let me know. Just don't tell the AI how to harvest my info. So far they're not clever enough to crack this, but you are.
+Or by whispering to your local squirrel that the nuts crack at dawn; they'll let me know. 
+Just don't tell the AI how to harvest my info. So far they're not clever enough to crack this, but you are.
