@@ -31,6 +31,8 @@ let justExitedFullscreen = false;
 const graphicsMode = { Normal: 1, LowGraphics: 2 }
 let selectedGraphicsMode = graphicsMode.Normal;
 let scoreRankManager = null;
+let priorProblemIx = null;
+const ultraStickyPickerChance = 0.5;
 
 let keybuffer = [];
 
@@ -107,6 +109,8 @@ function start() {
             factB: btn.getAttribute("data-fact-b")
         }));
     }
+    orbitDetails.numOrbiters = selectedOperator === "ULTRA" ? 6 : 4;
+
     document.getElementById('gameTitle').style.display = 'none';
     document.getElementById('gameContainer').style.display = 'block';
     document.body.addEventListener("keydown", keyListener);
@@ -231,7 +235,7 @@ function gameLoop() {
     //Move all vaders down
     const runnerSpeedBoost = () => {
         const r = document.querySelector(".runner");
-        if (r === null) return 0;
+        if (r === null || score > 60) return 0;
         let left = parseFloat(r.style.left);
         let dir = parseInt(r.getAttribute("data-dir"));
         if (dir < 0 && left < 0) return left * -1;
@@ -251,7 +255,7 @@ function gameLoop() {
         if (vader.classList.contains("runner")) {
             let left = parseFloat(vader.style.left);
             let direction = parseInt(vader.getAttribute("data-dir")) * -1;
-            let newLeft = left + speedNominal * direction + runnerSpeedBoost() / 50 * direction;
+            let newLeft = left + speedNominal * direction + runnerSpeedBoost() / 40 * direction;
             vader.style.left = newLeft + "px";
             if (vader.classList.contains("active") && !runnerOutOfBounds(vader).canBeActive) {
                 vader.classList.remove("active");
@@ -412,7 +416,8 @@ function showBigScore() {
 
 function spawnVader(id, init = false) {
     let isRunner = () => {
-        const chance = (Math.random() / vaderRunnerChance);
+        const ultraRunnerBoost = selectedOperator === "ULTRA" ? 1.3 : 1;
+        const chance = Math.random() / vaderRunnerChance * ultraRunnerBoost;
         let msg = chance + "";
         if (!init && container.querySelectorAll(".runner").length === 0 
                 && !multishotActive()
@@ -457,8 +462,12 @@ function getProblem() {
         alert("No " + selectedOperator.toLowerCase() + " facts selected.");
         return null;
     }
-    const randomIndex = Math.floor(Math.random() * selectedProblems.length);
-    return selectedProblems[randomIndex];
+    const randomIx = Math.floor(Math.random() * selectedProblems.length);
+    if (selectedOperator === "ULTRA" && Math.random() < ultraStickyPickerChance && priorProblemIx !== null) {
+        return selectedProblems[priorProblemIx];
+    }
+    priorProblemIx = randomIx;
+    return selectedProblems[randomIx];
 }
 
 function createVader(id, factA, factB, op) {
@@ -676,6 +685,7 @@ class keyListenerHelper {
                 //Above condition: shouldn't be possible to shoot runner while multishot is active, 
                 //but somehow it happens.
                 multishots += multishotsAwarded;
+                if (selectedOperator === "ULTRA") multishots += 2; //Extra bonus for ULTRA mode
                 orbitDetails.movementMode = "transfer";
                 orbitDetails.initTransfer(activeVader);
             }

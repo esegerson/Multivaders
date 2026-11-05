@@ -72,10 +72,11 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
             - TODO: draw turret
             - TODO: Has its own high score list
             - Bonuses:
-                - TODO: Two extra multishots are awarded if a runner is solved
-                - TODO: Higher chance of the same problem appearing in a row
+                - Two extra multishots are awarded when a runner is solved
+                - Higher chance of the same problem appearing in a row
                     - 33% chance of repeating the same vader (but use different format)
                     - Test this to see if it's fun
+                - Higher chance of a problem being a runner
             - Hazards:
                 - TODO: when score > 40, active vaders will sometimes "warp" to 
                     somewhere else (higher) on the screen after 2 seconds, 
@@ -91,6 +92,7 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
         - Scrolling rank next to score removed for non-preset games
     - Quality-of-Life Enhancements:
         - TODO: Hovering over a preset button now displays the high score
+        - TODO: Added a button to submit high score
 - *November 2026:*
     - Game enhancements:
         - Default presets have been tweaked:
