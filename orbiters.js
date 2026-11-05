@@ -168,6 +168,11 @@ function moveTurret() {
     else
         target.x -= screenMidpoint / 4;
 
+    //Do not move turret off screen
+    const screenWidth = window.innerWidth;
+    if (target.x < screenWidth * 0.1) target.x = screenWidth * 0.1;
+    if (target.x > screenWidth * 0.9) target.x = screenWidth * 0.9;
+
     let dist = target.x - current.x;
     let vx = parseFloat(turret.getAttribute("data-vx") ?? 0);
 
@@ -181,13 +186,19 @@ function moveTurret() {
     //Apply acceleration
     vx += ax;
 
-    //Optional snap-to-zero when extremely close
+    //Snap-to-zero when extremely close
     if (Math.abs(dist) < 0.5 && Math.abs(vx) < 0.05) {
         vx = 0;
     }
 
+    //Move
     let left = turret.getBoundingClientRect().left;
     left += vx;
+
+    //Final limiter: keep on-screen (fixes weird glitches when screen is zoomed by player)
+    if (left < -screenWidth * 0.1) left = -screenWidth * 0.1;
+    if (left > screenWidth * 1.1) left = screenWidth * 1.1;
+
     turret.style.left = left + "px";
     turret.setAttribute("data-vx", vx);
 }
