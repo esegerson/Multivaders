@@ -84,9 +84,8 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
                 - Higher chance of the same problem appearing in a row
                     - TODO: Test this to see if it's fun
             - Hazards:
-                - TODO: when score > 40, active vaders will sometimes teleport to 
-                    somewhere else (higher) on the screen after 2 seconds, 
-                    losing the active lock (retaining any typed values)
+                - When score > 40, active vaders will sometimes teleport to 
+                    somewhere else (higher) on the screen, losing the active lock
                 - TODO: when score > 50, add 5% chance of dive-bombers
                     - Descend fast but decelerate so full lifespan is about the same as a normal vader
                 - TODO: when score > 60, rotate vaders 90 or -90 degrees
@@ -96,6 +95,7 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
         - Problems no longer shift off the screen
         - Runners no longer take forever to appear when the score is less than 20
         - Scrolling rank next to score removed for non-preset games
+        - Other minor bug fixes
     - Quality-of-Life Enhancements:
         - TODO: Hovering over a preset button now displays the high score
         - TODO: Added a button to submit high score

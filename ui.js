@@ -344,6 +344,7 @@ function selectOperator(operator) {
         document.getElementById("titleSelectOperator").style.display = "none";
         selectedOperator = operator;
         document.querySelector("#gameContainer > .background").innerHTML = bgSymbol();
+        putSelectedOperatorInUrl();
         start();
         return;
     }
@@ -397,9 +398,7 @@ function selectOperator(operator) {
         b.title = desc;
     });
 
-    //Tweak URL
-    var refresh = window.location.protocol + "//" + window.location.host + window.location.pathname + "?op=" + selectedOperator;
-    window.history.pushState({ path: refresh }, '', refresh); 
+    putSelectedOperatorInUrl();
 }
 
 function updateUltraButton(makeVisible = false, unlock = false) {
@@ -1610,4 +1609,9 @@ class ScoreShiftManager {
     showRank() { this.rankEl.style.display = ""; }
 
     hideRank() { this.rankEl.style.display = "none"; }
+}
+
+function putSelectedOperatorInUrl() {
+    var refresh = window.location.protocol + "//" + window.location.host + window.location.pathname + "?op=" + selectedOperator;
+    window.history.pushState({ path: refresh }, '', refresh);
 }

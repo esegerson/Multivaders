@@ -32,7 +32,28 @@ const graphicsMode = { Normal: 1, LowGraphics: 2 }
 let selectedGraphicsMode = graphicsMode.Normal;
 let scoreRankManager = null;
 let priorProblemIx = null;
-const ultraStickyPickerChance = 0.5;
+const ultraModeSettings = {
+    runnerChanceMultiplier:  1.3,
+    stickyPickerChance:      0.5,
+    extraMultishots:           2,
+    
+    /*  0.001 per frame works out to 84% chance of at least 1 event per minute, 
+        or 54% chance of at least 2 events per minute,
+        or 27% chance of at least 3 events per minute.
+        
+        chance is per-frame
+        cooldown is seconds
+        last is performance.now() measurement and will change during gameplay
+    */
+
+    teleport:   { minScore: 40, chance: 0.0010, cooldown: 5, last: 0 }, //chance is per-frame
+    divebomb:   { minScore: 50, chance: 0.1000                       }, //chance is per-non-runner
+    rotate:     { minScore: 60, chance: 0.2000                       }, //chance is per-non-runner
+    factchange: { minScore: 80, chance: 0.0010, cooldown: 5, last: 0 }, //chance is per-frame
+
+    increaseChancesMinScore: 100, increaseChanceFactor: 3, //Multiply chances above by this
+};
+
 
 let keybuffer = [];
 
@@ -184,8 +205,29 @@ function gameLoop() {
         document.getElementById("gameContainer").classList.add("lowgraphics");
     }
 
-    let vaders = document.querySelectorAll("#gameContainer .vader");
+    const vaders = document.querySelectorAll("#gameContainer .vader");
     let incompleteVaders = Array.from(vaders).filter(v => !v.classList.contains("correct"));
+
+    //Select some random events per frame
+    let teleportVaderIx = -1;
+    let factChangeVaderIx = -1;
+    if (selectedOperator === "ULTRA") {
+        const teleportCutoff = now - ultraModeSettings.teleport.cooldown * 1000;
+        if (score >= ultraModeSettings.teleport.minScore
+                && Math.random() < ultraModeSettings.teleport.chance 
+                && incompleteVaders.length > 1
+                && ultraModeSettings.teleport.last < teleportCutoff) {
+            const activeVader = document.querySelector("#gameContainer .vader.active");
+            if (!activeVader.classList.contains("runner"))
+                teleportVaderIx = incompleteVaders.indexOf(activeVader);
+        }
+        if (score >= ultraModeSettings.factChangeMinScore
+                && Math.random() < ultraModeSettings.factChangeChance 
+                && incompleteVaders.length > 1) {
+            const inactiveVaders = incompleteVaders.filter(v => !v.classList.contains("active"));
+            factChangeVaderIx = Math.floor(Math.random() * inactiveVaders.length);
+        }
+    }
 
     //Spawn regular vader
     if (now - lastVaderSpawned > getDelay() || incompleteVaders.length === 0) {
@@ -270,7 +312,7 @@ function gameLoop() {
             vader.style.top = (top + speedNominal) + "px";
         }
 
-        //Adjust horizontal shift for regular vaders (from an incorrect value)
+        //Adjust horizontal shift for regular vaders (from an incorrect value, the "dodge")
         let hs = parseFloat(vader.getAttribute("data-horiz-speed")) || 0;
         if (hs !== 0) {
             hs *= 0.9; //Taper speed off each iteration
@@ -283,6 +325,17 @@ function gameLoop() {
             let left = parseFloat(vader.style.left);
             left += hs;
             vader.style.left = left + "px";
+        }
+
+        //Teleport
+        if (teleportVaderIx > -1 && incompleteVaders[teleportVaderIx] === vader
+                && !vader.classList.contains("preTeleport")) {
+            teleportVader(vader);
+        }
+
+        //Fact change
+        if (factChangeVaderIx > -1 && incompleteVaders[factChangeVaderIx] === vader) {
+            console.log("Changing fact for vader", vader.getAttribute("data-id"));
         }
     }
 
@@ -354,6 +407,56 @@ function gameLoop() {
     moveLaserParticles();
 }
 
+function teleportVader(vader) {
+    //Pick new left and top values. Left value must be lower than original
+    const oldTop = parseFloat(vader.style.top);
+    const oldLeft = parseFloat(vader.style.left);
+    const newTop = Math.random() * (oldTop - 10); //-10 ensures new position is higher
+    const newLeft = Math.random() * window.innerWidth * 0.8 + window.innerWidth * 0.1;
+    
+    //Prep for jump
+    vader.classList.add("preTeleport"); //1s "scrunch" animation
+    
+    //Schedule jump for 1s from now
+    setTimeout(function() {
+        //If player solved it in 1s, cancel jump
+        if (vader.classList.contains("correct") 
+                || !vader.classList.contains("active")
+                || !vader.classList.contains("preTeleport")) {
+            vader.classList.remove("preTeleport");
+            ultraModeSettings.teleport.last = performance.now();
+            return;
+        } 
+
+        //Move to new location
+        vader.style.left = newLeft + "px";
+        vader.style.top = newTop + "px";
+
+        //Remove active and select new active vader
+        vader.classList.remove("active");
+        const vaders = document.querySelectorAll("#gameContainer .vader");
+        for (const v of vaders) v.classList.remove("related");
+        getNextActiveVader(vader);
+
+        //Remove prep animation
+        vader.classList.add("postTeleport");
+        setTimeout(function() { 
+            vader.classList.remove("preTeleport");
+            vader.classList.remove("postTeleport");
+        }, 50);
+
+        //Draw teleportation particles
+        const g = document.getElementById("sparks");
+        const center = getVaderCenter(vader);
+        const offsetX = center.x - oldLeft;
+        const offsetY = center.y - oldTop;
+        createTeleportParticles(g, oldLeft + offsetX, oldTop + offsetY, newLeft + offsetX, newTop + offsetY);
+        createTeleportLandParticles(g, newLeft + offsetX, newTop + offsetY);
+        showScreenTip({ type: "point", classname: "tippoint", text: "!!", x: oldLeft, y: oldTop });
+        ultraModeSettings.teleport.last = performance.now();
+    }, 1000);
+}
+
 function sendKeyPress(key, targetGameplayBoard = true) {
     const event = new KeyboardEvent("keydown", {
         key: key,
@@ -416,7 +519,7 @@ function showBigScore() {
 
 function spawnVader(id, init = false) {
     let isRunner = () => {
-        const ultraRunnerBoost = selectedOperator === "ULTRA" ? 1.3 : 1;
+        const ultraRunnerBoost = selectedOperator === "ULTRA" ? ultraModeSettings.runnerChanceMultiplier : 1;
         const chance = Math.random() / vaderRunnerChance * ultraRunnerBoost;
         let msg = chance + "";
         if (!init && container.querySelectorAll(".runner").length === 0 
@@ -463,7 +566,7 @@ function getProblem() {
         return null;
     }
     const randomIx = Math.floor(Math.random() * selectedProblems.length);
-    if (selectedOperator === "ULTRA" && Math.random() < ultraStickyPickerChance && priorProblemIx !== null) {
+    if (selectedOperator === "ULTRA" && Math.random() < ultraModeSettings.stickyPickerChance && priorProblemIx !== null) {
         return selectedProblems[priorProblemIx];
     }
     priorProblemIx = randomIx;
@@ -643,8 +746,16 @@ function keyListener(e) {
             else vader.classList.remove("paused");
     } else if (e.key === "PageDown" && showStats) {
         //Debug: whatever I'm currently testing
-        //forceNextRunner = !forceNextRunner;
-        //spawnVader(lastId++, false);
+        //Testing teleport:  work with just a few near the bottom of screen
+        let vaders = document.querySelectorAll("#gameContainer .vader");
+        const maxVaders = 3;
+        Array.from(vaders).slice(maxVaders).forEach(v => v.remove());
+        getNextActiveVader();
+        let h = window.innerHeight - 200;
+        for (const vader of vaders) {
+            const t = parseInt(vader.style.top);
+            if (t < h) vader.style.top = h + "px";
+        }
     }
 }
 
@@ -689,7 +800,7 @@ class keyListenerHelper {
                 orbitDetails.movementMode = "transfer";
                 orbitDetails.initTransfer(activeVader);
             }
-            getNextActiveVader(activeVader.getAttribute("data-id"));
+            getNextActiveVader();
             playKeyboardPress(3); //3 = the bass harmonic
         } else {
             for (const [i, v] of relatedVaders.entries()) {
@@ -732,9 +843,10 @@ class keyListenerHelper {
     }
 }
 
-function getNextActiveVader() {
+function getNextActiveVader(notThisVader = null) {
     //Get the lowest vader on screen
-    const vaders = Array.from(document.querySelectorAll("#gameContainer .vader:not(.correct)"));
+    const vaders = Array.from(document.querySelectorAll("#gameContainer .vader:not(.correct)"))
+        .filter(v => v !== notThisVader);
     
     let maxTop = -1000;
     let id = null;
@@ -748,8 +860,9 @@ function getNextActiveVader() {
         }
     }
     if (id != null) 
-        vaders.filter(v => v.getAttribute("data-id") === id)[0].classList.add("active");
+        vaders.filter(v => v.getAttribute("data-id") === id)[0].classList.add("active"); //Set active
     if (multishotActive()) initMultishot();
+    ultraModeSettings.teleport.last = performance.now();
 }
 
 function runnerOutOfBounds(vader) {
@@ -767,7 +880,7 @@ function runnerOutOfBounds(vader) {
 }
 
 function selectDifferentVader(direction) {
-    //Direction: -1 = left of current active vader, 1 = right
+    //Direction: -1 = left of current active vader, 1 = right, 0 = random
     const vaders = Array.from(document.querySelectorAll("#gameContainer .vader:not(.correct)"));
     if (vaders.length === 0) return;
     for (const v of vaders) v.classList.remove("related");
@@ -791,6 +904,7 @@ function selectDifferentVader(direction) {
         nearestVader.classList.add("active");
         if (multishotActive()) initMultishot();
     }
+    ultraModeSettings.teleport.last = performance.now();
 }
 
 function getRelatedVaders(activeVader) {
@@ -1003,6 +1117,70 @@ function moveLaserParticles() {
         cy += vy;
         particle.setAttribute("cx", cx);
         particle.setAttribute("cy", cy);
+    }
+}
+
+function createTeleportParticles(g, x1, y1, x2, y2) {
+    //Create small particles along the teleport path 
+    //with a small velocity in that direction.  Particles should
+    //not form a line like the laser but should be more spread out.
+    //Do not draw particles on the line 10% closest to the second point.
+    const numParticles = 30;
+    const spread = window.innerWidth / 20;
+    const speedAdjust = 0.7;
+    const angleVariance = 0.6; //radians
+    const maxT = 0.7;
+
+    for (let i = 0; i < numParticles; i++) {
+        let t = Math.random() * maxT;
+        let px = x1 + t * (x2 - x1) + (Math.random() * spread - spread / 2);
+        let py = y1 + t * (y2 - y1) + (Math.random() * spread - spread / 2);
+
+        //Get angle of the line from (x1, y1) to (x2, y2)
+        let angle = Math.atan2(y2 - y1, x2 - x1) + (Math.random() * angleVariance - angleVariance / 2);
+        let speed = (Math.random() + 1) * speedAdjust;
+        
+        let vx = Math.cos(angle) * speed;
+        let vy = Math.sin(angle) * speed;
+        let particle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        particle.setAttribute("cx", px);
+        particle.setAttribute("cy", py);
+        particle.setAttribute("vx", vx);
+        particle.setAttribute("vy", vy);
+        particle.style.animationDelay = (Math.random() * -10) + "s"; //Negative delay so there's no "jump"
+
+        //Add particle
+        g.append(particle);
+
+        //Schedule particle removal
+        setTimeout(() => { particle.remove(); }, 10000);
+    }
+}
+
+function createTeleportLandParticles(g, x, y) {
+    //Create a cloud puff at this position
+    const numParticles = 20;
+    const initDist = 30; //radius, px
+    const initV = 10; //px/frame
+    for (let i = 0; i < numParticles; i++) {
+        let angle = Math.random() * Math.PI * 2; //Full circle
+        let px = x + Math.cos(angle) * initDist;
+        let py = y + Math.sin(angle) * initDist;
+        let vx = Math.cos(angle) * 0.2;
+        let vy = Math.sin(angle) * 0.2;
+        let particle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        particle.setAttribute("cx", px);
+        particle.setAttribute("cy", py);
+        particle.setAttribute("vx", vx);
+        particle.setAttribute("vy", vy);
+        particle.classList.add("cloud"); //Changes from yellow sparks to black clouds
+        particle.style.animationDelay = (Math.random() * -10) + "s"; //Negative delay so there's no "jump"
+
+        //Add particle
+        g.append(particle);
+
+        //Schedule particle removal
+        setTimeout(() => { particle.remove(); }, 10000);
     }
 }
 
