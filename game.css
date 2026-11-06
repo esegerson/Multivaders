@@ -465,6 +465,8 @@ button.fullscreen {
     transition: left 0.05s linear, top 0.05s linear !important;
 }
 .vader.preTeleport.postTeleport { animation: initial; }
+.vader.rotateCW { rotate: 90deg; }
+.vader.rotateCCW { rotate: -90deg; }
 
 @keyframes jiggle { /*death rattle*/
     0%   { transform: rotate(10deg) translate(0, 0); }

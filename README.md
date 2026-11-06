@@ -84,12 +84,13 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
                 - Higher chance of the same problem appearing in a row
                     - TODO: Test this to see if it's fun
             - Hazards:
-                - When score > 40, active vaders will sometimes teleport to 
+                - When score > 40, active problems will sometimes teleport to 
                     somewhere else (higher) on the screen, losing the active lock
                 - TODO: when score > 50, add 5% chance of dive-bombers
-                    - Descend fast but decelerate so full lifespan is about the same as a normal vader
-                - TODO: when score > 60, rotate vaders 90 or -90 degrees
-                - TODO: when score > 80, occasionally change facts on non-active vaders
+                    - Descend fast but decelerate so full lifespan is about the same as a normal problem
+                    - Something like y=\sin\left(\frac{x+30}{16}\right)\cdot20-x\cdot1+80 in desmos.com
+                - When score > 60, rotate problems 90 or -90 degrees
+                - TODO: when score > 80, occasionally change facts on non-active problems
         - Game is much harder with scores over 100 - the way it was intended to be
     - Bug fixes:
         - Problems no longer shift off the screen

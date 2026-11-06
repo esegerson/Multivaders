@@ -543,6 +543,10 @@ function spawnVader(id, init = false) {
         vader.setAttribute("data-dir", direction);
         const s = parseFloat(vader.getAttribute("data-speed")) * 8; //Much faster than reg vader
         vader.setAttribute("data-speed", s); //8X speed
+    } else if (selectedOperator === "ULTRA" 
+            && score >= ultraModeSettings.rotate.minScore 
+            && Math.random() < ultraModeSettings.rotate.chance) {
+        vader.classList.add("rotate" + (Math.random() < 0.5 ? "CW" : "CCW"));
     }
     container.appendChild(vader);
     
