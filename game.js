@@ -22,6 +22,7 @@ let totalSeconds = 0;
 let overrideSpeed = false;
 const vaderRunnerChance = 1 / 10; //This seems really wrong. 1/3 feels like 1/10
 let forceNextRunner = false;
+let forceDivebomber = false;
 let multishots = 0;
 const multishotsAwarded = 4;
 let multishotActive = function() { return multishots > 0; };
@@ -283,11 +284,26 @@ function gameLoop() {
             }
         } else {
             let top = parseFloat(vader.style.top || "-150");
-            if (top < 50 && score < 100) { //Do a fast slide-in so user doesn't have to wait
-                speedNominal = (50 - top) / 5 * speedNominal; //Hustle to get onto the screen
-                if (speedNominal < 0.2) speedNominal = 0.2; //Ensure a minimum speed
+            
+            if (vader.classList.contains("divebomb")) {
+                let boost = parseFloat(vader.getAttribute("data-boost"));
+                boostNominal = boost * window.innerHeight / 2160;
+                boost -= ultraModeSettings.divebomb.bleed;
+                const boostCap = -1 * window.innerHeight / 2160
+                if (boost < boostCap) boost = boostCap;
+                vader.setAttribute("data-boost", boost);
+                let boost2 = parseFloat(vader.getAttribute("data-boost2"));
+                boost2 += ultraModeSettings.divebomb.bleed / 100;
+                vader.setAttribute("data-boost2", boost2);
+                speedNominal += boostNominal + boost2;
+                vader.style.top = (top + speedNominal) + "px";
+            } else {
+                if (top < 50 && score < 100) { //Do a fast slide-in so user doesn't have to wait
+                    speedNominal = (50 - top) / 5 * speedNominal; //Hustle to get onto the screen
+                    if (speedNominal < 0.2) speedNominal = 0.2; //Ensure a minimum speed
+                }
+                vader.style.top = (top + speedNominal) + "px";
             }
-            vader.style.top = (top + speedNominal) + "px";
         }
 
         //Adjust horizontal shift for regular vaders (from an incorrect value, the "dodge")
@@ -496,7 +512,7 @@ function showBigScore() {
 }
 
 function spawnVader(id, init = false) {
-    let isRunner = () => {
+    const isRunner = () => {
         const ultraRunnerBoost = selectedOperator === "ULTRA" ? ultraModeSettings.runnerChanceMultiplier : 1;
         const chance = Math.random() / vaderRunnerChance * ultraRunnerBoost;
         let msg = chance + "";
@@ -508,8 +524,8 @@ function spawnVader(id, init = false) {
         }
         return false;
     };
-    let problem = getProblem();
-    let vader = createVader(id, problem.factA, problem.factB, problem.operator ?? selectedOperator);
+    const problem = getProblem();
+    const vader = createVader(id, problem.factA, problem.factB, problem.operator ?? selectedOperator);
     const container = document.getElementById("vaderContainer");
     if (container.querySelectorAll("#gameContainer .active").length === 0)
         vader.classList.add("active");
@@ -525,6 +541,15 @@ function spawnVader(id, init = false) {
             && score >= ultraModeSettings.rotate.minScore 
             && Math.random() < ultraModeSettings.rotate.chance) {
         vader.classList.add("rotate" + (Math.random() < 0.5 ? "CW" : "CCW"));
+    } else if (forceDivebomber
+            || (selectedOperator === "ULTRA"
+            && score >= ultraModeSettings.divebomb.minScore
+            && Math.random() < ultraModeSettings.divebomb.chance)) {
+        vader.classList.add("divebomb");
+        vader.setAttribute("data-boost", ultraModeSettings.divebomb.boost);
+        vader.setAttribute("data-speed", getSpeed() / 10);
+        vader.setAttribute("data-boost2", 0);
+        vader.setAttribute
     }
     container.appendChild(vader);
     
@@ -728,16 +753,10 @@ function keyListener(e) {
             else vader.classList.remove("paused");
     } else if (e.key === "PageDown" && showStats) {
         //Debug: whatever I'm currently testing
-        //Testing teleport:  work with just a few near the bottom of screen
-        let vaders = document.querySelectorAll("#gameContainer .vader");
-        const maxVaders = 3;
-        Array.from(vaders).slice(maxVaders).forEach(v => v.remove());
-        getNextActiveVader();
-        let h = window.innerHeight - 200;
-        for (const vader of vaders) {
-            const t = parseInt(vader.style.top);
-            if (t < h) vader.style.top = h + "px";
-        }
+        //Testing divebomb
+        forceDivebomber = true;
+        spawnVader(lastId++);
+        forceDivebomber = false;
     }
 }
 
