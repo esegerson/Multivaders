@@ -32,28 +32,6 @@ const graphicsMode = { Normal: 1, LowGraphics: 2 }
 let selectedGraphicsMode = graphicsMode.Normal;
 let scoreRankManager = null;
 let priorProblemIx = null;
-const ultraModeSettings = {
-    runnerChanceMultiplier:  1.3,
-    stickyPickerChance:      0.5,
-    extraMultishots:           2,
-    
-    /*  0.001 per frame works out to 84% chance of at least 1 event per minute, 
-        or 54% chance of at least 2 events per minute,
-        or 27% chance of at least 3 events per minute.
-        
-        chance is per-frame
-        cooldown is seconds
-        last is performance.now() measurement and will change during gameplay
-    */
-
-    teleport:   { minScore: 40, chance: 0.0010, cooldown: 5, last: 0 }, //chance is per-frame
-    divebomb:   { minScore: 50, chance: 0.1000                       }, //chance is per-non-runner
-    rotate:     { minScore: 60, chance: 0.2000                       }, //chance is per-non-runner
-    factchange: { minScore: 80, chance: 0.0010, cooldown: 5, last: 0 }, //chance is per-frame
-
-    increaseChancesMinScore: 100, increaseChanceFactor: 3, //Multiply chances above by this
-};
-
 
 let keybuffer = [];
 
