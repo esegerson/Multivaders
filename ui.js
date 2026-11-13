@@ -1069,6 +1069,7 @@ function populateHighScoresUI() {
     const olMainMenu = divHsMainMenu.querySelector("ol");
     const olGameOver = divHsGameOver.querySelector("ol");
     const pNewHighScore = divHsGameOver.querySelector("p");
+    const submitBtn = document.getElementById("btnEnter");
     const btns = document.getElementById("gameOverButtons");
     
     //Load existing highscores
@@ -1138,6 +1139,10 @@ function populateHighScoresUI() {
 
     //Add listeners for initials input if needed
     if (isHS && newMarked) document.addEventListener("keydown", initialsInputKeyDown);
+
+    //Prep submit button
+    submitBtn.style.display = "";
+    submitBtn.setAttribute("disabled", true);
 }
 
 function ordinal(n) {
@@ -1151,6 +1156,7 @@ function initialsInputKeyDown(e) {
 
     const inputEl = document.getElementById("initialsInput");
     const entry = document.querySelector("#highScoresGameOver ol.highscorelist li.new");
+    const btnEnter = document.getElementById("btnEnter");
     let val = inputEl.value;
     
     if (e.key === "Enter") {
@@ -1161,6 +1167,7 @@ function initialsInputKeyDown(e) {
         document.querySelector(".highscorelist li.new").classList.add("full"); //For short names
         document.querySelector(".highscorelist li.kicked")?.classList.add("hidden");
         document.querySelector("#highScoresGameOver p").style.opacity = "0";
+        btnEnter.style.display = "none";
         e.preventDefault();
     } else if (e.key === "Backspace") {
         val = val.slice(0, -1);
@@ -1173,6 +1180,15 @@ function initialsInputKeyDown(e) {
     }
     inputEl.value = val;
     document.querySelector("#highScoresGameOver ol.highscorelist li.new dd:nth-child(2)").textContent = val;
+    if (val.length === 0) 
+        btnEnter.setAttribute("disabled", true);
+    else
+        btnEnter.removeAttribute("disabled");
+}
+
+function btnEnterSubmitInitials() {
+    sendKeyPress('Enter', false);
+    document.getElementById("btnEnter").style.display = "none";
 }
 
 function newNameSparks() {
