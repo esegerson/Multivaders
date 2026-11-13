@@ -86,9 +86,7 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
             - Hazards:
                 - When score > 40, active problems will sometimes teleport to 
                     somewhere else (higher) on the screen, losing the active lock
-                - TODO: when score > 50, add 5% chance of dive-bombers
-                    - Descend fast but decelerate so full lifespan is about the same as a normal problem
-                    - Something like y=\sin\left(\frac{x+30}{16}\right)\cdot20-x\cdot1+80 in desmos.com
+                - When score > 50, there's a chance of dive-bombers
                 - When score > 60, rotate problems 90 or -90 degrees
                 - TODO: when score > 80, occasionally change facts on non-active problems
         - Game is much harder with scores over 100 - the way it was intended to be
@@ -171,6 +169,8 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
 ## Assets
 
 One asset is used, a royalty-free MP3 file ["Soft - Soft Music"](https://pixabay.com/music/upbeat-calm-soft-background-music-357212/) (originally titled "Calm Soft Background Music") by [Viacheslav Starostin aka original_soundtrack](https://pixabay.com/users/original_soundtrack-50153119/), found on [Pixabay.com](https://pixabay.com). Direct download of file is [here](https://cdn.pixabay.com/download/audio/2025/06/09/audio_2feeb02bcd.mp3?filename=calm-soft-background-music-357212.mp3).
+
+Retro Zap Sound 06 https://pixabay.com/sound-effects/technology-retro-zap-sound-06-474813/
 
 All other files were authored by myself.
 

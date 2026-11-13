@@ -216,7 +216,7 @@ function gameLoop() {
             hitCeiling += 4;
             //Award 4 extra points (in additon to the 1 point for solving each vader)
             score += extraPoints - 1; //Last extra point awarded in incrementScore()
-            playChimeSound();
+            playSound.chime();
             showScreenTip({ type: "clear", classname: "tipclear", text: "Clear! +" + extraPoints });
             incrementScore(); //Called here to refresh the score display
         }
@@ -709,7 +709,7 @@ function keyListener(e) {
         if (result.textContent.length === 1 && result.textContent === "\xa0") result.textContent = "";
         if (result.textContent.length < 3) {
             result.textContent += e.key;
-            playKeyboardPress(Math.floor(Math.random() * 3));
+            playSound.randomTypeTone();
         }
         if (multishotActive()) { //Copy pressed number to all related vaders
             for (const v of relatedVaders) {
@@ -788,7 +788,9 @@ class keyListenerHelper {
                     y: parseInt(v.style.top) + v.offsetHeight - 60
                 });
             }
+            let shotMulti = false;
             if (multishotActive()) {
+                shotMulti = true;
                 multishots--;
                 hideOneOrbiter();
                 if (!multishotActive()) endMultishot();
@@ -802,7 +804,8 @@ class keyListenerHelper {
                 orbitDetails.initTransfer(activeVader);
             }
             getNextActiveVader();
-            playKeyboardPress(3); //3 = the bass harmonic
+            playSound.bassTone();
+            if (shotMulti) playSound.boom(); else playSound.zap();
         } else {
             for (const [i, v] of relatedVaders.entries()) {
                 v.setAttribute("data-last-val", result.textContent);
