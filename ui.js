@@ -261,7 +261,8 @@ function selectOperator(operator) {
         const setLetter = setName.split("Set ")[1];   //A, B, C, D, E
         const ix = setLetter.charCodeAt(0) - 65;      //0, 1, 2, 3, 4
         const desc = presets.find(x => x.name === setName)?.description ?? setName;
-        b.title = desc;
+        const high = getHigestScoreForSet(setName);
+        b.title = desc + "\n\n" + high;
     });
 
     putSelectedOperatorInUrl();
@@ -421,6 +422,15 @@ function updateUltraButton(makeVisible = false, unlock = false) {
         btn.title = msg;
         btn.querySelector("aside").innerHTML = msg;
     }
+}
+
+function getHigestScoreForSet(setName) {
+    const highscores = getHighScoresForSet(setName, selectedOperator);
+    const filtered = highscores.filter(o => o.initials !== defaultInitials);
+    const highest = filtered.length > 0 ? filtered[0] : null;
+    if (highest === null || highest.initials === defaultInitials) 
+        return "No high score; be the first!";
+    return "High score: " + highest.score + " set by " + highest.initials;
 }
 
 function menuLoop() {
@@ -675,6 +685,7 @@ function refreshCustomPresetButtons() {
         el.setAttribute("onclick", "presetCustom(this)");
         el.setAttribute("onmouseover", "hoverPreset(this)");
         el.setAttribute("onmouseout", "clearHoverPreset()");
+        el.title = getHigestScoreForSet(p.name);
         container.appendChild(el);
         container.appendChild(document.createTextNode(" ")); //Add a space between buttons
     }
