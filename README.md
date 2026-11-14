@@ -97,7 +97,7 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
         - Other minor bug fixes
     - Quality-of-Life Enhancements:
         - TODO: Hovering over a preset button now displays the high score
-        - TODO: Added a button to submit high score
+        - Added a button to submit high score
 - *November 2026:*
     - Game enhancements:
         - Default presets have been tweaked:
