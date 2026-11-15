@@ -917,6 +917,7 @@ function populateHighScoresUI() {
     const h3GameOver = divHsGameOver.querySelector("h3");
     const olMainMenu = divHsMainMenu.querySelector("ol");
     const olGameOver = divHsGameOver.querySelector("ol");
+    const pNotice    = divHsGameOver.querySelector("#noset");
     const pNewHighScore = divHsGameOver.querySelector("p");
     const submitBtn = document.getElementById("btnEnter");
     const btns = document.getElementById("gameOverButtons");
@@ -976,6 +977,8 @@ function populateHighScoresUI() {
         olMainMenu.appendChild(li);
         olGameOver.appendChild(li.cloneNode(true));
     }
+    olGameOver.style.display = "";
+    pNotice.style.display = "none";
 
     //Show instructions
     h2GameOver.style.display = selectedSetName === "" ? "none" : "block";
@@ -1015,7 +1018,6 @@ function initialsInputKeyDown(e) {
         document.querySelector(".highscorelist li.new").classList.add("emphasize");
         document.querySelector(".highscorelist li.new").classList.add("full"); //For short names
         document.querySelector(".highscorelist li.kicked")?.classList.add("hidden");
-        document.querySelector("#highScoresGameOver p").style.opacity = "0";
         btnEnter.style.display = "none";
         e.preventDefault();
     } else if (e.key === "Backspace") {
