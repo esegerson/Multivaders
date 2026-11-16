@@ -380,6 +380,7 @@ function updateUltraButton(makeVisible = false, unlock = false) {
         "Are you ready?",
         "How good are you?",
         "Meet the boss.",
+        "Activate boss mode!",
         "Are you faster than a calculator?",
         
         //Quotes (\u2013 is en-dash, displays well in tooltip and DOM)
@@ -839,7 +840,7 @@ function saveHighScore() {
 
     //Get set name
     let setName = selectedSetName;
-    if (setName === "") {
+    if (setName === "" && selectedOperator !== "ULTRA") {
         alert("Unable to save high score: No preset selected.");
         return;
     }
@@ -894,13 +895,15 @@ function saveHighScore() {
 function getHighScoresForSet(setName, operator = selectedOperator) {
     const highscoreList = getHighscoresFromStorage();
     if (!highscoreList || highscoreList.length === 0) return defaultHighScores();
-    const setEntry = highscoreList.find(s => s.name === setName && s.operator === operator);
+    const setEntry = highscoreList
+        .find(s => (s.name === setName && s.operator === operator) 
+            || (operator === "ULTRA" && s.operator === operator));
     if (!setEntry) return defaultHighScores();
     return setEntry.scores;
 }
 
 function isHighScore(setName, score) {
-    if (setName === "") return false;
+    if (setName === "" && selectedOperator !== "ULTRA") return false;
     if (score < 2) return false;
     let highscoreList = getHighScoresForSet(setName);
     if (highscoreList.length < 10) return true;
@@ -948,8 +951,10 @@ function populateHighScoresUI() {
     olGameOver.replaceChildren();
 
     //Set titles
-    h3MainMenu.textContent = selectedSetName;
-    h3GameOver.textContent = selectedSetName;
+    let setNameDisplay = selectedSetName;
+    if (selectedOperator === "ULTRA") setNameDisplay = "ULTRA MODE";
+    h3MainMenu.textContent = setNameDisplay;
+    h3GameOver.textContent = setNameDisplay;
 
     //Populate both lists
     let newMarked = false;
@@ -981,7 +986,7 @@ function populateHighScoresUI() {
     pNotice.style.display = "none";
 
     //Show instructions
-    h2GameOver.style.display = selectedSetName === "" ? "none" : "block";
+    h2GameOver.style.display = setNameDisplay === "" ? "none" : "block";
     pNewHighScore.style.display = isHS ? "block" : "none";
     btns.style.display = isHS ? "none" : "inline-block";
     if (!isHS) {

@@ -123,7 +123,10 @@ function start() {
         document.getElementById("liveOldScores"), 
         document.getElementById("liveCurScore"),
         getHighScoresForSet(selectedSetName))
-    if (selectedSetName === "") scoreRankManager.hideRank(); else scoreRankManager.showRank();
+    if (selectedSetName === "" && selectedOperator !== "ULTRA") 
+        scoreRankManager.hideRank(); 
+    else 
+        scoreRankManager.showRank();
     score = -1;
     incrementScore(); //Start score at 0
     resetBigScore();
@@ -484,7 +487,7 @@ function gameOver(vader) {
         //Show high scores
         const gameOverScreen = document.getElementById("highScoresGameOver");
         gameOverScreen.style.display = "block";
-        if (selectedSetName !== "") {
+        if (selectedSetName !== "" || selectedOperator === "ULTRA") {
             populateHighScoresUI();
             document.getElementById("noset").style.display = "none";
         } else {
