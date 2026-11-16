@@ -35,9 +35,11 @@ const osk = {
                 this.numericEl.classList.add("hidden");
                 this.alphaEl.classList.remove("hidden");
             }
+            document.getElementById("pauseKey").innerText = "Pause";
         } else {
             this.numericEl.classList.add("hidden");
             this.alphaEl.classList.add("hidden");
+            document.getElementById("pauseKey").innerText = "spacebar";
         }
     }
 }

@@ -77,7 +77,7 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
             - Uses a random subset of all facts on the 12x12 grid
             - Mixes all formats together
             - TODO: draw turret
-            - TODO: Has its own high score list
+            - Has its own high score list
             - Bonuses:
                 - Higher chance of a problem being a runner
                 - Two extra multishots are awarded when a runner is solved

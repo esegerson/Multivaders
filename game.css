@@ -353,11 +353,13 @@ button.fullscreen {
 
 #statsContainer DL > DD { margin: 0; }
 
-#gameContainer.paused {
-    filter: blur(0.7rem);
-    pointer-events: none;
-    opacity: 0.6;
-}
+#gameContainer.paused { pointer-events: none; opacity: 0.6; }
+#gameContainer.paused .score,
+#gameContainer.paused #tipContainer, 
+#gameContainer.paused .decoration,
+#gameContainer.paused .background,
+#gameContainer.paused #vaderContainer,
+#gameContainer.paused  #svgContainerBehind { filter: blur(0.7rem); }
 
 #gameContainer .background {
     position: absolute;
