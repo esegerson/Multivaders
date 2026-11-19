@@ -8,13 +8,27 @@ const defaultInitials = "\u2013\u2013\u2013"; //EN DASH x3
 let menuLoopInterval = null;
 let hideCursorTimer = 0;
 const osk = {
+    states: {
+        menu: "menu",
+        gameplay: "gameplay",
+        gamePaused: "gamePaused",
+        gameOver: "gameOver",
+        gameOverNoHighScore: "gameOverNoHighScore",
+        gameOverHighScore: "gameOverHighScore"
+    },
     isOn: false, //On-screen keyboard (either numeric or alpha)
     isNumeric: true, //When false, is alpha for initials entry
+    curState: null,
     numericEl: null,
     alphaEl: null,
+    pauseEl: null,
+    quitEl: null,
     bind: function() {
         this.numericEl = document.getElementById("inputTable");
         this.alphaEl = document.getElementById("inputTableAlpha");
+        this.pauseEl = this.numericEl.querySelector("button[data-key=' ']");
+        this.quitEl = this.numericEl.querySelector("button[data-key=q]");
+        this.curState = this.states.menu;
     },
     toggleOn: function() {
         this.isOn = !this.isOn;
@@ -23,6 +37,68 @@ const osk = {
     toggleMode: function() {
         this.isNumeric = !this.isNumeric;
         this.setState(this.isOn, this.isNumeric);
+    },
+    enterState: function(state = this.curState) {
+        const setNumericMode = function(isNumeric, nEl, aEl) {
+            if (isNumeric) {
+                nEl.classList.remove("hidden");
+                aEl.classList.add("hidden");
+            } else {
+                nEl.classList.add("hidden");
+                aEl.classList.remove("hidden");
+            }
+        };
+        const enableAllButtons = function(enable, el) {
+            if (enable)
+                el.querySelectorAll("button")
+                    .forEach(b => b.removeAttribute("disabled"));
+            else
+                el.querySelectorAll("button")
+                    .forEach(b => b.setAttribute("disabled", true));
+        };
+        const enableButton = function(enable, el) {
+            if (enable)
+                el.removeAttribute("disabled");
+            else
+                el.setAttribute("disabled", true);
+        }
+        this.curState = state;
+        switch (this.curState) {
+            case this.states.menu: //Numeric, disable all buttons
+                this.isNumeric = true;
+                setNumericMode(true, this.numericEl, this.alphaEl);
+                enableAllButtons(false, this.numericEl);
+                break;
+            case this.states.gameplay: //Numeric, enable all buttons
+                this.isNumeric = true;
+                setNumericMode(true, this.numericEl, this.alphaEl);
+                enableAllButtons(true, this.numericEl);
+                break;
+            case this.states.gamePaused: //Numeric, disable all buttons except Pause and Quit
+                this.isNumeric = true;
+                setNumericMode(true, this.numericEl, this.alphaEl);
+                enableAllButtons(false, this.numericEl);
+                enableButton(true, this.pauseEl);
+                enableButton(true, this.quitEl);
+                break;
+            case this.states.gameOver: //Immediate death before highscore screen
+                this.isNumeric = true;
+                setNumericMode(true, this.numericEl, this.numericEl);
+                enableAllButtons(false, this.numericEl);
+                break;
+            case this.states.gameOverNoHighScore: //Hide all buttons
+                this.isNumeric = false;
+                setNumericMode(false, this.numericEl, this.alphaEl);
+                enableAllButtons(false, this.alphaEl);
+                break;
+            case this.states.gameOverHighScore: //Alpha, enable all buttons
+                this.isNumeric = false;
+                setNumericMode(false, this.numericEl, this.alphaEl);
+                enableAllButtons(true, this.alphaEl);
+                break;
+        }
+
+        this.setState(this.isOn, this.isNumeric); //Preserve visibility
     },
     setState: function(isOn, isNumeric) {
         this.isOn = isOn;
@@ -987,6 +1063,8 @@ function populateHighScoresUI() {
     olGameOver.style.display = "";
     pNotice.style.display = "none";
 
+    osk.enterState(isHS ? osk.states.gameOverHighScore : osk.states.gameOverNoHighScore);
+
     //Show instructions
     h2GameOver.style.display = setNameDisplay === "" ? "none" : "block";
     pNewHighScore.style.display = isHS ? "block" : "none";
@@ -1128,7 +1206,7 @@ function returnToMainMenuFromGameOver() {
     document.querySelectorAll("#gameContainer .vader").forEach(v => v.remove()); //Clear vaders
     tintBackground(); 
     score = 0; //Resets background multis to a calm state
-    osk.setState(osk.isOn, true);
+    osk.enterState(osk.states.menu);
 }
 
 function toggleFullscreen() {

@@ -838,7 +838,7 @@ a:hover { color: white; text-shadow: 0 0 5px white; }
     left: 0;
     bottom: 0;
     width: 100%;
-    pointer-events: all; /*Cancels out #gameContainer pointer-events:none*/
+    pointer-events: none;
     opacity: 0.5;
     transition: bottom 1s ease;
 }
@@ -852,7 +852,8 @@ a:hover { color: white; text-shadow: 0 0 5px white; }
     max-height: 7vw;
     font-size: 2vw; 
     line-height: 0;
-    transition: opacity 1s ease;
+    pointer-events: all;
+    transition: opacity 1s ease, border-width 1s ease;
 }
 @media (max-width: 600px) {
     .keyboard td button { 
@@ -865,6 +866,7 @@ a:hover { color: white; text-shadow: 0 0 5px white; }
 }
 .keyboard td button > * { pointer-events: none; } /*SVG was blocking clicks*/
 .keyboard button svg { height: 3vw; }
+.keyboard button:disabled { border-width: 0; opacity: 0.4; pointer-events: none; }
 .keyboard#inputTable td.enter button, .keyboard#inputTableAlpha td.enter button { font-size: 4vw; }
 .keyboard#inputTable td.enter button > span, .keyboard#inputTableAlpha td.enter button > span { font-size: 0.5em; display: block; margin: 0.5em 0; }
 .keyboard td.enter.left button, .keyboard#inputTableAlpha td.enter button { max-height: none; height: 14vw;}

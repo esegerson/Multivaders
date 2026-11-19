@@ -137,6 +137,7 @@ function start() {
     priorScreenHeight = window.innerHeight;
     priorScreenWidth = window.innerWidth;
     lastGraphicsModeAutoSwitch = performance.now();
+    osk.enterState(osk.states.gameplay);
 
     //Construct turret
     setTurretOperatorSign(selectedOperator);
@@ -476,13 +477,12 @@ function gameOver(vader) {
     let music = document.getElementById("gameMusic");
     music.volume = 0.1;
     showBigScore();
+    osk.enterState(osk.states.gameOver);
     setTimeout(() => {
         document.getElementById("gameOver").style.display = "block";
         document.getElementById("gameContainer").style.display = "none";
         document.body.removeEventListener("keydown", keyListener);
         document.body.classList.toggle("noscroll");
-
-        osk.toggleMode();
 
         //Show high scores
         const gameOverScreen = document.getElementById("highScoresGameOver");
@@ -836,12 +836,14 @@ class keyListenerHelper {
         paused = !paused;
         if (paused) {
             clearInterval(gameLoopInterval);
+            osk.enterState(osk.states.gamePaused);
             document.getElementById("paused").style.display = "block";
             let music = document.getElementById("gameMusic");
             music.volume = 0.1; //Lower volume when paused
             pausedStart = performance.now();
         } else {
             gameLoopInterval = setInterval(gameLoop, 1000 / idealCoreGameLoopFramesPerSec); //Resume the game loop
+            osk.enterState(osk.states.gameplay);
             document.getElementById("paused").style.display = "none";
             let music = document.getElementById("gameMusic");
             music.volume = 0.2;

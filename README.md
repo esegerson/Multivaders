@@ -58,6 +58,9 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
 - If player plays a non-preset game, at game over, 
     present the option to create a preset to save the high score.
 - Add favicon.ico
+- Add a classic arcade demo mode that plays automatically 
+    for 20 seconds and then shows a random high score
+- Refactor code to be cleaner
 
 ## Known Bugs
 
@@ -97,6 +100,7 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
     - Quality-of-Life Enhancements:
         - Hovering over a preset button now displays the high score
         - Added a button to submit high score
+        - Keys on the on-screen keyboard are disabled in different contexts
 - *November 2026:*
     - Game enhancements:
         - Default presets have been tweaked:

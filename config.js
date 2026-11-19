@@ -146,8 +146,8 @@ const ultraModeSettings = {
         last is performance.now() measurement and will change during gameplay
     */
 
-    teleport:   { minScore: 40, chance: 0.0010, cooldown: 5, last: 0 }, //chance is per-frame
-    divebomb:   { minScore: 50, chance: 0.1000, boost: 23, bleed: 0.15 }, //chance is per-non-runner
+    teleport:   { minScore: 40, chance: 0.0020, cooldown: 5, last: 0 }, //chance is per-frame
+    divebomb:   { minScore: 50, chance: 0.10, boost: 23, bleed: 0.15 }, //chance is per-non-runner
     rotate:     { minScore: 60, chance: 0.2000                       }, //chance is per-non-runner
     factchange: { minScore: 80, chance: 0.0010, cooldown: 5, last: 0 }, //chance is per-frame
 
@@ -165,8 +165,6 @@ const gameState = {
     hitCeiling: 0,
     autoSolve: false,
     autoSolveInProgress: false,
-    
-
 
     features: {
         teleport:   { unlocked: false, multiplier: 1 },
