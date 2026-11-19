@@ -69,6 +69,7 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
 
 - *December 2026:*
     - Game enhancements:
+        - Game is much harder with scores over 100 - the way it was intended to be
         - ULTRA MODE added
             - Button in operator menu is hidden until player shows *interest* in the game
             - Button is locked until player shows *proficiency* in all operators
@@ -82,14 +83,12 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
                 - Higher chance of a problem being a runner
                 - Two extra multishots are awarded when a runner is solved
                 - Higher chance of the same problem appearing in a row
-                    - TODO: Test this to see if it's fun
             - Hazards:
                 - When score > 40, active problems will sometimes teleport to 
                     somewhere else (higher) on the screen, losing the active lock
                 - When score > 50, there's a chance of dive-bombers
                 - When score > 60, rotate problems 90 or -90 degrees
                 - TODO: when score > 80, occasionally change facts on non-active problems
-        - Game is much harder with scores over 100 - the way it was intended to be
     - Bug fixes:
         - Problems no longer shift off the screen
         - Runners no longer take forever to appear when the score is less than 20
