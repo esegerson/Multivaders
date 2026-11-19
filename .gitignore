@@ -1,1 +1,7 @@
 notes/
+
+#Do not include eslint as part of the official repository; local tool only
+node_modules/
+package-lock.json
+package.json
+eslint.config.mjs
