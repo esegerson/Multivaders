@@ -49,14 +49,13 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
     - Correct answer "zap"
     - Backspace "click"
     - Game over "groan" or explosion
-    - Pre-teleport "vwoo" and teleport "zip"
+    - Pre-teleport "vwoo" and teleport "zip" or "schwip"
 - To prevent overlapping and legibility, darken problems that are behind the 
     active problem; restore them when the active problem is solved
 - The fewer the facts selected, the more powerful multishot becomes. Inversely, the 
     more facts selected, the more useless multishot becomes. Find a way to even this out?
 - If player plays a non-preset game, at game over, 
     present the option to create a preset to save the high score.
-- Add favicon.ico
 - Add a classic arcade demo mode that plays automatically 
     for 20 seconds and then shows a random high score
 - Refactor code to be cleaner
