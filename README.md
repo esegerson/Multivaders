@@ -49,6 +49,7 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
     - Correct answer "zap"
     - Backspace "click"
     - Game over "groan" or explosion
+    - Pre-teleport "vwoo" and teleport "zip"
 - To prevent overlapping and legibility, darken problems that are behind the 
     active problem; restore them when the active problem is solved
 - The fewer the facts selected, the more powerful multishot becomes. Inversely, the 
