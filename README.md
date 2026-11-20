@@ -49,8 +49,6 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
     - Correct answer "zap"
     - Backspace "click"
     - Game over "groan" or explosion
-- Move graphics code from game.js to separate graphics.js file
-    - Refactor and clean up global space
 - To prevent overlapping and legibility, darken problems that are behind the 
     active problem; restore them when the active problem is solved
 - The fewer the facts selected, the more powerful multishot becomes. Inversely, the 
@@ -61,6 +59,9 @@ The game is built entirely in HTML, JavaScript, and CSS.  There are some inline 
 - Add a classic arcade demo mode that plays automatically 
     for 20 seconds and then shows a random high score
 - Refactor code to be cleaner
+    - One central object
+    - Convert project from JavaScript to TypeScrpt
+    - Replace setInterval() with requestAnimationFrame()
 
 ## Known Bugs
 

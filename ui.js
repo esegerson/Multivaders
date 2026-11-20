@@ -999,6 +999,7 @@ function populateHighScoresUI() {
     const olMainMenu = divHsMainMenu.querySelector("ol");
     const olGameOver = divHsGameOver.querySelector("ol");
     const pNotice    = divHsGameOver.querySelector("#noset");
+    const pInstruct  = divHsGameOver.querySelector("#pHighScoreInstructions");
     const pNewHighScore = divHsGameOver.querySelector("p");
     const submitBtn = document.getElementById("btnEnter");
     const btns = document.getElementById("gameOverButtons");
@@ -1069,6 +1070,7 @@ function populateHighScoresUI() {
     h2GameOver.style.display = setNameDisplay === "" ? "none" : "block";
     pNewHighScore.style.display = isHS ? "block" : "none";
     btns.style.display = isHS ? "none" : "inline-block";
+    pInstruct.style.display = isHS ? "" : "none";
     if (!isHS) {
         document.getElementById("gameOverButtons").style.display = "block";
         document.getElementById("btnPlayAgain").focus();
@@ -1180,7 +1182,6 @@ function moveNameParticles() {
 function playAgain() {
     document.getElementById("gameContainer").style.display = "block";
     document.getElementById("gameOver").style.display = "none";
-    osk.toggleMode();
     start();
 }
 
